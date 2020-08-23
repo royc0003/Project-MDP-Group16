@@ -1,0 +1,92 @@
+
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-image: linear-gradient(260deg, #2376ae 0%, #c16ecf 100%);
+  }
+.flex-nav ul{
+    border:1px solid black;
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+}
+/*Flex Item*/
+.flex-nav button{
+    flex:3;
+    height: 40px;
+}
+.spacing{
+    height: 20px;
+}
+
+.Map-Wrapper {
+    background:rgba(255, 255, 255, 0.5);
+    display: flex;
+    justify-content: center;
+    height: 600px;
+    border-radius: 25px;
+}
+
+.Actual-Arena-Map{
+    align-self: center;
+    border-style: dotted;
+    height:500px;
+    width: 500px;
+}
+.Inputs-Wrapper{
+    display:flex;
+    justify-content: center;
+}
+.Inputs-Wrapper .MapDescriptor_text{
+    flex: 6;
+}
+.Inputs-Wrapper .MapDescriptor_button{
+    flex:2;
+}
+.Inputs-Wrapper .spacing_2{
+    flex:1;
+}
+
+.Overall-Inputs-Wrapper{
+    display: flex;
+    font-size: 13px;
+    color:black;
+    background:rgba(255, 255, 255, 0.5);
+
+}
+.Inputs-space{
+    flex:1;
+}
+.Inputs-1{
+    flex:3;
+    display: flex;
+    flex-direction: column;
+    
+}
+.Inputs-1 input[type='text']{
+    flex:1;
+}
+
+.Inputs-2{
+    flex:3;
+    display: flex;
+    flex-direction: column;
+}
+
+.Inputs-3{
+    flex:3;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-buttons{
+    display: flex;
+}
+.footer-buttons .button-space{
+    flex:3;
+}
+.footer-buttons button{
+    flex: 4;
+    
+}
