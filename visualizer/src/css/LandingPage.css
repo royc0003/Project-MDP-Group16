@@ -30,9 +30,15 @@ body {
 
 .Actual-Arena-Map{
     align-self: center;
-    border-style: dotted;
-    height:500px;
-    width: 500px;
+    /* border-style: dotted; */
+    height:600px;
+    width: 450px;
+}
+.No-Arena-Map{
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background-color: white;
 }
 .Inputs-Wrapper{
     display:flex;
