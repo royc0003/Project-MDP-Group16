@@ -152,8 +152,7 @@ export default (props) => {
     let update = true;
     const draw = (p5) => {
         if (update) {
-            drawArena(arena, p5);
-        }
+            drawArena(arena, p5);        }
     };
  
     return <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked}/>;
