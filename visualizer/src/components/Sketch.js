@@ -2,7 +2,7 @@ import React from 'react';
 import Sketch from "react-p5";
 
 export default (props) => {
-    const arena = props.arena;
+    const { arena, updateMapDescriptor}  = props;
 
     // height of the canvas
     const width = 450;
@@ -125,6 +125,30 @@ export default (props) => {
         }
     };
 
+    const mouseClicked = (p5) => {
+        if (p5.mouseX >= pad && p5.mouseX <= width + pad && p5.mouseY >= pad && p5.mouseY <= height + pad && arena != undefined) {
+            
+            //mouse clicked inside the arena
+            const widthX = 15
+            const widthY = 20
+            const eachX = width / widthX
+            const eachY = height / widthY
+    
+            const xCoord = Math.floor((p5.mouseX - pad) / eachX)
+            const yCoord = Math.floor((p5.mouseY - pad) / eachY)
+
+            if (arena.Arena[yCoord][xCoord] === "obstacle") {
+                arena.Arena[yCoord][xCoord] = "empty"
+                updateMapDescriptor(arena);
+            }
+            else {
+                arena.Arena[yCoord][xCoord] = "obstacle"
+                updateMapDescriptor(arena);
+            }
+    
+        }
+    }
+
     let update = true;
     const draw = (p5) => {
         if (update) {
@@ -132,5 +156,5 @@ export default (props) => {
         }
     };
  
-    return <Sketch setup={setup} draw={draw} />;
+    return <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked}/>;
 };

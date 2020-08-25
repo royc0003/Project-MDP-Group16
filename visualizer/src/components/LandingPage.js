@@ -2,6 +2,7 @@ import React from "react";
 import "../css/LandingPage.css";
 import ArenaMap from "./ArenaMap";
 import { getMapDescriptor } from '../simulator/mapDescriptor';
+import { generateDescriptor } from '../simulator/generateDescriptor';
  
 
 class LandingPage extends React.Component {
@@ -10,7 +11,9 @@ class LandingPage extends React.Component {
     this.state = {
       descriptor1: "",
       descriptor2: "",
-      arena: {}
+      arena: {},
+      descriptor: "",
+      showDescriptor: false
     }
   }
 
@@ -23,6 +26,22 @@ class LandingPage extends React.Component {
         Arena: getMapDescriptor(arenaMode.toUpperCase())
       }
     });
+  }
+
+  updateMapDescriptor = (arena) => {
+    this.setState({ 
+      arena: {
+        Height: 20,
+        Width: 15,
+        Arena: arena.Arena
+      },
+    });
+  }
+
+  generateDescriptor = () => {
+    const { arena: { Arena } } = this.state;
+    if(!Arena) this.setState({ descriptor: "No Arena Input yet" });
+    else this.setState({ descriptor: generateDescriptor(Arena) });
   }
 
   render() {
@@ -39,7 +58,7 @@ class LandingPage extends React.Component {
         <div className="spacing"></div>
 
         <div className="Map-Wrapper">
-          <ArenaMap arena={this.state.arena}/>
+          <ArenaMap arena={this.state.arena} updateMapDescriptor={(arena) => this.updateMapDescriptor(arena)}/>
         </div>
         <div className="spacing"></div>
         <div className="Inputs-Wrapper">
@@ -52,9 +71,17 @@ class LandingPage extends React.Component {
           <input onClick={this.setMapDescriptor}
             className="MapDescriptor_button"
             type="submit"
-            value="load"
+            value="Load"
+          ></input>
+          <input onClick={this.generateDescriptor}
+            className="MapDescriptor_button"
+            type="submit"
+            value="Generate Map Descriptor"
           ></input>
           <div className="spacing_2"></div>
+        </div>
+        <div className="MapGenerator">
+          {`Map Descriptor: ${this.state.descriptor}`}
         </div>
         <div className="spacing"></div>
         <div className="Overall-Inputs-Wrapper">

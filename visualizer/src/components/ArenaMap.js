@@ -8,11 +8,11 @@ class ArenaMap extends React.Component {
   }
 
   render() {
-    const arena = this.props.arena;
+    const { arena, updateMapDescriptor} = this.props;
     return (
       <div className="Actual-Arena-Map">
           {Object.keys(arena).length !== 0 ? 
-            <Sketch arena = {this.props.arena}/> 
+            <Sketch arena = {arena} updateMapDescriptor={(arena) => updateMapDescriptor(arena)}/> 
             : 
             <div className="No-Arena-Map">No map loaded yet</div>}
       </div>
