@@ -1,8 +1,49 @@
 import React from "react";
 import "../css/LandingPage.css";
 import ArenaMap from "./ArenaMap";
+import { getMapDescriptor } from '../simulator/mapDescriptor';
+import { generateDescriptor } from '../simulator/generateDescriptor';
+ 
 
 class LandingPage extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      descriptor1: "",
+      descriptor2: "",
+      arena: {},
+      descriptor: "",
+      showDescriptor: false
+    }
+  }
+
+  setMapDescriptor = () => {
+    const arenaMode = this.refs.map_descriptor.value;
+    this.setState({ 
+      arena: {
+        Height: 20,
+        Width: 15,
+        Arena: getMapDescriptor(arenaMode.toUpperCase())
+      }
+    });
+  }
+
+  updateMapDescriptor = (arena) => {
+    this.setState({ 
+      arena: {
+        Height: 20,
+        Width: 15,
+        Arena: arena.Arena
+      },
+    });
+  }
+
+  generateDescriptor = () => {
+    const { arena: { Arena } } = this.state;
+    if(!Arena) this.setState({ descriptor: "No Arena Input yet" });
+    else this.setState({ descriptor: generateDescriptor(Arena) });
+  }
+
   render() {
     return (
       <body>
@@ -17,47 +58,55 @@ class LandingPage extends React.Component {
         <div className="spacing"></div>
 
         <div className="Map-Wrapper">
-          <ArenaMap />
+          <ArenaMap arena={this.state.arena} updateMapDescriptor={(arena) => this.updateMapDescriptor(arena)}/>
         </div>
         <div className="spacing"></div>
         <div className="Inputs-Wrapper">
           <div className="spacing_2"></div>
-          <input
+          <input ref="map_descriptor"
             className="MapDescriptor_text"
             type="text"
             placeholder="Map Descriptor"
           ></input>
-          <input
+          <input onClick={this.setMapDescriptor}
             className="MapDescriptor_button"
             type="submit"
-            value="load"
+            value="Load"
+          ></input>
+          <input onClick={this.generateDescriptor}
+            className="MapDescriptor_button"
+            type="submit"
+            value="Generate Map Descriptor"
           ></input>
           <div className="spacing_2"></div>
+        </div>
+        <div className="MapGenerator">
+          {`Map Descriptor: ${this.state.descriptor}`}
         </div>
         <div className="spacing"></div>
         <div className="Overall-Inputs-Wrapper">
           <div className="Inputs-1">
-            <a>
+            <div>
               Step:{" "}
               <input type="text" placeholder="Step in milliseconds"></input>ms
-            </a>
-            <a>
+            </div>
+            <div>
               TimeOut:
               <input type="text" placeholder="TimeOut"></input>s
-            </a>
-            <a>
+            </div>
+            <div>
               Coverage:
               <input type="text" placeholder="Coverage"></input>s
-            </a>
-            <a>
+            </div>
+            <div>
               Start X-Cord:
               <input type="text" placeholder="Start X-Cord"></input>s
-            </a>
-            <a>
+            </div>
+            <div>
               Start Y-Cord:
               <input type="text" placeholder="Start Y-Cord:"></input>s
-            </a>
-            <a>
+            </div>
+            <div>
               Start Direction:
               <select name="Direction-Select" id="Direction">
                 <option value="Up">Up</option>
@@ -65,37 +114,37 @@ class LandingPage extends React.Component {
                 <option value="Up">Left</option>
                 <option value="Up">Right</option>
               </select>
-            </a>
-            <a>
+            </div>
+            <div>
               Goal X-Cord:
               <input type="text" placeholder="Goal X-Cord"></input>
-            </a>
-            <a>
+            </div>
+            <div>
               Goal Y-Cord:
               <input type="text" placeholder="Goal Y-Cord"></input>
-            </a>
+            </div>
           </div>
           <div className="Inputs-space"></div>
           <div className="Inputs-2">
-            <a>
+            <div>
               Map Descriptor (1):
-              <input type="text" placeholder=""></input>
-            </a>
-            <a>
+              <input type="text" placeholder="" value={this.state.descriptor1} key={this.state.descriptor1}></input>
+            </div>
+            <div>
               Map Descriptor (2):
-              <input type="text" placeholder=""></input>
-            </a>
+              <input type="text" placeholder="" value={this.state.descriptor2} key={this.state.descriptor2}></input>
+            </div>
           </div>
           <div className="Inputs-space"></div>
           <div className="Inputs-3">
-          <a>
+            <div>
               Checkpoint X-Coord:
               <input type="text" placeholder=""></input>
-            </a>
-            <a>
+            </div>
+            <div>
               Checkpoint Y-Coord:
               <input type="text" placeholder=""></input>
-            </a>
+            </div>
           </div>
         </div>
         <div className="spacing"></div>
