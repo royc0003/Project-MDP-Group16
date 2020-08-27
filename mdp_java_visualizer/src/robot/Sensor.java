@@ -6,7 +6,6 @@ import robot.RobotConstants.DIRECTION;
 /**
  * Represents a sensor mounted on the robot.
  *
- * @author Suyash Lakhotia
  */
 
 public class Sensor {
@@ -55,11 +54,12 @@ public class Sensor {
      */
     private int getSensorVal(Map exploredMap, Map realMap, int rowInc, int colInc) {
         // Check if starting point is valid for sensors with lowerRange > 1.
+        //
         if (lowerRange > 1) {
             for (int i = 1; i < this.lowerRange; i++) {
                 int row = this.sensorPosRow + (rowInc * i);
                 int col = this.sensorPosCol + (colInc * i);
-
+                //if not a valid coordinate return i
                 if (!exploredMap.checkValidCoordinates(row, col)) return i;
                 if (realMap.getCell(row, col).getIsObstacle()) return i;
             }

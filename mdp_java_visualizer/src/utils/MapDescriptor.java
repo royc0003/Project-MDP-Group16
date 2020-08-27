@@ -11,7 +11,6 @@ import java.io.*;
  * Part 1: 1/0 represents explored state. All cells are represented.
  * Part 2: 1/0 represents obstacle state. Only explored cells are represented.
  *
- * @author Suyash Lakhotia
  */
 
 public class MapDescriptor {
