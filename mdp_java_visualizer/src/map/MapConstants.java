@@ -3,7 +3,7 @@ package map;
 /**
  * Constants used in the Map class.
  *
- * @author Suyash Lakhotia
+
  */
 
 public class MapConstants {

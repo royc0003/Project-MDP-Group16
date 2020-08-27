@@ -9,12 +9,7 @@ import robot.RobotConstants.DIRECTION;
 import robot.RobotConstants.MOVEMENT;
 import utils.CommMgr;
 
-/**
- * Exploration algorithm for the robot.
- *
- * @author Priyanshu Singh
- * @author Suyash Lakhotia
- */
+
 
 public class ExplorationAlgo {
     private final Map exploredMap;

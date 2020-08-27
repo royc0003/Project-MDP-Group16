@@ -3,7 +3,6 @@ package robot;
 /**
  * Constants used in this package.
  *
- * @author Suyash Lakhotia
  */
 
 public class RobotConstants {
@@ -21,7 +20,11 @@ public class RobotConstants {
     public static final int SENSOR_LONG_RANGE_H = 4;                // range of long range sensor (cells)
 
     public static final int INFINITE_COST = 9999;
-
+    //some Notes:
+    // note that oridnal returns the index of the given array
+    // also note that values return all the values of the current enum
+    // Assume current direction is north index = 0 --> (0+1) % 4 == 1
+    // For previous direction assuming 1; (1 + 3) % 4 == 0
     public enum DIRECTION {
         NORTH, EAST, SOUTH, WEST;
 

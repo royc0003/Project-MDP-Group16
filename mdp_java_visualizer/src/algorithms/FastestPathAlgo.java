@@ -14,12 +14,10 @@ import java.util.Stack;
 
 // @formatter:off
 /**
- * Fastest path algorithm for the robot. Uses a version of the A* algorithm.
- *
+
  * g(n) = Real Cost from START to n
  * h(n) = Heuristic Cost from n to GOAL
- *
- * @author Suyash Lakhotia
+
  */
 // @formatter:on
 

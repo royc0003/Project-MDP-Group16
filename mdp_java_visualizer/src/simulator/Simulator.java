@@ -19,7 +19,6 @@ import static utils.MapDescriptor.loadMapFromDisk;
 /**
  * Simulator for robot navigation in virtual arena.
  *
- * @author Suyash Lakhotia
  */
 
 public class Simulator {

@@ -2,8 +2,7 @@ package map;
 
 /**
  * Represents each cell in the map grid.
- *
- * @author Suyash Lakhotia
+
  */
 
 public class Cell {
