@@ -1,0 +1,2 @@
+For Arduino to always point to the correct port:
+serial = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
