@@ -1,84 +1,82 @@
 import socket
 import time
+import sys
+
 
 class PC:
-    def __int__(self):
-        self.isConnected = False
+    def __init__(self):
+        self.tcp_ip = "192.168.16.1" # RPI IP address
         self.port = 5560
-        self.host = ''
-        self.sock = None
-        self.client_sock = None
-        
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        print('Socket has been created.')
+        self.conn = None
+        self.client = None
+        self.addr = None
+        #self.pc_is_connect = False
 
-        try:
-            self.sock.bind((self.host,self.port))
-            print('Socket bind complete.')
-            self.sock.listen(1)
-            
-        except socket.error as msg:
-            print(msg)
-
-    def connect(self):
-        try:
-            print('Establishing connection with the PC...')
-
-            if self.client_sock is None:
-                self.client_sock, self.address = self.sock.accept()
-                print('Connected to: ' + str(self.address))
-
-        except Exception as error:
-            print('Connection with PC failed.')
-
-            if self.client_sock is not None:
-                self.client_sock.close()
-                self.client_sock = None
 
     def disconnect(self):
-        try:
-            if self.client_sock is not None:
-                self.client_sock.close()
-                self.client_sock = None
+        if self.conn:
+            self.conn.close()
+            print("Closing server socket")
+        if self.client:
+            self.client.close()
+            print("Closing client socket")
+        #self.pc_is_connect = False
 
-            if self.socket is not None:
-                self.socket.close()
-                self.socket = None
-                
-            print('Successfully closed connection with PC.')
+
+    #def is_connected(self):
+    #    return self.pc_is_connect
+
+
+    def connect(self):
+        # Create a TCP/IP socket
+        try:
+            self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # important to allow reuse of IP
+            self.conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.conn.bind((self.tcp_ip, self.port))
+            # Listen for incoming connections
+            self.conn.listen(1)
+            print("Listening for incoming connections from PC...")
+            self.client, self.addr = self.conn.accept()
+            print("Connected! Connection address: ", self.addr)
+            #self.pc_is_connect = True
             
         except Exception as error:
-            print('Disconnection from the PC is unsuccessful.')
+                print('Connection failed: ' + str(error))
 
     def read(self):
         try:
-            message = self.client_sock.recv(1024)
+            message = self.client.recv(2048)
+            #return msg_from_pc.decode("utf-8")
             message = message.decode('utf-8')
 
             if len(message) > 0:
                 print('From PC: ' + message)
-                #print(message)
                 return message
-            
+
             return None
 
         except Exception as error:
             print('Failed to read from PC: ' + str(error))
-            raise error
+            self.close_pc_socket()
+            self.connect_pc()
 
     def write(self, message):
+        #print(msg)
+        #print(isinstance(msg, bytes))
+        #msg = msg + "\r"
         try:
+            #self.client.sendto(str(msg).encode("utf-8"), self.addr)
             print('To PC: ' + message)
-            #print(message)
-            self.client_sock.send(str.encode(message))
-
-        except Exception as error:
+            self.client.sendto(str(message).encode('utf-8'), self.addr)
+                                        
+        except Exception as e:
             print('Failed to write to PC: ' + str(error))
-            raise(error)
+            self.close_pc_socket()
+            self.connect_pc()
 
-# If you want this to be the main thread, run this.
-if __name__ == '__main__':
+# If you want this to be the only process, run this.
+if __name__ == 'main':
     ser = PC()
     ser.__int__()
     ser.connect()
@@ -86,7 +84,7 @@ if __name__ == '__main__':
     while True:
         try:
             ser.read()
-            ser.write('Recevied Input!')
+            ser.write('Received input!')
         except KeyboardInterrupt:
-            print('PC Communication interrupted.')
-            ser.disconnect()
+            print('PC communication interrupted.')
+    ser.disconnect()
