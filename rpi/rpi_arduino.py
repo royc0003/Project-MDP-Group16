@@ -56,7 +56,7 @@ class Arduino:
             print('Arduino write failed: ' + str(error))
             raise error
 
-# If this was the main thread, run this.
+# If you want this to be the main thread, run this.
 if __name__ == "__main__":
     ser = Arduino()
     ser.__init__()
