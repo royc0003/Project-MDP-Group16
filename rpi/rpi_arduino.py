@@ -15,7 +15,7 @@ class Arduino:
             self.connection = serial.Serial(self.serial_port, self.baud_rate)
 
             if self.connection is not None:
-                print('Successfully connected with Arduino.')
+                print('Successfully connected with Arduino. ')
 
         except Exception as error:
             print('Connection with Arduino failed: ' + str(error))
@@ -48,15 +48,16 @@ class Arduino:
     
     def write(self, message):
         try:
-            print('To Arduino:')
-            print(message)
-            self.connection.write(message)
+            #print('To Arduino:')
+            #print(message)
+            #self.connection.write(str.encode(message))
+            self.connection.write(str(message).encode('utf-8'))
 
         except Exception as error:
             print('Arduino write failed: ' + str(error))
             raise error
 
-# If you want this to be the main thread, run this.
+# If you want this to be the only process, run this.
 if __name__ == "__main__":
     ser = Arduino()
     ser.__init__()
@@ -71,3 +72,4 @@ if __name__ == "__main__":
             print('Serial Communication Interrupted.')
             ser.disconnect()
             break
+ 
