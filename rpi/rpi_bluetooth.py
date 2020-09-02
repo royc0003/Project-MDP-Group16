@@ -1,77 +1,87 @@
-import bluetooth
-import time
+import subprocess
+from bluetooth import *
 
 class Android:
-    def __int__(self):
-        self.server_sock = None
-        self.client_sock = None
+    def __init__(self):
+        subprocess.call(["pkill","blueman-applet"])
+        subprocess.call(["sudo","hciconfig","hci0","piscan"])
+        self.server_socket = None
+        self.client_socket = None
+        #self.is_connected = False
 
-        self.server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.server_sock.bind(('',4))
-        self.server_sock.listen(1)
-        port = self.server_sock.getsockname()[1]
+    def disconnect(self):
+        if self.client_socket:
+            self.client_socket.close()
+            print("Closing client socket")
+        if self.server_socket:
+            self.server_socket.close()
+            print("Closing server socket")
+        #self.is_connected = False
 
-        uuid = '92c1090e-e85b-11ea-adc1-0242ac120002'
 
-        bluetooth.advertise_service(
-            self.server_sock, 'MDPGrp16BT', service_id = uuid,
-            service_classes = [ uuid, bluetooth.SERIAL_PORT_CLASS ],
-            profiles = [ bluetooth.SERIAL_PORT_PROFILE ]
-        )
-        print('Waiting for connection on RFCOMM channel %d' % port)
+    #def is_connect(self):
+        #return self.is_connected
+
 
     def connect(self):
+        # Creating the server socket and bind to port           
+        btport = 4
         try:
-            print('Establishing connection with the Android...')
+            self.server_socket = BluetoothSocket( RFCOMM )
+            self.server_socket.bind(("", btport))
+            # Listen for requests
+            self.server_socket.listen(1)
+            self.port = self.server_socket.getsockname()[1]
+            uuid = '92c1090e-e85b-11ea-adc1-0242ac120002'
 
-            if self.client_sock is None:
-                self.client_sock, address = self.server_sock.accept()
-                print('Connected to: ' + str(address))
+            advertise_service( self.server_socket, 'MDPGrp16BT',
+                                service_id = uuid,
+                                service_classes = [ uuid, SERIAL_PORT_CLASS ],
+                                profiles = [ SERIAL_PORT_PROFILE ], )
+            print('Waiting for BT connection on RFCOMM channel %d' % self.port)
+            # Accept requests
+            self.client_socket, client_address = self.server_socket.accept()
+            print('Accepted connection from ', client_address)
+            #self.is_connected = True
 
         except Exception as error:
-            print('Connection with Android failed.' + str(error))
-            if self.client_sock is not None:
-                self.client_sock.close()
-                self.client_sock = None
-                
-    def disconnect(self):
-        try:
-            if self.client_sock is not None:
-                self.client_sock.close()
-                self.client_sock = None
-                self.server_sock.close()
-                self.server_sock = None
-                
-            print('Android disconnected successfully.')
-
-        except Exception as error:
-            print('Disconnection with Android failed.' + str(error))
+            print('Connection Error - Bluetooth: ' + str(error))
             
+
     def read(self):
         try:
-            message = self.client_sock.recv(1024)
+            #msg_from_bt = self.client_socket.recv(2048)
+            #return msg_from_bt.decode('utf-8')
+            message = self.client_socket.recv(1024)
             message = message.decode('utf-8')
-            
-            print('From Android: ' + message)
 
+            print('From Android: ' + message)
+            
             if len(message) > 0:
                 return message
 
             return None
 
-        except Exception as error:
-            print('Failed to read from Android: ' + str(error))
-            raise error
+        except BluetoothError:
+            print('\nBluetooth Read Error. Connection lost')
+            # Re-establish connection
+            self.close_bt_socket()
+            self.connect_bt()
+
 
     def write(self, message):
         try:
-            print('To Android: ' + message)
-            self.client_sock.send(str.encode(message))
-            
-        except Exception as error:
-            print('Failed to write to Android: ' + str(error))
-            raise error
+            #self.client_socket.send(str(msg))
+            #print('To Android: ' + message)
+            self.client_socket.send(str(message).encode('utf-8'))
 
+        except BluetoothError:
+            print('\nBluetooth Write Error. Connection lost')
+            # Re-establish connection
+            self.close_bt_socket()
+            self.connect_bt()
+
+# If you want this to be the only process, run this.
 if __name__ == "__main__":
     ser = Android()
     ser.__int__()
@@ -83,5 +93,4 @@ if __name__ == "__main__":
             ser.write('From Rpi!')
         except KeyboardInterrupt:
             print('Android communication interrupted.')
-            ser.disconnect()
-    ser.close()
+    ser.disconnect()
