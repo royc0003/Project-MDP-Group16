@@ -15,7 +15,7 @@ class Arduino:
             self.connection = serial.Serial(self.serial_port, self.baud_rate)
 
             if self.connection is not None:
-                print('Successfully connected with Arduino: ' + str(self.connection.name))
+                print('Successfully connected with Arduino.')
 
         except Exception as error:
             print('Connection with Arduino failed: ' + str(error))
