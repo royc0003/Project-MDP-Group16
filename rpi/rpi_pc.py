@@ -1,7 +1,7 @@
 import socket
 import time
 
-class PC():
+class PC:
     def __int__(self):
         self.isConnected = False
         self.port = 5560
@@ -89,4 +89,4 @@ if __name__ == '__main__':
             ser.write('Recevied Input!')
         except KeyboardInterrupt:
             print('PC Communication interrupted.')
-    ser.close()
+            ser.disconnect()
