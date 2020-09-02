@@ -61,19 +61,13 @@ if __name__ == "__main__":
     ser = Arduino()
     ser.__init__()
     ser.connect()
-    #count = 0
-    #string = 'It is working!'
     while True:
-        #count += 1
         try:
             ser.read()
-            #if count == 1:
-                #ser.write(string.encode('ascii'))
-            #count += 1
             testArduino = 'S'
-            #testArduinoEncode = testArduino.encode('ascii')
             ser.write(testArduino.encode('ascii'))
             
         except KeyboardInterrupt:
             print('Serial Communication Interrupted.')
+            ser.disconnect()
             break
