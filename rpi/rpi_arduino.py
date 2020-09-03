@@ -33,6 +33,7 @@ class Arduino:
             
     def read(self):
         try:
+            self.connection.flush()
             message = self.connection.readline()
             print('From Arduino:')
             print(message)
@@ -51,6 +52,7 @@ class Arduino:
             #print('To Arduino:')
             #print(message)
             #self.connection.write(str.encode(message))
+            self.connection.flush()
             self.connection.write(str(message).encode('utf-8'))
 
         except Exception as error:
@@ -65,11 +67,9 @@ if __name__ == "__main__":
     while True:
         try:
             ser.read()
-            testArduino = 'S'
-            ser.write(testArduino.encode('ascii'))
+            ser.write('S')
             
         except KeyboardInterrupt:
             print('Serial Communication Interrupted.')
             ser.disconnect()
             break
- 
