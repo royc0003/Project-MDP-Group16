@@ -3,8 +3,8 @@ import serial
 class Arduino:
     def __init__(self):
         #self.serial_port = '/dev/ttyACM0'
-        self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
-        #self.serial_port = 'COM5'
+        #self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
+        self.serial_port = 'COM5'
         self.baud_rate = 9600
         self.connection = None
 
@@ -53,6 +53,8 @@ class Arduino:
             #print(message)
             #self.connection.write(str.encode(message))
             self.connection.flush()
+            print('To Arduino: ' + message)
+            #print(message)
             self.connection.write(str(message).encode('utf-8'))
 
         except Exception as error:
