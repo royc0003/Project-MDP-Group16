@@ -35,6 +35,7 @@ class Arduino:
         try:
             self.connection.flush()
             message = self.connection.readline()
+            print('')
             print('From Arduino:')
             print(message)
 
