@@ -72,7 +72,7 @@ class Android:
     def write(self, message):
         try:
             #self.client_socket.send(str(msg))
-            #print('To Android: ' + message)
+            print('To Android: ' + message)
             self.client_socket.send(str(message).encode('utf-8'))
 
         except BluetoothError:
@@ -84,7 +84,7 @@ class Android:
 # If you want this to be the only process, run this.
 if __name__ == "__main__":
     ser = Android()
-    ser.__int__()
+    ser.__init__()
     ser.connect()
     while True:
         try:
@@ -93,4 +93,6 @@ if __name__ == "__main__":
             ser.write('From Rpi!')
         except KeyboardInterrupt:
             print('Android communication interrupted.')
-    ser.disconnect()
+            ser.disconnect()
+            break
+        
