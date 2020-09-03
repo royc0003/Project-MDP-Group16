@@ -87,4 +87,5 @@ if __name__ == 'main':
             ser.write('Received input!')
         except KeyboardInterrupt:
             print('PC communication interrupted.')
-    ser.disconnect()
+            ser.disconnect()
+            break
