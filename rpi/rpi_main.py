@@ -24,13 +24,14 @@ class Main(threading.Thread):
         while True:
             try:
                 pMsg = self.pc.read()
+                self.pc.write(str(pMsg))
                 # Destination is Tablet
-                if (pMsg[1] == '0'):
-                    self.bt.write(pMsg[2:])
+                #if (pMsg[1] == '0'):
+                #    self.bt.write(pMsg[2:])
                 # Destination is Arduino
-                elif (pMsg[1] == '1'):
-                    self.sr.write(pMsg[2:])
-                    fmessage = '\nPC > Arduino: ' + str(pMsg[2:])
+                #elif (pMsg[1] == '1'):
+                #    self.sr.write(pMsg[2:])
+                #    fmessage = '\nPC > Arduino: ' + str(pMsg[2:])
             except Exception as e:
                 fmessage = '\nError in PC read: ' + str(e)
                 print(fmessage)
@@ -39,12 +40,13 @@ class Main(threading.Thread):
         while True:
             try:
                 bMsg = self.bt.read()
+                self.bt.write(str(bMsg))
                 # Destination is PC
-                if (bMsg[1] == '2'):
-                    self.pc.write(bMsg[2:])
+                #if (bMsg[1] == '2'):
+                #    self.pc.write(bMsg[2:])
                 # Destination is Arduino
-                elif(bMsg[1] == '1'):
-                    self.sr.write(bMsg[2:])
+                #elif(bMsg[1] == '1'):
+                #    self.sr.write(bMsg[2:])
             except Exception as e:
                 fmessage = '\nError in BT read: ' + str(e)
                 print(fmessage)
@@ -53,7 +55,7 @@ class Main(threading.Thread):
         while True:
             try:
                 sMsg = self.sr.read()
-                self.pc.write(str(sMsg))
+                #self.sr.write(str(sMsg))
             except Exception as e:
                 fmessage = '\nError in Serial read: ' + str(e)
                 print(fmessage)
