@@ -3,8 +3,8 @@ import serial
 class Arduino:
     def __init__(self):
         #self.serial_port = '/dev/ttyACM0'
-        #self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
-        self.serial_port = 'COM5'
+        self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
+        #self.serial_port = 'COM5'
         self.baud_rate = 9600
         self.connection = None
 
@@ -17,8 +17,8 @@ class Arduino:
             if self.connection is not None:
                 print('Successfully connected with Arduino. ')
 
-        except Exception as error:
-            print('Connection with Arduino failed: ' + str(error))
+        except Exception as e:
+            print('Connection with Arduino failed: %s ' % str(e))
 
     def disconnect(self):
         try:
@@ -28,8 +28,8 @@ class Arduino:
 
                 print('Successfully closed connection with Arduino.')
 
-        except Exception as error:
-            print('Arduino close connection failed: ' + str(error))
+        except Exception as e:
+            print('Arduino close connection failed: %s ' % str(e))
             
     def read(self):
         try:
@@ -44,9 +44,9 @@ class Arduino:
 
             return None
        
-        except Exception as error:
-            print('Arduino read failed: ' + str(error))
-            raise error
+        except Exception as e:
+            print('Arduino read failed: %s ' % str(e))
+            raise e
     
     def write(self, message):
         try:
@@ -55,12 +55,11 @@ class Arduino:
             #self.connection.write(str.encode(message))
             self.connection.flush()
             print('To Arduino: ' + message)
-            #print(message)
             self.connection.write(str(message).encode('utf-8'))
 
-        except Exception as error:
-            print('Arduino write failed: ' + str(error))
-            raise error
+        except Exception as e:
+            print('Arduino write failed: %s ' % str(e))
+            raise e
 
 # If you want this to be the only process, run this.
 if __name__ == "__main__":
