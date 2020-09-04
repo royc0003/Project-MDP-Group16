@@ -3,7 +3,7 @@ int piTest = 0;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600); // initialize the baud rate
+  Serial.begin(115200); // initialize the baud rate
   //pinMode(ledTest, OUTPUT);
   Serial.println("Starting Communication!");
   delay(1000);
