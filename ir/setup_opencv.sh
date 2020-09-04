@@ -40,7 +40,7 @@ sudo apt-get -y update
     # took a really long time
     pip3 install numpy
 
-    cd ~/opencv
+    cd home/opencv
     mkdir build
     cd build
 
@@ -60,12 +60,12 @@ sudo apt-get -y update
     sudo ldconfig
     sudo apt-get update
 
-    cd ~/opencv/build/lib/python3
+    cd home/opencv/build/lib/python3
     mkdir -p ~/lib/cv2
     cp cv2.cpython-37m-arm-linux-gnueabihf.so ~/lib/cv2
-    ln -s ~/lib/cv2/cv2.cpython-37m-arm-linux-gnueabihf.so ~/.virtualenvs/cv2_env/lib/python3.7/site-packages/cv2.so
+    ln -s home/lib/cv2/cv2.cpython-37m-arm-linux-gnueabihf.so ~/.virtualenvs/cv2_env/lib/python3.7/site-packages/cv2.so
 
-    cd ~
+    cd /home
 
     # update /etc/dphys-swapfile to increase size
     # set CONF_SWAPSIZE=100
