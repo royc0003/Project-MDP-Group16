@@ -61,9 +61,9 @@ sudo apt-get -y update
     sudo apt-get update
 
     cd home/opencv/build/lib/python3
-    mkdir -p ~/lib/cv2
-    cp cv2.cpython-37m-arm-linux-gnueabihf.so ~/lib/cv2
-    ln -s home/lib/cv2/cv2.cpython-37m-arm-linux-gnueabihf.so ~/.virtualenvs/cv2_env/lib/python3.7/site-packages/cv2.so
+    mkdir -p home/lib/cv2
+    cp cv2.cpython-37m-arm-linux-gnueabihf.so home/lib/cv2
+    ln -s home/lib/cv2/cv2.cpython-37m-arm-linux-gnueabihf.so home/.virtualenvs/cv2_env/lib/python3.7/site-packages/cv2.so
 
     cd /home
 
