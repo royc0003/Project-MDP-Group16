@@ -1,7 +1,7 @@
 import serial
 
 # receiving input from the Arduino, "Hello World!"
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('/dev/ttyACM0', 115200)
 
 # Transmitting output to Arduino, 'S'
 testArduino = 'S'
