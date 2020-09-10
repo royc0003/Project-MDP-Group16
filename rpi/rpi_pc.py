@@ -3,9 +3,9 @@ import time
 import sys
 
 
-class PC:
+class PC():
     def __init__(self):
-        self.tcp_ip = "192.168.16.1" # RPI IP address
+        self.tcp_ip = "192.168.16.2" # RPI IP address
         self.port = 5560
         self.conn = None
         self.client = None
