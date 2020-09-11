@@ -2,13 +2,10 @@ import serial
 
 class Arduino(object):
     def __init__(self):
-        self.serial_port = '/dev/ttyACM0'
+        #self.serial_port = '/dev/ttyACM0'
         #self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
         #self.serial_port = 'COM8'
-<<<<<<< HEAD
-=======
         self.serial_port = '/dev/serial/by-id/usb-Arduino_Srl_Arduino_Uno_95336333635351A0A111-if00'
->>>>>>> 1ce13444a687c5e8c651898772fb459cd5bbca6b
         self.baud_rate = 115200
         self.connection = None
 
