@@ -2,18 +2,21 @@ import time
 import threading
 from rpi_arduino import *
 from rpi_pc import *
-#from rpi_bluetooth import *
+from rpi_bluetooth import *
 
 
 class Main(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.sr = Arduino()
+        
         self.pc = PC()
-        #self.bt = Android()
-        self.sr.connect()
+        self.bt = Android()
+        #self.sr = Arduino()
+
         self.pc.connect()
-        #self.bt.connect()
+        self.bt.connect()
+        #self.sr.connect()
+        
         fmessage = 'Sleep for a while'
         print(fmessage)
         time.sleep(0.5)
@@ -39,18 +42,18 @@ class Main(threading.Thread):
 
     def readBTMsg(self):
         while True:
-            #try:
-            bMsg = self.bt.read()
-            self.bt.write(str(bMsg))
+            try:
+                bMsg = self.bt.read()
+                self.bt.write(str(bMsg))
                 # Destination is PC
-                #if (bMsg[1] == '2'):
-                #    self.pc.write(bMsg[2:])
+                if (bMsg[2] == '2'):
+                    self.pc.write(bMsg[3:])
                 # Destination is Arduino
-                #elif(bMsg[1] == '1'):
-                #    self.sr.write(bMsg[2:])
-            #except Exception as e:
-                #fmessage = '\nError in BT read: ' + str(e)
-                #print(fmessage)
+                elif(bMsg[2] == '1'):
+                    self.sr.write(bMsg[3:])
+            except Exception as e:
+                fmessage = '\nError in BT read: ' + str(e)
+                print(fmessage)
 
     def readSerialMsg(self):
         while True:
@@ -64,47 +67,34 @@ class Main(threading.Thread):
     
 
     def threadStart(self):
-        pcReadThread = threading.Thread(target=self.readPCMsg, name="PC Read Thread")
-        #pcWriteThread = threading.Thread(target=self.pc.write, args=("",), name="PC Write Thread")
 
+        blueReadThread = threading.Thread(target=self.readBTMsg, name="Bluetooth Read Thread")
+        fmessage = '\nBluetooth Read/Write Thread'
+        print(fmessage)
+        
+        pcReadThread = threading.Thread(target=self.readPCMsg, name="PC Read Thread")
         fmessage = '\nPC Read/Write Thread'
         print(fmessage)
 
-        #blueReadThread = threading.Thread(target=self.readBTMsg, name="Bluetooth Read Thread")
-        #blueWriteThread = threading.Thread(target=self.bt.write, args=("",), name="Bluetooth Write Thread")
+        #serReadThread = threading.Thread(target=self.readSerialMsg, name="Serial Read Thread")
 
-        #fmessage = '\nBluetooth Read/Write Thread'
+        #fmessage = '\nSerial Read/Write Thread'
         #print(fmessage)
 
-        serReadThread = threading.Thread(target=self.readSerialMsg, name="Serial Read Thread")
-        #serWriteThread = threading.Thread(target=self.sr.write, args=("",), name="Serial Write Thread")
-
-        fmessage = '\nSerial Read/Write Thread'
-        print(fmessage)
-
         pcReadThread.daemon = True
-        #pcWriteThread.daemon = True
-        #blueReadThread.daemon = True
-        #blueWriteThread.daemon = True
-        serReadThread.daemon = True
-        #serWriteThread.daemon = True
+        blueReadThread.daemon = True
+        #serReadThread.daemon = True
         fmessage = '\nAll Threads Daemon = True'
         print(fmessage)
 
         pcReadThread.start()
-        #pcWriteThread.start()
-        #blueReadThread.start()
-        #blueWriteThread.start()
-        serReadThread.start()
-        #serWriteThread.start()
+        blueReadThread.start()
+        #serReadThread.start()
 
         pcReadThread.join()
-        #serWriteThread.join()
-        serReadThread.join()
-        #pcWriteThread.join()
-        #blueReadThread.join()
-        #blueWriteThread.join()
+        blueReadThread.join()
         
+        #serReadThread.join()
 
         fmessage = '\nAll Read Write Thread Started\n'
         print(fmessage)
@@ -114,10 +104,10 @@ class Main(threading.Thread):
             self.pc.disconnect()
             fmessage = '\nClosing PC'
             print(fmessage)
-            #self.bt.disconnect()
-            #fmessage = '\nClosing Bluetooth'
-            #print(fmessage)
-            self.sr.disconnect()
+            self.bt.disconnect()
+            fmessage = '\nClosing Bluetooth'
+            print(fmessage)
+            #self.sr.disconnect()
             fmessage = '\nClosing Serial'
             print(fmessage)
         except Exception as e:
