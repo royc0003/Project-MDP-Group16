@@ -101,10 +101,10 @@ if __name__ == "__main__":
     
     while True:
         try:
-            print("pcReadThread running now...")
+#            print("pcReadThread running now...")
             pcReadThread.join(0.1)
             #blueReadThread.join(0.1)
-            print("serReadThread running now...")
+ #           print("serReadThread running now...")
             serReadThread.join(0.1)
             
             if not pcReadThread.isAlive():
@@ -118,6 +118,6 @@ if __name__ == "__main__":
             print('\nInterrupted! Closing program.')
             testMain.close()
             break
-      print('\nInterrupted! Closing program.')
-      testMain.close()
+    print('\nInterrupted! Closing program.')
+    testMain.close()
       
