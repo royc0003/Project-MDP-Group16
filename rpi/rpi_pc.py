@@ -10,7 +10,7 @@ class PC():
         self.conn = None
         self.client = None
         self.addr = None
-        #self.pc_is_connect = False
+        self.pc_is_connect = False
 
 
     def disconnect(self):
@@ -20,7 +20,7 @@ class PC():
         if self.client:
             self.client.close()
             print("Closing client socket")
-        #self.pc_is_connect = False
+        self.pc_is_connect = False
 
 
     #def is_connected(self):
@@ -58,8 +58,9 @@ class PC():
 
         except Exception as error:
             print('Failed to read from PC: ' + str(error))
-            self.close_pc_socket()
-            self.connect_pc()
+            #self.close_pc_socket()
+            #self.connect_pc()
+           # self.disconnect()
 
     def write(self, message):
         #print(msg)
@@ -72,8 +73,9 @@ class PC():
                                         
         except Exception as e:
             print('Failed to write to PC: ' + str(error))
-            self.close_pc_socket()
-            self.connect_pc()
+            #self.close_pc_socket()
+            #self.connect_pc()
+           # self.disconnect()
 
 # If you want this to be the only process, run this.
 if __name__ == 'main':
@@ -89,3 +91,6 @@ if __name__ == 'main':
             print('PC communication interrupted.')
             ser.disconnect()
             break
+            #pass
+    print('PC communication interrupted.')
+    ser.disconnect()
