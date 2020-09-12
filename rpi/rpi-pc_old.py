@@ -1,6 +1,6 @@
 # import the socket module to allow us to setup socket communication
 import socket
-host = '192.168.16.2'
+host = ''
 # Pick a port that is unassigned
 port = 5560
 
