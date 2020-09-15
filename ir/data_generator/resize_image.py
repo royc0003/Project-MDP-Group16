@@ -2,7 +2,7 @@ from PIL import Image
 from os import listdir
 from os.path import isfile, join
 
-RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/six'
+RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/eight'
 width = 240
 
 all_images = [f for f in listdir(RAW_DATA_DIRECTORY) if isfile(join(RAW_DATA_DIRECTORY, f)) and f.endswith('.JPG')]
