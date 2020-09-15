@@ -4,6 +4,7 @@ left_cascade = cv2.CascadeClassifier('left_cascade.xml')
 up_cascade = cv2.CascadeClassifier('up_cascade.xml')
 right_cascade = cv2.CascadeClassifier('right_cascade.xml')
 down_cascade = cv2.CascadeClassifier('down_cascade.xml')
+zero_cascade = cv2.CascadeClassifier('cascade-2.xml')
 
 cap=cv2.VideoCapture(0)
 
@@ -30,6 +31,12 @@ while True:
     for(dx,dy,dw,dh) in down:
         cv2.rectangle(img, (dx,dy),(dx+dw,dy+dh),(255,255,255),2)
         cv2.putText(img,"Down",(dx,dy+dh+40),font,2,(255,255,255),2)
+
+    zero = zero_cascade.detectMultiScale(gray,1.3,5)
+    for(zx,zy,zw,zh) in zero:
+        cv2.rectangle(img, (zx,zy),(zx+zw,zy+zh),(255,255,255),2)
+        cv2.putText(img,"Zero",(zx,zy+zh+40),font,2,(255,255,255),2)
+
 
     cv2.imshow('img',img)
     k = cv2.waitKey(30) & 0xff
