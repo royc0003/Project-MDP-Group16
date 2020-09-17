@@ -201,9 +201,9 @@ public class Simulator {
                 ExplorationAlgo exploration;
                 exploration = new ExplorationAlgo(exploredMap, realMap, bot, coverageLimit, timeLimit);
 
-                if (realRun) {
-                    CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
-                }
+                // if (realRun) {
+                //     CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
+                // }
 
                 exploration.runExploration();
                 generateMapDescriptor(exploredMap);

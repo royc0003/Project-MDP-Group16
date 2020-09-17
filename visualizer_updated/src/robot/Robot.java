@@ -21,6 +21,18 @@ import java.util.concurrent.TimeUnit;
  *        [X] [X] [X]
  *   < LR [X] [X] [X] SR >
  *        [X] [X] [X]
+ * -----------------------------
+ * 
+ * Our one:
+ * 
+ *          ^   ^   ^
+ *         SR  SR  SR
+ *    
+ *    <LR  [X] [X] [X]
+ *   < SR [X] [X] [X] SR >
+ *        [X] [X] [X]
+ *
+ * (Long range on top )
  *
  * SR = Short Range Sensor, LR = Long Range Sensor
  *
@@ -52,9 +64,11 @@ public class Robot {
         SRFrontLeft = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, this.robotDir, "SRFL");
         SRFrontCenter = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol, this.robotDir, "SRFC");
         SRFrontRight = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.robotDir, "SRFR");
-        SRLeft = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "SRL");
+        //srLeft = LRleft
+        LRLeft = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "SRL");
         SRRight = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT), "SRR");
-        LRLeft = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "LRL");
+        SRLeft = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "LRL");
+        
     }
 
     public void setRobotPos(int row, int col) {
@@ -154,7 +168,7 @@ public class Robot {
                 break;
         }
 
-        if (realBot) sendMovement(m, sendMoveToAndroid);
+        if (realBot) sendMovement(m, sendMoveToAndroid); // this is to adrunio
         else System.out.println("Move: " + MOVEMENT.print(m));
 
         updateTouchedGoal();
@@ -281,7 +295,10 @@ public class Robot {
         } else {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
+            //msg = "SDATA;0_val0;1_val1;2_val2;3_val3;4_val4;5_val5"
+
             String[] msgArr = msg.split(";");
+            //msgArr = [SDATA, 0_val0, 1_val1, 2_val2, 3_val3, 4_val4, 5_val5, 6_val6]
 
             if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
                 result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
@@ -291,7 +308,7 @@ public class Robot {
                 result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
                 result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
             }
-
+            
             SRFrontLeft.senseReal(explorationMap, result[0]);
             SRFrontCenter.senseReal(explorationMap, result[1]);
             SRFrontRight.senseReal(explorationMap, result[2]);
@@ -306,3 +323,6 @@ public class Robot {
         return result;
     }
 }
+
+
+//[0, "0_3", "1_4"]

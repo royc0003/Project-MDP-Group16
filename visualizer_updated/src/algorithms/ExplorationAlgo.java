@@ -36,32 +36,40 @@ public class ExplorationAlgo {
      */
     public void runExploration() {
         if (bot.getRealBot()) {
-            System.out.println("Starting calibration...");
+            //System.out.println("Starting calibration...");
 
-            CommMgr.getCommMgr().recvMsg();
-            if (bot.getRealBot()) {
-                bot.move(MOVEMENT.LEFT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.LEFT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.RIGHT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.RIGHT, false);
+            // CommMgr.getCommMgr().recvMsg();
+            // if (bot.getRealBot()) {
+            //     bot.move(MOVEMENT.LEFT, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.CALIBRATE, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.LEFT, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.CALIBRATE, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.RIGHT, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.CALIBRATE, false);
+            //     CommMgr.getCommMgr().recvMsg();
+            //     bot.move(MOVEMENT.RIGHT, false);
+            // }
+
+        //    while (true) {
+        //        System.out.println("Waiting for EX_START...");
+        //        String msg = CommMgr.getCommMgr().recvMsg();
+        //        String[] msgArr = msg.split(";");
+        //        if (msgArr[0].equals(CommMgr.EX_START)) break;
+        //    }
+             while (true) {
+                System.out.println("Waiting for EX_START...");
+                String msg = CommMgr.getCommMgr().recvMsg();
+                //String[] msgArr = msg.split(";");
+                if(msg.equals("From Arduino: Communicating with Rpi")) break;
+                //if (msgArr[0].equals(CommMgr.EX_START)) break;
             }
-
-//            while (true) {
-//                System.out.println("Waiting for EX_START...");
-//                String msg = CommMgr.getCommMgr().recvMsg();
-//                String[] msgArr = msg.split(";");
-//                if (msgArr[0].equals(CommMgr.EX_START)) break;
-//            }
         }
+
 
         System.out.println("Starting exploration...");
 
