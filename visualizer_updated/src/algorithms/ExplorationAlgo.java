@@ -61,7 +61,7 @@ public class ExplorationAlgo {
         //        String[] msgArr = msg.split(";");
         //        if (msgArr[0].equals(CommMgr.EX_START)) break;
         //    }
-             while (true) {
+            while (true) {
                 System.out.println("Waiting for EX_START...");
                 String msg = CommMgr.getCommMgr().recvMsg();
                 //String[] msgArr = msg.split(";");
