@@ -1,7 +1,7 @@
 import subprocess
 from bluetooth import *
 
-class Android:
+class Android(object):
     def __init__(self):
         subprocess.call(["pkill","blueman-applet"])
         subprocess.call(["sudo","hciconfig","hci0","piscan"])
@@ -25,7 +25,7 @@ class Android:
 
     def connect(self):
         # Creating the server socket and bind to port           
-        btport = 4
+        btport = 8
         try:
             self.server_socket = BluetoothSocket( RFCOMM )
             self.server_socket.bind(("", btport))
