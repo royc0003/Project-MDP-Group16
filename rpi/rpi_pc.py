@@ -3,29 +3,21 @@ import time
 import sys
 
 
-class PC():
+class PC(object):
     def __init__(self):
-        self.tcp_ip = "192.168.16.2" # RPI IP address
+        self.tcp_ip = '' # don't change this, leave it blank
         self.port = 5560
         self.conn = None
         self.client = None
         self.addr = None
-        #self.pc_is_connect = False
-
 
     def disconnect(self):
         if self.conn:
             self.conn.close()
-            print("Closing server socket")
+            #print("Closing server socket")
         if self.client:
             self.client.close()
-            print("Closing client socket")
-        #self.pc_is_connect = False
-
-
-    #def is_connected(self):
-    #    return self.pc_is_connect
-
+            #print("Closing client socket")
 
     def connect(self):
         # Create a TCP/IP socket
@@ -39,14 +31,13 @@ class PC():
             print("Listening for incoming connections from PC...")
             self.client, self.addr = self.conn.accept()
             print("Connected! Connection address: ", self.addr)
-            #self.pc_is_connect = True
             
         except Exception as error:
                 print('Connection failed: ' + str(error))
 
     def read(self):
         try:
-            message = self.client.recv(2048)
+            message = self.client.recv(2048).strip()
             #return msg_from_pc.decode("utf-8")
             message = message.decode('utf-8')
 
@@ -62,9 +53,6 @@ class PC():
             self.connect_pc()
 
     def write(self, message):
-        #print(msg)
-        #print(isinstance(msg, bytes))
-        #msg = msg + "\r"
         try:
             #self.client.sendto(str(msg).encode("utf-8"), self.addr)
             print('To PC: ' + message)
