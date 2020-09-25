@@ -37,9 +37,8 @@ class PC(object):
 
     def read(self):
         try:
-            message = self.client.recv(2048).strip()
-            #return msg_from_pc.decode("utf-8")
-            message = message.decode('utf-8')
+            message = self.client.recv(2048)
+            message = message.decode('utf-8').strip()
 
             if len(message) > 0:
                 print('From PC: ' + message)
@@ -54,7 +53,6 @@ class PC(object):
 
     def write(self, message):
         try:
-            #self.client.sendto(str(msg).encode("utf-8"), self.addr)
             print('To PC: ' + message)
             self.client.sendto(str(message).encode('utf-8'), self.addr)
                                         
