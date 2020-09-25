@@ -2,8 +2,8 @@ import serial
 
 class Arduino(object):
     def __init__(self):
-        #self.serial_port = '/dev/ttyACM0'
-        #self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
+#        self.serial_port = '/dev/ttyACM0'
+       # self.serial_port = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
         #self.serial_port = 'COM8'
         self.serial_port = '/dev/serial/by-id/usb-Arduino_Srl_Arduino_Uno_95336333635351A0A111-if00'
         self.baud_rate = 115200
@@ -34,14 +34,15 @@ class Arduino(object):
             
     def read(self):
         try:
-            self.connection.flush()
-            message = self.connection.readline()
-            print('')
-            print('From Arduino:')
-            print(message)
+            if self.connection is not None:
+                self.connection.flush()
+                message = self.connection.readline()
+                print('')
+                print('From Arduino:')
+                print(message)
 
-            if len(message) > 0:
-                return message
+                if len(message) > 0:
+                    return message
 
             return None
        
