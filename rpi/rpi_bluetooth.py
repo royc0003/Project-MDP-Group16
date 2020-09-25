@@ -1,13 +1,12 @@
 import subprocess
 from bluetooth import *
 
-class Android:
+class Android(object):
     def __init__(self):
         subprocess.call(["pkill","blueman-applet"])
         subprocess.call(["sudo","hciconfig","hci0","piscan"])
         self.server_socket = None
         self.client_socket = None
-        #self.is_connected = False
 
     def disconnect(self):
         if self.client_socket:
@@ -16,16 +15,10 @@ class Android:
         if self.server_socket:
             self.server_socket.close()
             print("Closing server socket")
-        #self.is_connected = False
-
-
-    #def is_connect(self):
-        #return self.is_connected
-
 
     def connect(self):
         # Creating the server socket and bind to port           
-        btport = 4
+        btport = 8
         try:
             self.server_socket = BluetoothSocket( RFCOMM )
             self.server_socket.bind(("", btport))
@@ -50,11 +43,7 @@ class Android:
 
     def read(self):
         try:
-            #msg_from_bt = self.client_socket.recv(2048)
-            #return msg_from_bt.decode('utf-8')
-            message = self.client_socket.recv(1024)
-            message = message.decode('utf-8')
-
+            message = self.client_socket.recv(2048).decode('utf-8').strip()
             print('From Android: ' + message)
             
             if len(message) > 0:
@@ -65,21 +54,18 @@ class Android:
         except BluetoothError:
             print('\nBluetooth Read Error. Connection lost')
             # Re-establish connection
-            self.close_bt_socket()
-            self.connect_bt()
-
+            
 
     def write(self, message):
         try:
             #self.client_socket.send(str(msg))
-            print('To Android: ' + message)
+            #print('To Android: ' + message)
             self.client_socket.send(str(message).encode('utf-8'))
 
         except BluetoothError:
             print('\nBluetooth Write Error. Connection lost')
             # Re-establish connection
-            self.close_bt_socket()
-            self.connect_bt()
+            
 
 # If you want this to be the only process, run this.
 if __name__ == "__main__":
