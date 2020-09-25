@@ -27,15 +27,18 @@ class Main(threading.Thread):
                 if not pMsg:
                     break
                 self.pc.write(str(pMsg))
-                # Destination is Tablet
-                #if(pMsg[1] == '0'):
-                #    self.bt.write(pMsg[2:])
-                #if (pMsg[2] == '1'):
-                #    self.sr.write(pMsg[3:])
-                #    fmessage = '\nPC > Arduino: ' + str(pMsg[3:])
+                 #Destination is Tablet
+                if(pMsg[2] == '0'):
+                    self.bt.write(pMsg[4:])
+                # send to adruino 
+                if (pMsg[2] == '1'):
+                    self.sr.write(pMsg[4])
+                    fmessage = '\nPC > Arduino: ' + str(pMsg[4])
             except Exception as e:
                 fmessage = '\nError in PC read: ' + str(e)
                 print(fmessage)
+                
+                # 2|1|F
 
     def readBTMsg(self):
         while True:
@@ -43,12 +46,10 @@ class Main(threading.Thread):
                 bMsg = self.bt.read()
                 if not bMsg:
                     break
-                self.bt.write(str(bMsg))
-                # Destination is PC
-                #if(bMsg[2] == '2'):
-                #    self.pc.write(bMsg[3:])
-                #elif(bMsg[2] == '1'):
-                #    self.pc.write(bMsg[3:])
+                if(bMsg[2] == '2'):
+                    self.pc.write(bMsg[4:]) # Destination is PC
+                if(bMsg[2] == '0'):
+                    self.sr.write(bMsg[4:]) # To Arduino
             except Exception as e:
                 fmessage = '\nError in BT read: ' + str(e)
                 print(fmessage)
@@ -83,9 +84,13 @@ class Main(threading.Thread):
 if __name__ == "__main__":
     testMain = Main()
 
-    pcReadThread = threading.Thread(target=testMain.readPCMsg, name="PC Read Thread", daemon = True)
-    blueReadThread = threading.Thread(target=testMain.readBTMsg, name="Bluetooth Read Thread", daemon = True)
+    pcReadThread = threading.Thread(target=testMain.readPCMsg, name="PC Read Thread")
+    blueReadThread = threading.Thread(target=testMain.readBTMsg, name="Bluetooth Read Thread")
     #serReadThread = threading.Thread(target=testMain.readSerialMsg, name="Serial Read Thread")
+
+    pcReadThread.daemon = True
+    blueReadThread.daemon = True
+    #serReadThread.daemon = True
 
     pcReadThread.start()
     blueReadThread.start()
@@ -111,3 +116,6 @@ if __name__ == "__main__":
             print('\nInterrupted! Closing program.')
             testMain.close()
             break
+    print('\nInterrupted! Closing program.')
+    testMain.close()
+    
