@@ -29,10 +29,15 @@ class Main(threading.Thread):
                 # Destination is Tablet
                 if(pMsg[2] == '0'):
                     self.bt.write(pMsg[4:])
-                # Destination is adruino 
-                if (pMsg[2] == '1'):
+                # Destination is Adruino 
+                elif (pMsg[2] == '1'):
                     self.sr.write(pMsg[4])
                     fmessage = '\nPC > Arduino: ' + str(pMsg[4])
+                # Destination is nowhere; for debugging
+                elif(pMsg[2] != '0' and pMsg[2] != '1'):
+                    self.pc.write(pMsg)
+                    print('Flushing buffer!', flush=True)
+                    
             except Exception as e:
                 fmessage = '\nError in PC read: ' + str(e)
                 print(fmessage)
@@ -47,8 +52,13 @@ class Main(threading.Thread):
                 if(bMsg[2] == '2'):
                     self.pc.write(bMsg[4:])
                 # Destination is Arduino
-                if(bMsg[2] == '1'):
+                elif(bMsg[2] == '1'):
                     self.sr.write(bMsg[4:])
+                # Destination is nowhere; for debugging
+                elif(bMsg[2] != '0' and bMsg[2] != '1'):
+                    self.bt.write('') # Will close tablet
+                    print('Flushing buffer!', flush=True)
+                    
             except Exception as e:
                 fmessage = '\nError in BT read: ' + str(e)
                 print(fmessage)
@@ -60,6 +70,7 @@ class Main(threading.Thread):
                 if not sMsg:
                     break
                 self.pc.write(str(sMsg))
+                
             except Exception as e:
                 fmessage = '\nError in Serial read: ' + str(e)
                 print(fmessage)
