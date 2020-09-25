@@ -1,7 +1,5 @@
 import socket
 import time
-import sys
-
 
 class PC(object):
     def __init__(self):
@@ -49,7 +47,6 @@ class PC(object):
         except Exception as error:
             print('Failed to read from PC: ' + str(error))
             self.close_pc_socket()
-            self.connect_pc()
 
     def write(self, message):
         try:
@@ -59,7 +56,6 @@ class PC(object):
         except Exception as e:
             print('Failed to write to PC: ' + str(error))
             self.close_pc_socket()
-            self.connect_pc()
 
 # If you want this to be the only process, run this.
 if __name__ == 'main':
