@@ -35,7 +35,6 @@ class Android(object):
             # Accept requests
             self.client_socket, client_address = self.server_socket.accept()
             print('Accepted connection from ', client_address)
-            #self.is_connected = True
 
         except Exception as error:
             print('Connection Error - Bluetooth: ' + str(error))
@@ -46,10 +45,10 @@ class Android(object):
             message = self.client_socket.recv(2048).decode('utf-8').strip()
             print('From Android: ' + message)
             
-            if len(message) > 0:
-                return message
+            if not message:
+                return None
 
-            return None
+            return message
 
         except BluetoothError:
             print('\nBluetooth Read Error. Connection lost')
@@ -58,8 +57,7 @@ class Android(object):
 
     def write(self, message):
         try:
-            #self.client_socket.send(str(msg))
-            #print('To Android: ' + message)
+            print('To Android: ' + message)
             self.client_socket.send(str(message).encode('utf-8'))
 
         except BluetoothError:
