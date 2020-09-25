@@ -26,19 +26,16 @@ class Main(threading.Thread):
                 pMsg = self.pc.read()
                 if not pMsg:
                     break
-                self.pc.write(str(pMsg))
-                 #Destination is Tablet
+                # Destination is Tablet
                 if(pMsg[2] == '0'):
                     self.bt.write(pMsg[4:])
-                # send to adruino 
+                # Destination is adruino 
                 if (pMsg[2] == '1'):
                     self.sr.write(pMsg[4])
                     fmessage = '\nPC > Arduino: ' + str(pMsg[4])
             except Exception as e:
                 fmessage = '\nError in PC read: ' + str(e)
                 print(fmessage)
-                
-                # 2|1|F
 
     def readBTMsg(self):
         while True:
@@ -46,10 +43,12 @@ class Main(threading.Thread):
                 bMsg = self.bt.read()
                 if not bMsg:
                     break
+                # Destination is PC
                 if(bMsg[2] == '2'):
-                    self.pc.write(bMsg[4:]) # Destination is PC
-                if(bMsg[2] == '0'):
-                    self.sr.write(bMsg[4:]) # To Arduino
+                    self.pc.write(bMsg[4:])
+                # Destination is Arduino
+                if(bMsg[2] == '1'):
+                    self.sr.write(bMsg[4:])
             except Exception as e:
                 fmessage = '\nError in BT read: ' + str(e)
                 print(fmessage)
