@@ -55,7 +55,7 @@ class Main(threading.Thread):
                 elif(bMsg[2] == '1'):
                     self.sr.write(bMsg[4:])
                 # Destination is nowhere; for debugging
-                elif(bMsg[2] != '0' and bMsg[2] != '1'):
+                elif(bMsg[2] != '2' and bMsg[2] != '1'):
                     self.bt.write('') # Will close tablet
                     print('Flushing buffer!', flush=True)
                     
