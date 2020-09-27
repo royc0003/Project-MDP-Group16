@@ -1,0 +1,6 @@
+For Arduino to always point to the correct port:
+serial = '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75833353035351603131-if00'
+^ Applies to specific arduino only.
+
+Random uuid, do not use.
+uuid = "0x0003-0000-1000-8000-00805F9B34FB"
