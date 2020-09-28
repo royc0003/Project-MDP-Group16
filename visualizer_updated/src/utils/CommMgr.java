@@ -39,8 +39,8 @@ public class CommMgr {
         System.out.println("Opening connection...");
 
         try {
-            //String HOST = "192.168.16.2";
-            String HOST = "192.168.16.2";
+            String HOST = "192.168.16.1";
+            // String HOST = "192.168.16.2";
             int PORT = 5560;
             conn = new Socket(HOST, PORT);
 

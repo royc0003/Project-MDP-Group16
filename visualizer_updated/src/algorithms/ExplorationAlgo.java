@@ -55,21 +55,14 @@ public class ExplorationAlgo {
             //     bot.move(MOVEMENT.RIGHT, false);
             // }
 
-        //    while (true) {
-        //        System.out.println("Waiting for EX_START...");
-        //        String msg = CommMgr.getCommMgr().recvMsg();
-        //        String[] msgArr = msg.split(";");
-        //        if (msgArr[0].equals(CommMgr.EX_START)) break;
-        //    }
-            while (true) {
-                System.out.println("Waiting for EX_START...");
-                String msg = CommMgr.getCommMgr().recvMsg();
-                //String[] msgArr = msg.split(";");
-                if(msg.equals("From Arduino: Communicating with Rpi")) break;
-                //if (msgArr[0].equals(CommMgr.EX_START)) break;
-            }
+            // System.out.println("Waiting for EX_START...");
+            // String msg = CommMgr.getCommMgr().recvMsg();
+           while (true) {
+               System.out.println("Waiting for EX_START...");
+               String msg = CommMgr.getCommMgr().recvMsg();
+               if (msg.equals(CommMgr.EX_START)) break;
+           }
         }
-
 
         System.out.println("Starting exploration...");
 
@@ -96,7 +89,7 @@ public class ExplorationAlgo {
     private void explorationLoop(int r, int c) {
         do {
             nextMove();
-
+            
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
 
@@ -122,7 +115,8 @@ public class ExplorationAlgo {
         } else if (lookLeft()) {
             moveBot(MOVEMENT.LEFT);
             if (lookForward()) moveBot(MOVEMENT.FORWARD);
-        } else {
+        }
+        else {
             moveBot(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
         }
@@ -297,19 +291,19 @@ public class ExplorationAlgo {
         if (bot.getRealBot() && !calibrationMode) {
             calibrationMode = true;
 
-            if (canCalibrateOnTheSpot(bot.getRobotCurDir())) {
-                lastCalibrate = 0;
-                moveBot(MOVEMENT.CALIBRATE);
-            } else {
-                lastCalibrate++;
-                if (lastCalibrate >= 5) {
-                    DIRECTION targetDir = getCalibrationDirection();
-                    if (targetDir != null) {
-                        lastCalibrate = 0;
-                        calibrateBot(targetDir);
-                    }
-                }
-            }
+            // if (canCalibrateOnTheSpot(bot.getRobotCurDir())) {
+            //     lastCalibrate = 0;
+            //     moveBot(MOVEMENT.CALIBRATE);
+            // } else {
+            //     lastCalibrate++;
+            //     // if (lastCalibrate >= 5) {
+            //     //     DIRECTION targetDir = getCalibrationDirection();
+            //     //     if (targetDir != null) {
+            //     //         lastCalibrate = 0;
+            //     //         calibrateBot(targetDir);
+            //     //     }
+            //     // }
+            // }
 
             calibrationMode = false;
         }

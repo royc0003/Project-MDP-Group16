@@ -210,7 +210,8 @@ public class Robot {
                     break;
             }
 
-            comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            //comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            comm.sendMsg(this.getRobotPosCol() + "," + this.getRobotPosRow() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
         }
     }
 
@@ -221,7 +222,8 @@ public class Robot {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
         if (m != MOVEMENT.CALIBRATE && sendMoveToAndroid) {
-            comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            //comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            comm.sendMsg(this.getRobotPosCol() + "," + this.getRobotPosRow() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
         }
     }
 
@@ -296,7 +298,6 @@ public class Robot {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
             //msg = "SDATA;0_val0;1_val1;2_val2;3_val3;4_val4;5_val5"
-
             String[] msgArr = msg.split(";");
             //msgArr = [SDATA, 0_val0, 1_val1, 2_val2, 3_val3, 4_val4, 5_val5, 6_val6]
 
@@ -325,4 +326,3 @@ public class Robot {
 }
 
 
-//[0, "0_3", "1_4"]
