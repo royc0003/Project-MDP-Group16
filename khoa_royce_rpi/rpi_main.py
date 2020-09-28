@@ -73,6 +73,12 @@ class Main(threading.Thread):
                 #sMsg = sMsg[:length]
                 if not sMsg:
                     break
+                # index some value;
+                # if some value >= 3 LRLeft
+                # -1 = x <= 2 || -1 <= y <= 4
+                # variable_image = call API end point to take image
+                # variable_value = variable_imeage['img']
+                # self.writePCMsg (str(sMsg)+variable_value)
                 self.writePCMsg(str(sMsg))
             except Exception as e:
                 fmessage = '\nError in Serial read: ' + str(e)
