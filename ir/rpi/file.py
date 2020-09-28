@@ -20,6 +20,7 @@ time.sleep(0.1)
 
 for frame in cap.capture_continuous(rawCapture,format="bgr",use_video_port=True):
     img=frame.array
+    print(type(img))
     rawCapture.truncate(0)
   #  ret, img = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
