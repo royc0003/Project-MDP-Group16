@@ -15,6 +15,8 @@ public class Sensor {
     private int sensorPosCol;
     private DIRECTION sensorDir;
     private final String id;
+    private int imgPosRow;
+    private int imgPosCol;
 
     public Sensor(int lowerRange, int upperRange, int row, int col, DIRECTION dir, String id) {
         this.lowerRange = lowerRange;
@@ -23,6 +25,19 @@ public class Sensor {
         this.sensorPosCol = col;
         this.sensorDir = dir;
         this.id = id;
+    }
+    public void setImgPosRow (int imgRow){
+        this.imgPosRow = imgRow;
+    }
+    public void setImgPosCol (int imgCol){
+        this.imgPosCol = imgCol;
+    }
+
+    public int getImgPosRow(){
+        return this.imgPosRow;
+    }
+    public int getImgPosCol(){
+        return this.imgPosCol;
     }
 
     public void setSensor(int row, int col, DIRECTION dir) {
@@ -130,6 +145,12 @@ public class Sensor {
 
             if (sensorVal == i) {
                 exploredMap.setObstacleCell(row, col, true);
+                // id(id.equals("LRLeft"))
+                // send row and col
+                if(id.equals("LRL")){
+                    setImgPosRow((row));
+                    setImgPosCol(col);
+                }
                 break;
             }
 

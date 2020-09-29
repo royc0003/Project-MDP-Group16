@@ -18,6 +18,7 @@ public class CommMgr {
     public static final String BOT_START = "BOT_START";     // PC --> Arduino
     public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
     public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
+    public static final String CAMERA_DATA = "CAM";
 
     private static CommMgr commMgr = null;
     private static Socket conn = null;
@@ -91,7 +92,11 @@ public class CommMgr {
                 outputMsg = msgType + "\n";
             } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
                 outputMsg = msgType + " " + msg + "\n";
-            } else {
+            }
+            else if(msgType.equals(CAMERA_DATA))  {
+                outputMsg = "2|1|NID|"+msg+"\n";
+            }
+            else {
                 outputMsg = msgType + "\n" + msg + "\n";
             }
 

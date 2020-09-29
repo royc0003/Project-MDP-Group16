@@ -40,6 +40,9 @@ public class Robot {
     private final Sensor LRLeft;            // west-facing left LR
     private boolean touchedGoal;
     private final boolean realBot;
+    //set image value here
+
+
 
     public Robot(int row, int col, boolean realBot) {
         posRow = row;
@@ -56,6 +59,8 @@ public class Robot {
         SRRight = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT), "SRR");
         LRLeft = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "LRL");
     }
+
+
 
     public void setRobotPos(int row, int col) {
         posRow = row;
@@ -81,7 +86,21 @@ public class Robot {
     public DIRECTION getRobotCurDir() {
         return robotDir;
     }
-
+    public char getRobotCameraDir(){
+        DIRECTION current_direction = getRobotCurDir();
+        switch(current_direction){
+            case NORTH: // U
+                return 'R';
+            case EAST: // R
+                return 'D';
+            case SOUTH: // D
+                return 'L';
+            case WEST: //L
+                return 'U';
+            default:
+                return 'X';
+        }
+    }
     public boolean getRealBot() {
         return realBot;
     }
@@ -269,7 +288,7 @@ public class Robot {
      * @return [SRFrontLeft, SRFrontCenter, SRFrontRight, SRLeft, SRRight, LRLeft]
      */
     public int[] sense(Map explorationMap, Map realMap) {
-        int[] result = new int[6];
+        int[] result = new int[7];
 
         if (!realBot) {
             result[0] = SRFrontLeft.sense(explorationMap, realMap);
@@ -282,7 +301,7 @@ public class Robot {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
             String[] msgArr = msg.split(";");
-
+            // add extra string
             if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
                 result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
                 result[1] = Integer.parseInt(msgArr[2].split("_")[1]);
@@ -290,6 +309,8 @@ public class Robot {
                 result[3] = Integer.parseInt(msgArr[4].split("_")[1]);
                 result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
                 result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
+                result[6] = Integer.parseInt(msgArr[7].split("_")[1]); //for cam_ID
+
             }
 
             SRFrontLeft.senseReal(explorationMap, result[0]);
@@ -301,6 +322,18 @@ public class Robot {
 
             String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
             comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+            //async
+
+            if(result[5] != -1){
+                String camera_data = Integer.toString(result[6]);
+                comm.sendMsg("("+LRLeft.getImgPosCol()+","+LRLeft.getImgPosRow()+","+camera_data+getRobotCameraDir()+")",CommMgr.CAMERA_DATA);
+            }
+
+            //sends another message to
+            // 2|1|NID|("6,18,13,U")
+            //String imgString = "NID|(
+            //comm.sendMsg()
+
         }
 
         return result;
