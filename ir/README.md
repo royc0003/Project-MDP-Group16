@@ -1,5 +1,9 @@
 # Image Recognition
 
+## Build the docker image
+
+`sudo docker build . -t ir-endpoint`
+
 ## Run the docker image
 
 ```bash
@@ -8,6 +12,7 @@ docker run -ti --device=/dev/vcsm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -v /home/pi/Desktop/repo/ir/rpi:/home/pi/Desktop/repo/ir/rpi \
+    -p 5000:5000
     sgtwilko/rpi-raspbian-opencv:latest
 
 ```
