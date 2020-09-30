@@ -17,9 +17,9 @@ if __name__ == "__main__":
         ("up", cv2.CascadeClassifier('up_cascade.xml')),
         ("down", cv2.CascadeClassifier('down_cascade.xml')),
         ("left", cv2.CascadeClassifier('left_cascade.xml')),
-        ("right", cv2.CascadeClassifier('right_cascade.xml')),
-        ("w", cv2.CascadeClassifier('w_cascade.xml')),
-        ("zero", cv2.CascadeClassifier('zero_cascade.xml'))
+        ("right", cv2.CascadeClassifier('right_cascade.xml'))
+        # ("w", cv2.CascadeClassifier('w_cascade.xml')),
+        # ("zero", cv2.CascadeClassifier('zero_cascade.xml'))
     ]
     font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             area = rect[2] * rect[3]
             ratio = float(rect[2]) / float(rect[3])
             bb = (rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3])
-            if 1.3 >= ratio >= 0.7 and area >= 50000:
+            if 1.3 >= ratio >= 0.7 and 250000 >= area >= 50000:
                 bbs.append(bb)
                 # cv2.rectangle(img, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (255, 255, 255), 2)
                 # cv2.putText(img, str(area), (rect[0], rect[1] + rect[3] + 40), font, 2, (255, 255, 255), 2)
@@ -51,24 +51,29 @@ if __name__ == "__main__":
         for bb in bbs:
             # for each boundary, extract the image. this is the potential image
             potential_image = img_copy[bb[1]:bb[3], bb[0]:bb[2]]
-            # potential_image = cv2.resize(potential_image, (180, 240))
+            # potential_image = cv2.resize(potential_image, (18, 24))
             potential_image = cv2.cvtColor(potential_image, cv2.COLOR_BGR2GRAY)
             potential_images.append((potential_image, bb))
 
-        # for category, model in models:
-        #     undetected_potential_images = []
-        #     for image, bb in potential_images:
-        #         reg_img = recognize(model=model,
-        #                             img=image,
-        #                             category=category)
-        #         for _ in reg_img:
-        #             cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
-        #             cv2.putText(img, category, (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
-        #             potential_images.remove((image, bb))
+        switch = False
+        for category, model in models:
+            for image, bb in potential_images:
+                reg_img = recognize(model=model,
+                                    img=image,
+                                    category=category)
+                for _ in reg_img:
+                    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
+                    cv2.putText(img, category, (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
+                    switch = True
 
         cv2.imshow('img', img)
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             break
+        if switch:
+            time.sleep(0.5)
+        switch = False
+
+        print("one iterate")
     cap.release()
     cv2.destroyAllWindows()
