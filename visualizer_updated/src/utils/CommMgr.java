@@ -13,11 +13,12 @@ public class CommMgr {
 
     public static final String EX_START = "EX_START";       // Android --> PC
     public static final String FP_START = "FP_START";       // Android --> PC
-    public static final String MAP_STRINGS = "MAP";         // PC --> Android
-    public static final String BOT_POS = "BOT_POS";         // PC --> Android
-    public static final String BOT_START = "S";     // PC --> Arduino
+    public static final String TO_ANDROID = "TO_ANDROID";   // PC --> Android
+    public static final String BOT_START = "S";             // PC --> Arduino
     public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
+    public static final String CALIBRATE = "C";             // PC --> Arduino
     public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
+    public static final String CAMERA = "NID";              // PC --> Rpi
 
     private static CommMgr commMgr = null;
     private static Socket conn = null;
@@ -90,9 +91,10 @@ public class CommMgr {
             String outputMsg;
             if (msg == null) {
                 outputMsg = "2|1|" + msgType + "\n";
-                //outputMsg = "2|1|" + outputMsg;
-            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
-                outputMsg = "2|0|" + msgType + " " + msg + "\n";
+            }
+            else if (msgType.equals(TO_ANDROID)){
+            // else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)){
+                outputMsg = "2|0|" + msg + "\n";
             } else if(msgType.equals(INSTRUCTIONS)) {
                 outputMsg = "2|1|" + msg + "\n";
             } else {
