@@ -2,10 +2,10 @@ from PIL import Image
 from os import listdir
 from os.path import isfile, join
 
-RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/eight'
+RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/environment'
 width = 240
 
-all_images = [f for f in listdir(RAW_DATA_DIRECTORY) if isfile(join(RAW_DATA_DIRECTORY, f)) and f.endswith('.JPG')]
+all_images = [f for f in listdir(RAW_DATA_DIRECTORY) if isfile(join(RAW_DATA_DIRECTORY, f)) and f.endswith('.jpg')]
 for image in all_images:
     print(image)
     full_path_to_img = join(RAW_DATA_DIRECTORY, image)
