@@ -45,7 +45,7 @@ public class ExplorationAlgo {
             while(true){
                 System.out.println("Waiting for Calibration_Ok...");
                 String msg = CommMgr.getCommMgr().recvMsg();
-                if (msg.equals("K")) break;
+                if (msg.equals("k")) break;
             }
 
             while (true) {
@@ -329,13 +329,12 @@ public class ExplorationAlgo {
             case NORTH:
                 return exploredMap.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.getIsObstacleOrWall(row - 1, col + 2);
             case EAST:
-                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2 , col + 1);
+                return exploredMap.getIsObstacleOrWall(row - 2, col + 1) && exploredMap.getIsObstacleOrWall(row - 2 , col - 1);
             case SOUTH:
                 return exploredMap.getIsObstacleOrWall(row - 1, col - 2) && exploredMap.getIsObstacleOrWall(row + 1, col - 2);
             case WEST:
-                return exploredMap.getIsObstacleOrWall(row - 2, col + 1) && exploredMap.getIsObstacleOrWall(row - 2, col - 1);
+                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2, col + 1);
         }
-
         return false;
     }
 
