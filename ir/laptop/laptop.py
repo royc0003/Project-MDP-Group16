@@ -12,10 +12,10 @@ if __name__ == "__main__":
         # ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         # ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
-        ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
-        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
-        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
+        # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/eight_cascadexml'))
+        # ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        # ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
 
         # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
 
@@ -68,8 +68,8 @@ if __name__ == "__main__":
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             break
-        if switch:
-            time.sleep(0.5)
+        # if switch:
+        #     time.sleep(0.5)
         switch = False
 
         print("one iterate")
