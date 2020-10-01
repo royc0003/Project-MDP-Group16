@@ -10,7 +10,7 @@
 docker run -ti --device=/dev/vcsm \
     --device=/dev/vchiq \
     -e DISPLAY=$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \ 
     -v /home/pi/Desktop/repo/ir/rpi:/home/pi/Desktop/repo/ir/rpi \
     -p 5000:5000 \
     ir-endpoint

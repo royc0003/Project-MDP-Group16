@@ -1,5 +1,4 @@
 import cv2
-from extract import extractBoundingBox
 from recognize import recognize
 from PIL import Image
 import time
@@ -7,19 +6,19 @@ import time
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
 
-    # up_model = cv2.CascadeClassifier('up_cascade.xml')
-    # down_model = cv2.CascadeClassifier('down_cascade.xml')
-    # left_model = cv2.CascadeClassifier('left_cascade.xml')
-    # right_model = cv2.CascadeClassifier('right_cascade.xml')
-    # w_model = cv2.CascadeClassifier('w_cascade.xml')
-    # zero_model = cv2.CascadeClassifier('zero_cascade.xml')
     models = [
-        ("up", cv2.CascadeClassifier('up_cascade.xml')),
-        ("down", cv2.CascadeClassifier('down_cascade.xml')),
-        ("left", cv2.CascadeClassifier('left_cascade.xml')),
-        ("right", cv2.CascadeClassifier('right_cascade.xml'))
-        # ("w", cv2.CascadeClassifier('w_cascade.xml')),
-        # ("zero", cv2.CascadeClassifier('zero_cascade.xml'))
+        # ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
+        # ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
+        # ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
+        # ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
+
+        ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
+        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
+
+        # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
+
     ]
     font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -58,9 +57,8 @@ if __name__ == "__main__":
         switch = False
         for category, model in models:
             for image, bb in potential_images:
-                reg_img = recognize(model=model,
-                                    img=image,
-                                    category=category)
+                reg_img = model.detectMultiScale(image, 1.30, 2)
+
                 for _ in reg_img:
                     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
                     cv2.putText(img, category, (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)

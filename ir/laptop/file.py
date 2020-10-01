@@ -8,40 +8,40 @@ zero_cascade = cv2.CascadeClassifier('zero_cascade.xml')
 w_cascade = cv2.CascadeClassifier('w_cascade.xml')
 
 cap=cv2.VideoCapture(0)
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 while True:
     ret, img = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    left = left_cascade.detectMultiScale(gray,1.3,5)
-    for(lx,ly,lw,lh) in left:
-        cv2.rectangle(img, (lx,ly),(lx+lw,ly+lh),(255,0,0),2)
-        cv2.putText(img,"Left",(lx,ly+lh+40),font,2,(255,0,0),2)
 
-    up = up_cascade.detectMultiScale(gray,1.3,5)
-    font=cv2.FONT_HERSHEY_SIMPLEX
-    for(ux,uy,uw,uh) in up:
-        cv2.rectangle(img, (ux,uy),(ux+uw,uy+uh),(0,255,0),2)
-        cv2.putText(img,"Up",(ux,uy+uh+40),font,2,(0,255,0),2)
 
-    right = right_cascade.detectMultiScale(gray,1.3,5)
-    for(rx,ry,rw,rh) in right:
-        cv2.rectangle(img, (rx,ry),(rx+rw,ry+rh),(0,0,255),2)
-        cv2.putText(img,"Right",(rx,ry+rh+40),font,2,(0,0,255),2)
 
-    down = down_cascade.detectMultiScale(gray,1.3,5)
-    for(dx,dy,dw,dh) in down:
-        cv2.rectangle(img, (dx,dy),(dx+dw,dy+dh),(255,255,255),2)
-        cv2.putText(img,"Down",(dx,dy+dh+40),font,2,(255,255,255),2)
 
-    zero = zero_cascade.detectMultiScale(gray,1.3,5)
-    for(zx,zy,zw,zh) in zero:
-        cv2.rectangle(img, (zx,zy),(zx+zw,zy+zh),(255,255,255),2)
-        cv2.putText(img,"Zero",(zx,zy+zh+40),font,2,(255,255,255),2)
+    models = [
+        ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
+        ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
+        ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
+        ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
-    w = w_cascade.detectMultiScale(gray,1.3,5)
-    for(zx,zy,zw,zh) in w:
-        cv2.rectangle(img, (zx,zy),(zx+zw,zy+zh),(255,255,255),2)
-        cv2.putText(img,"W",(zx,zy+zh+40),font,2,(255,255,255),2)
+        ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
+        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
+
+        # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
+
+    ]
+
+    for category, model in models:
+        reg_img = model.detectMultiScale(gray, 1.3, 5)
+        for (x, y, w, h) in reg_img:
+            # filter out image that are too small
+            area = w * h
+            if 250000 >= area >= 50000:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 255), 2)
+                cv2.putText(img, category, (x, y + 40), font, 2, (255, 255, 255), 2)
+
+
 
 
     cv2.imshow('img',img)
