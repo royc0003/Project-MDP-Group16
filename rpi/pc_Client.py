@@ -10,20 +10,8 @@ s.connect((host, port))
 
 while True:
     command = input("Enter your command: ")
-    
-    if command == 'EXIT':
-        # Send EXIT request to server
-        s.send(str.encode(command))
-        break
-    elif command == 'KILL':
-        # Send KILL request to server
-        s.send(str.encode(command))
-        break
-    
-    # send this when it is not any of the above commands
     s.send(str.encode(command))
-    # received reply
-    reply = s.recv(1024)
+    reply = s.recv(2048)
     print(reply.decode('utf-8'))
 
 s.close()
