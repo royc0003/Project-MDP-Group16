@@ -1,19 +1,2 @@
-- Added random rotation in processing to improve the accuracy.
-- Add more negative sample.
-
-
-
-Some of the images are harder to train due to similarities. we add more images to neg set.
-eight :
-30 env
-40 zero
-40 nine
-40 six
-40 circle
-
-six :
-30 env
-40 zero
-40 nine
-40 eight
-40 circle
+# README
+Here we track what data has been trained with for the model in models directory. This enable us to examine and learn the best parameters for the models, such as rotation, resizing etc. Please do not amend data in this directory since model training is an iterative process and data here are often reference back.

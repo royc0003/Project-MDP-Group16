@@ -18,14 +18,14 @@ while True:
 
 
     models = [
-        # ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
-        # ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
-        # ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
+        ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
+        ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
+        ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
         # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
-        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        # ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
+        # ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
         ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
 
         # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
@@ -33,7 +33,8 @@ while True:
     ]
 
     for category, model in models:
-        reg_img = model.detectMultiScale(gray, 1.10, 5)
+        reg_img = model.detectMultiScale(gray, 1.30, 5)
+
         for (x, y, w, h) in reg_img:
             # filter out image that are too small
             area = w * h
