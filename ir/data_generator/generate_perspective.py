@@ -74,10 +74,6 @@ def bottom_perspective_coordinates(img, percent):
     return current_coordinates, new_coordinates, (x, y)
 
 
-def convert_to_pil(img_ndarray):
-    return Image.fromarray(np.uint8(cm.gist_earth(img_ndarray) * 255))
-
-
 def write_to_output(img):
     for percent in range(3, 15, 3):
 
