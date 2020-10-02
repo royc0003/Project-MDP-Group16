@@ -9,12 +9,12 @@ if __name__ == "__main__":
     models = [
         # ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
         # ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
-        # ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
-        # ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
+        ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
+        ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
         # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        ("eight", cv2.CascadeClassifier('../models/eight_cascadexml'))
-        # ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
+        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml'))
         # ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
 
         # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
@@ -50,28 +50,23 @@ if __name__ == "__main__":
         for bb in bbs:
             # for each boundary, extract the image. this is the potential image
             potential_image = img_copy[bb[1]:bb[3], bb[0]:bb[2]]
-            # potential_image = cv2.resize(potential_image, (18, 24))
+            potential_image = cv2.resize(potential_image, (240, 240))
             potential_image = cv2.cvtColor(potential_image, cv2.COLOR_BGR2GRAY)
             potential_images.append((potential_image, bb))
 
-        switch = False
         for category, model in models:
             for image, bb in potential_images:
-                reg_img = model.detectMultiScale(image, 1.30, 2)
+                reg_img = model.detectMultiScale(image, 1.50, 5)
 
                 for _ in reg_img:
                     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
                     cv2.putText(img, category, (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
-                    switch = True
 
         cv2.imshow('img', img)
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             break
-        # if switch:
-        #     time.sleep(0.5)
-        switch = False
 
-        print("one iterate")
+#        print("one iterate")
     cap.release()
     cv2.destroyAllWindows()

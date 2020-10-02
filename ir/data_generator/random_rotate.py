@@ -1,16 +1,10 @@
+import random
 from PIL import Image
 from os import listdir
 from os.path import isfile, join
-import random
-
 
 RAW_DATA_DIRECTORY = '/Users/ongcj/Dev/mdp/ir/data/processed/six_resized'
 OUTPUT_DIRECTORY = '/Users/ongcj/Dev/mdp/ir/data/training/six/p'
-width = 240
-
-
-def get_random_width():
-    return random.randrange(96, 480)
 
 
 def random_rotation(img):
@@ -24,8 +18,6 @@ for image in all_images:
     print(image)
     full_path_to_img = join(RAW_DATA_DIRECTORY, image)
     img = Image.open(full_path_to_img)
-    percent = (width / float(img.size[0]))
-    resized_img = img.resize((width, int((float(img.size[1] * float(percent)))))).convert('L')
-    resized_img = random_rotation(resized_img)
-    resized_img.save(join(OUTPUT_DIRECTORY, full_path_to_img.replace(RAW_DATA_DIRECTORY, OUTPUT_DIRECTORY).replace(".JPG", "_ROTATED_RESIZED.JPG")), "JPEG",
+    resized_img = random_rotation(img)
+    resized_img.save(join(OUTPUT_DIRECTORY, full_path_to_img.replace(RAW_DATA_DIRECTORY, OUTPUT_DIRECTORY).replace(".JPG", "_ROTATED.JPG")), "JPEG",
                      optimize=True)

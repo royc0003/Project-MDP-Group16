@@ -9,10 +9,6 @@ OUTPUT_DIRECTORY = '/Users/ongcj/Dev/mdp/ir/data/training/six/p'
 width = 240
 
 
-def get_random_width():
-    return random.randrange(96, 480)
-
-
 def random_rotation(img):
     # pick a random degree of rotation between 25% on the left and 25% on the right
     random_degree = random.uniform(-15, 15)
@@ -27,5 +23,5 @@ for image in all_images:
     percent = (width / float(img.size[0]))
     resized_img = img.resize((width, int((float(img.size[1] * float(percent)))))).convert('L')
     resized_img = random_rotation(resized_img)
-    resized_img.save(join(OUTPUT_DIRECTORY, full_path_to_img.replace(RAW_DATA_DIRECTORY, OUTPUT_DIRECTORY).replace(".JPG", "_ROTATED_RESIZED.JPG")), "JPEG",
+    resized_img.save(join(OUTPUT_DIRECTORY, full_path_to_img.replace(RAW_DATA_DIRECTORY, OUTPUT_DIRECTORY).replace(".JPG", "_RESIZED.JPG")), "JPEG",
                      optimize=True)
