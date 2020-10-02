@@ -68,15 +68,15 @@ def readSerialMsg():
             testString = dataSplit[4]
             if(testString[2] == '3' or testString[2] == '4'):
                 msgQueue.put(sMsg)
-            else:
-                writePCMsg(str(sMsg))
+                continue
+            writePCMsg(str(sMsg))
         except Exception as e:
             fmessage = '\nError in Serial read: ' + str(e)
             print(fmessage)
 
 def image_rec():
     try:
-        while running:
+        while True:
             message = msgQueue.get()
 
             if message == None:
