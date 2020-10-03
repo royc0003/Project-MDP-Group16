@@ -7,15 +7,15 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
 
     models = [
-        # ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
-        # ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
+        ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
+        ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
         ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
         # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        # ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/cascade-3.xml')),
         ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
-        ("six", cv2.CascadeClassifier('../models/nine_cascade.xml'))
+        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
 
         # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
 

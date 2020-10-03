@@ -24,8 +24,8 @@ while True:
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
         # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        # ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')),
-        ("nine", cv2.CascadeClassifier('../models/cascade-3.xml')),
+        ("eight", cv2.CascadeClassifier('../models/cascade-3.xml')),
+        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
         ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
 
         # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
