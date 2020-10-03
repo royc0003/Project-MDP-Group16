@@ -12,12 +12,17 @@ if __name__ == "__main__":
         ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
-        # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        # ("eight_resized", cv2.CascadeClassifier('../models/cascade-3.xml')),
-        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
-        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
+        ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')), # not very good
 
-        # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
+        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        ("six", cv2.CascadeClassifier('../models/six_cascade.xml')),
+        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')), # not very good
+
+        ("circle", cv2.CascadeClassifier('../models/circle_cascade.xml')),
+
+        ("x", cv2.CascadeClassifier('../models/x_cascade.xml')),
+        ("z", cv2.CascadeClassifier('../models/z_cascade.xml')),
+        ("w", cv2.CascadeClassifier('../models/w_cascade.xml')) # not very good
 
     ]
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -56,7 +61,7 @@ if __name__ == "__main__":
 
         for category, model in models:
             for image, bb in potential_images:
-                reg_img = model.detectMultiScale(image, 1.50, 5)
+                reg_img = model.detectMultiScale(image, 1.3, 5)
 
                 for _ in reg_img:
                     cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
