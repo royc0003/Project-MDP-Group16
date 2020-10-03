@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from os.path import join
 from PIL import Image
 from matplotlib import cm
+import sys
 
 # pick one upright image
-PATH_TO_IMAGE = "/Users/ongcj/Dev/mdp/ir/data/processed/nine_resized/IMG_0262_RESIZED_RANDOM_RESIZE_RESIZED.JPG"
-PATH_TO_TARGET_DIRECTORY = "/Users/ongcj/Dev/mdp/ir/data/training/nine/p"
+# PATH_TO_IMAGE = "/Users/ongcj/Dev/mdp/ir/data/training/six/p/IMG_1679_RESIZED_RANDOM_RESIZE_RANDOM_RESIZE62.JPG"
+# PATH_TO_TARGET_DIRECTORY = "/Users/ongcj/Dev/mdp/ir/data/training/six/p"
 
 
 def left_perspective_coordinates(img, percent):
@@ -103,5 +103,7 @@ def write_to_output(img):
 
 
 if __name__ == "__main__":
+    PATH_TO_IMAGE = sys.argv[1]
+    PATH_TO_TARGET_DIRECTORY = sys.argv[2]
     img = cv2.imread(PATH_TO_IMAGE)
     write_to_output(img)

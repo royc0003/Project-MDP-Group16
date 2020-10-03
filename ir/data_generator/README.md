@@ -5,7 +5,9 @@
 
 `random_rotate.py` randomly picks images from the given directory and generate a new images with a random rotation between -25 to 25 degree.
 
-`random_resize` resize all of the images randomly between of width 96 to 480 with proportional ratio to height in the given directory and remove old images. 
+`random_resize.py` resize all of the images randomly between of width 96 to 480 with proportional ratio to height in the given directory and remove old images. 
+
+`generate_perspective.py` Generate perspective of left, right, bottom and top by manipulating the image coordinates.
 
 ## To generate positive images
 Change the directory in `generate_p_training_set.bash`.
