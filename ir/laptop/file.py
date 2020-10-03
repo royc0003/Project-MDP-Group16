@@ -23,12 +23,10 @@ while True:
         ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
-        # ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')),
-        # ("eight", cv2.CascadeClassifier('../models/cascade-3.xml')),
         ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
-        ("six", cv2.CascadeClassifier('../models/six_cascade.xml'))
+        ("six", cv2.CascadeClassifier('../models/six_cascade.xml')),
 
-        # ("circle", cv2.CascadeClassifier('../models/zero_cascade.xml'))
+        ("x", cv2.CascadeClassifier('../models/x_cascade.xml'))
 
     ]
 
@@ -41,9 +39,6 @@ while True:
             if 250000 >= area >= 50000:
                 cv2.rectangle(gray, (x, y), (x + w, y + h), (255, 255, 255), 2)
                 cv2.putText(gray, category + str(area), (x, y + 40), font, 2, (255, 255, 255), 2)
-
-
-
 
     cv2.imshow('img',gray)
     k = cv2.waitKey(30) & 0xff
