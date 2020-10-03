@@ -15,6 +15,7 @@ public class Sensor {
     private int sensorPosCol;
     private DIRECTION sensorDir;
     private final String id;
+    private int sensorVal;
 
     public Sensor(int lowerRange, int upperRange, int row, int col, DIRECTION dir, String id) {
         this.lowerRange = lowerRange;
@@ -31,6 +32,9 @@ public class Sensor {
         this.sensorDir = dir;
     }
 
+    public int getSensorVal(){
+        return this.sensorVal;
+    }
     /**
      * Returns the number of cells to the nearest detected obstacle or -1 if no obstacle is detected.
      */
@@ -88,6 +92,7 @@ public class Sensor {
      * Uses the sensor direction and given value from the actual sensor to update the map.
      */
     public void senseReal(Map exploredMap, int sensorVal) {
+        this.sensorVal = sensorVal;
         switch (sensorDir) {
             case NORTH:
                 processSensorVal(exploredMap, sensorVal, 1, 0);
@@ -129,12 +134,16 @@ public class Sensor {
             exploredMap.getCell(row, col).setIsExplored(true);
 
             if (sensorVal == i) {
+                if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
+                    return;
+                }
                 exploredMap.setObstacleCell(row, col, true);
                 break;
             }
 
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.getCell(row, col).getIsObstacle()) {
+                //|| id.equals("SRRT") || id.equals("SRRB")
                 if (id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")) {
                     exploredMap.setObstacleCell(row, col, false);
                 } else {

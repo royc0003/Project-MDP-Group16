@@ -81,6 +81,11 @@ public class Robot {
     public DIRECTION getRobotCurDir() {
         return robotDir;
     }
+
+    public boolean checkRightNotPhantom(){
+        return SRRightTop.getSensorVal() == 1 && SRRightBottom.getSensorVal() == 1;
+    }
+
     public char getCameraDirection(DIRECTION d){
         switch(d){
             case NORTH:
