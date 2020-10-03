@@ -4,8 +4,8 @@ from os.path import isfile, join
 import random
 
 
-RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/MDP/x'
-OUTPUT_DIRECTORY = '/Users/ongcj/Dev/mdp/ir/data/processed/x_resized'
+RAW_DATA_DIRECTORY = '/Users/ongcj/Desktop/MDP/v'
+OUTPUT_DIRECTORY = '/Users/ongcj/Dev/mdp/ir/data/processed/v_resized'
 width = 240
 
 
