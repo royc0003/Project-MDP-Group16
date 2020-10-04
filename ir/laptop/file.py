@@ -18,7 +18,7 @@ while True:
         ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
         ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
 
-        ("zero", cv2.CascadeClassifier('../models/zero_cascade.xml')), # not very good
+        ("zero", cv2.CascadeClassifier('../models/zero_cascade_2.xml')), # not very good
         ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
         ("six", cv2.CascadeClassifier('../models/six_cascade.xml')),
         ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')), # not very good
@@ -34,20 +34,18 @@ while True:
 
     ]
     # ret, threshold_grey = cv2.threshold(gray, 100, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    th2 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
     th3 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     for category, model in models:
-        reg_img = model.detectMultiScale(gray, 1.30, 5)
+        reg_img = model.detectMultiScale(gray, 1.3, 5)
 
         for (x, y, w, h) in reg_img:
             # filter out image that are too small
             area = w * h
-            if 250000 >= area >= 50000:
+            if 250000 >= area >= 25000:
                 cv2.rectangle(gray, (x, y), (x + w, y + h), (255, 255, 255), 2)
                 cv2.putText(gray, category + " " + str(area), (x, y + 40), font, 2, (255, 255, 255), 2)
 
     cv2.imshow('img1', th3)
-    cv2.imshow('img2', th2)
     cv2.imshow('img', gray)
 
 
