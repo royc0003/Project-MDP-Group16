@@ -45,7 +45,7 @@ while True:
                 cv2.rectangle(gray, (x, y), (x + w, y + h), (255, 255, 255), 2)
                 cv2.putText(gray, category + " " + str(area), (x, y + 40), font, 2, (255, 255, 255), 2)
 
-    cv2.imshow('img1', th3)
+    # cv2.imshow('img1', th3)
     cv2.imshow('img', gray)
 
 
