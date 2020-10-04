@@ -13,30 +13,31 @@ while True:
 
 
     models = [
-        ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
-        ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
-        ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
-        ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
-
-        ("zero", cv2.CascadeClassifier('../models/zero_cascade_2.xml')), # not very good
-        ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
-        ("six", cv2.CascadeClassifier('../models/six_cascade.xml')),
-        ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')), # not very good
-        ("seven", cv2.CascadeClassifier('../models/seven_cascade.xml')), # not very good
-
-        ("x", cv2.CascadeClassifier('../models/x_cascade.xml')),
-        ("z", cv2.CascadeClassifier('../models/z_cascade.xml')),
-        ("v", cv2.CascadeClassifier('../models/v_cascade.xml')),
-        ("y", cv2.CascadeClassifier('../models/y_cascade.xml')),
-        ("w", cv2.CascadeClassifier('../models/w_cascade.xml')), # not very good
+        # ("up", cv2.CascadeClassifier('../models/up_cascade.xml')),
+        # ("down", cv2.CascadeClassifier('../models/down_cascade.xml')),
+        # ("left", cv2.CascadeClassifier('../models/left_cascade.xml')),
+        # ("right", cv2.CascadeClassifier('../models/right_cascade.xml')),
+        #
+        # ("zero", cv2.CascadeClassifier('../models/zero_cascade_2.xml')), # not very good
+        # ("nine", cv2.CascadeClassifier('../models/nine_cascade.xml')),
+        # ("six", cv2.CascadeClassifier('../models/six_cascade.xml')),
+        # ("eight", cv2.CascadeClassifier('../models/eight_cascade.xml')), # not very good
+        # ("seven", cv2.CascadeClassifier('../models/seven_cascade.xml')), # not very good
+        #
+        # ("x", cv2.CascadeClassifier('../models/x_cascade.xml')),
+        # ("z", cv2.CascadeClassifier('../models/z_cascade.xml')),
+        # ("v", cv2.CascadeClassifier('../models/v_cascade.xml')),
+        # ("y", cv2.CascadeClassifier('../models/y_cascade.xml')),
+        # ("w", cv2.CascadeClassifier('../models/w_cascade.xml')), # not very good
 
         ("circle", cv2.CascadeClassifier('../models/circle_cascade.xml')),
+        ("circle_2", cv2.CascadeClassifier('../models/circle_adpative_threshold_cascade.xml')),
 
     ]
     # ret, threshold_grey = cv2.threshold(gray, 100, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     th3 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     for category, model in models:
-        reg_img = model.detectMultiScale(gray, 1.3, 5)
+        reg_img = model.detectMultiScale(gray, 1.5, 5)
 
         for (x, y, w, h) in reg_img:
             # filter out image that are too small
