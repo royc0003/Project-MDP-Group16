@@ -8,6 +8,7 @@ import utils.CommMgr;
 import utils.MapDescriptor;
 
 import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 // @formatter:off
 /**
@@ -317,21 +318,40 @@ public class Robot {
         } else {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
-            //msg = "SDATA;0_val0;1_val1;2_val2;3_val3;4_val4;5_val5"
-            String[] msgArr = msg.split(";");
-            //msgArr = [SDATA, 0_val0, 1_val1, 2_val2, 3_val3, 4_val4, 5_val5, 6_val6]
 
-            if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
-                result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
-                result[1] = Integer.parseInt(msgArr[2].split("_")[1]);
-                result[2] = Integer.parseInt(msgArr[3].split("_")[1]);
-                result[3] = Integer.parseInt(msgArr[4].split("_")[1]);
-                result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
-                result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
+            // String msg = "SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_2;SDATA;1_2;2_1;3_-1;4_1;5_-1;6_3;SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_3;";
+
+            String[] msgArr = msg.split(";");
+            int i;
+            
+            for(i=1;i<7;i++){
+            int n = msgArr.length / 7;
+            int j;
+            HashMap<Integer, Integer> freq = new HashMap<Integer, Integer>();
+            int mostFreq = Integer.parseInt(msgArr[i].split("_")[1]);
+
+            for(j=0;j<n;j++){
+                int value = Integer.parseInt(msgArr[i+7*j].split("_")[1]);
+                if(!freq.containsKey(value)){
+                freq.put(value, 1);
+                } else freq.put(value, freq.get(value)+1);
+                
+                if(freq.get(value) > freq.get(mostFreq)) mostFreq = value;
+            }
+            result[i-1] = mostFreq;
             }
 
-            //Fantom block due to poor center sensor
-            if(result[0] == result[2]) result[1] = result[0];
+            // if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
+            //     result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
+            //     result[1] = Integer.parseInt(msgArr[2].split("_")[1]);
+            //     result[2] = Integer.parseInt(msgArr[3].split("_")[1]);
+            //     result[3] = Integer.parseInt(msgArr[4].split("_")[1]);
+            //     result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
+            //     result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
+            // }
+
+            // //Fantom block due to poor center sensor
+            // if(result[0] == result[2]) result[1] = result[0];
 
             SRFrontLeft.senseReal(explorationMap, result[0]);
             SRFrontCenter.senseReal(explorationMap, result[1]);
