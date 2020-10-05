@@ -140,15 +140,17 @@ public class Sensor {
                 /*if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
                     return;
                 }*/
-                // check if has been rewarded before? if yes give penalty
-                if(exploredMap.getCell(row, col).isRewarded()){
-                    //obstacle too far so increment reward by 1
-                    exploredMap.getCell(row, col).givePenaltyReward();
-                    if(exploredMap.getCell(row, col).getReward() >= -500 && exploredMap.getCell(row, col).getReward() <=0){
-                        exploredMap.setObstacleCell(row, col, false);
-                    }
+                // if immediate front has obstacle, give reward
+                if(sensorVal == 1 && id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")){
+                    exploredMap.getCell(row, col).setReward(1000);
+                }
+                // check if has been rewarded before? Rewarded and Have Obstacle
+                else if(exploredMap.getCell(row, col).isRewarded()){
+                    exploredMap.getCell(row, col).giveBonusReward();
+
                 }
                 else{
+                    //never get rewarded before and identify as obstacle
                     exploredMap.getCell(row, col).increaseReward();
                 }
                 if(exploredMap.getCell(row, col).getReward()>=1){
@@ -157,9 +159,19 @@ public class Sensor {
                 break;
             }
             /*
-             * very sure that the current cell is not an obstacle after checking if it's an obstacle
+             * if immediate front has 0 obstacles
              * */
-            if(i == 1)exploredMap.getCell(row, col).setReward(-1000);
+            if(i == 1 && id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR"))exploredMap.getCell(row, col).setReward(-1000);
+                /*
+                 * False +ve Scenario (block not there but detected as there)| Phantom Block | Remove it
+                 * Rewarded but no obstacle
+                 * */
+            else if(exploredMap.getCell(row, col).isRewarded()){
+                    exploredMap.getCell(row, col).givePenaltyReward();
+                    if(exploredMap.getCell(row, col).getReward() >= -500 && exploredMap.getCell(row, col).getReward() <=0){
+                        exploredMap.setObstacleCell(row, col, false);
+                    }
+                }
             else{
                 exploredMap.getCell(row, col).decreaseReward();
             }

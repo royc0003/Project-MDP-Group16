@@ -75,6 +75,9 @@ public class Cell {
     public void decreaseReward() {
         this.reward -= 1;
     }
+    public void giveBonusReward() {
+        this.reward += 2;
+    }
 
     public void givePenaltyReward() {
         this.reward -= 10;
