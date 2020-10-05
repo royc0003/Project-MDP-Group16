@@ -7,6 +7,7 @@ import robot.RobotConstants.MOVEMENT;
 import utils.CommMgr;
 import utils.MapDescriptor;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 // @formatter:off
@@ -268,6 +269,32 @@ public class Robot {
      *
      * @return [SRFrontLeft, SRFrontCenter, SRFrontRight, SRLeft, SRRight, LRLeft]
      */
+    public int mode(int []array)
+    {
+        HashMap<Integer,Integer> hm = new HashMap<Integer,Integer>();
+        int max  = 1;
+        int temp = 0;
+
+        for(int i = 0; i < array.length; i++) {
+
+            if (hm.get(array[i]) != null) {
+
+                int count = hm.get(array[i]);
+                count++;
+                hm.put(array[i], count);
+
+                if(count > max) {
+                    max  = count;
+                    temp = array[i];
+                }
+            }
+
+            else
+                hm.put(array[i],1);
+        }
+        return temp;
+    }
+
     public int[] sense(Map explorationMap, Map realMap) {
         int[] result = new int[6];
 

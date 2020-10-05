@@ -116,13 +116,13 @@ public class Sensor {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
         // If above fails, check if starting point is valid for sensors with lowerRange > 1.
-        for (int i = 1; i < this.lowerRange; i++) {
-            int row = this.sensorPosRow + (rowInc * i);
-            int col = this.sensorPosCol + (colInc * i);
-
-            if (!exploredMap.checkValidCoordinates(row, col)) return;
-            if (exploredMap.getCell(row, col).getIsObstacle()) return;
-        }
+//        for (int i = 1; i < this.lowerRange; i++) {
+//            int row = this.sensorPosRow + (rowInc * i);
+//            int col = this.sensorPosCol + (colInc * i);
+//
+//            if (!exploredMap.checkValidCoordinates(row, col)) return;
+//            if (exploredMap.getCell(row, col).getIsObstacle()) return;
+//        }
 
         // Update map according to sensor's value.
         for (int i = this.lowerRange; i <= this.upperRange; i++) {
@@ -133,18 +133,43 @@ public class Sensor {
 
             exploredMap.getCell(row, col).setIsExplored(true);
 
+            /*
+            * Obstacle is present, therefore set the value
+            * */
             if (sensorVal == i) {
-                if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
+                /*if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
                     return;
+                }*/
+                // check if has been rewarded before? if yes give penalty
+                if(exploredMap.getCell(row, col).isRewarded()){
+                    //obstacle too far so increment reward by 1
+                    exploredMap.getCell(row, col).givePenaltyReward();
+                    if(exploredMap.getCell(row, col).getReward() >= -500 && exploredMap.getCell(row, col).getReward() <=0){
+                        exploredMap.setObstacleCell(row, col, false);
+                    }
                 }
-                exploredMap.setObstacleCell(row, col, true);
+                else{
+                    exploredMap.getCell(row, col).increaseReward();
+                }
+                if(exploredMap.getCell(row, col).getReward()>=1){
+                    exploredMap.setObstacleCell(row, col, true);
+                }
                 break;
+            }
+            /*
+             * very sure that the current cell is not an obstacle after checking if it's an obstacle
+             * */
+            if(i == 1)exploredMap.getCell(row, col).setReward(-1000);
+            else{
+                exploredMap.getCell(row, col).decreaseReward();
             }
 
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.getCell(row, col).getIsObstacle()) {
                 //|| id.equals("SRRT") || id.equals("SRRB")
                 if (id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")) {
+                    //very sure that this is an obstacle
+                    exploredMap.getCell(row, col).setReward(-1000);
                     exploredMap.setObstacleCell(row, col, false);
                 } else {
                     break;

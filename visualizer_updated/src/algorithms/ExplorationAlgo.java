@@ -1,7 +1,5 @@
 package algorithms;
 
-import java.util.*;
-
 import map.Cell;
 import map.Map;
 import map.MapConstants;
@@ -10,6 +8,9 @@ import robot.RobotConstants;
 import robot.RobotConstants.DIRECTION;
 import robot.RobotConstants.MOVEMENT;
 import utils.CommMgr;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 
@@ -330,7 +331,7 @@ public class ExplorationAlgo {
      */
     private void moveBot(MOVEMENT m) {
         bot.move(m);
-        exploredMap.repaint();
+//        exploredMap.repaint();
         if (m != MOVEMENT.CALIBRATE_FRONT && m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
             senseAndRepaint();
         } 

@@ -5,6 +5,7 @@ import robot.RobotConstants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Represents the entire map grid for the arena.
@@ -15,12 +16,17 @@ import java.awt.*;
 public class Map extends JPanel {
     private final Cell[][] grid;
     private final Robot bot;
+    private ArrayList<Cell> unExplored;
 
     /**
      * Initialises a Map object with a grid of Cell objects.
      */
     public Map(Robot bot) {
         this.bot = bot;
+        /*
+        * Sets arraylist of unexplored cells
+        * */
+        unExplored = new ArrayList<Cell>();
 
         grid = new Cell[MapConstants.MAP_ROWS][MapConstants.MAP_COLS];
         for (int row = 0; row < grid.length; row++) {
@@ -30,6 +36,18 @@ public class Map extends JPanel {
                 // Set the virtual walls of the arena
                 if (row == 0 || col == 0 || row == MapConstants.MAP_ROWS - 1 || col == MapConstants.MAP_COLS - 1) {
                     grid[row][col].setVirtualWall(true);
+                }
+            }
+        }
+    }
+    /*
+    * Returns all unexplored cells
+    * */
+    public void getAllUnExplored() {
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[0].length; col++) {
+                if(!grid[row][col].getIsExplored()){
+                    unExplored.add(grid[row][col]);
                 }
             }
         }

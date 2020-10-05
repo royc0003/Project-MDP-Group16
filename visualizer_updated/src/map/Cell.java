@@ -11,6 +11,11 @@ public class Cell {
     private boolean isObstacle;
     private boolean isVirtualWall;
     private boolean isExplored;
+    /*
+     * This would set every counter to 0
+     * */
+    private int reward = 0;
+    private boolean isRewarded = true;
 
     public Cell(int row, int col) {
         this.row = row;
@@ -54,4 +59,31 @@ public class Cell {
     public boolean getIsExplored() {
         return this.isExplored;
     }
+
+    public int getReward() {
+        return reward;
+    }
+
+    public void setReward(int reward) {
+        this.reward = reward;
+    }
+
+    public void increaseReward() {
+        this.reward += 1;
+    }
+
+    public void decreaseReward() {
+        this.reward -= 1;
+    }
+
+    public void givePenaltyReward() {
+        this.reward -= 10;
+    }
+    public boolean isRewarded(){
+        if(this.reward >0){
+            return this.isRewarded;
+        }
+        return !this.isRewarded;
+    }
+
 }
