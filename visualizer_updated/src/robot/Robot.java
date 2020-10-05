@@ -333,7 +333,7 @@ public class Robot {
             for(j=0;j<n;j++){
                 int value = Integer.parseInt(msgArr[i+7*j].split("_")[1]);
                 if(!freq.containsKey(value)){
-                freq.put(value, 1);
+                    freq.put(value, 1);
                 } else freq.put(value, freq.get(value)+1);
                 
                 if(freq.get(value) > freq.get(mostFreq)) mostFreq = value;
@@ -352,6 +352,8 @@ public class Robot {
 
             // //Fantom block due to poor center sensor
             // if(result[0] == result[2]) result[1] = result[0];
+
+            System.out.println(Arrays.toString(result));
 
             SRFrontLeft.senseReal(explorationMap, result[0]);
             SRFrontCenter.senseReal(explorationMap, result[1]);

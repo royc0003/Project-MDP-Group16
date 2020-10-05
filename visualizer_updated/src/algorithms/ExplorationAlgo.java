@@ -331,7 +331,7 @@ public class ExplorationAlgo {
     private void moveBot(MOVEMENT m) {
         bot.move(m);
         exploredMap.repaint();
-        if (m != MOVEMENT.CALIBRATE_FRONT || m != MOVEMENT.CALIBRATE_RIGHT || m != MOVEMENT.CALIBRATE_DISTANCE){
+        if (m != MOVEMENT.CALIBRATE_FRONT && m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
             senseAndRepaint();
         } 
         else {
