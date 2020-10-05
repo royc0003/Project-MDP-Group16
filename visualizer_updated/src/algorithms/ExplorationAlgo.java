@@ -28,7 +28,6 @@ public class ExplorationAlgo {
     private ArrayList<MOVEMENT> movement = new ArrayList<MOVEMENT>();
     private int prevLocRow;
     private int prevLocCol;
-    private boolean canCalibrateDistance;
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Robot bot, int coverageLimit, int timeLimit) {
         this.exploredMap = exploredMap;
@@ -342,79 +341,66 @@ public class ExplorationAlgo {
 
         if (bot.getRealBot() && !calibrationMode) {
             calibrationMode = true;
-            // This calibration is activated (distance both) when meet with a right angle.
-            if(canCalibrateOnTheSpotFront(bot.getRobotCurDir()) && canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
-               DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir());  
-               calibrateBot(dirToCheck, MOVEMENT.CALIBRATE_DISTANCE);
-               moveBot(MOVEMENT.CALIBRATE_DISTANCE);
-               lastCalibrate = 0;
-
-            // } else if(lastCalibrate >= 2 ){
-            //     if(canCalibrateOnTheSpotRight(bot.getRobotCurDir())){
-            //         lastCalibrate = 0;
-            //         moveBot(MOVEMENT.CALIBRATE_RIGHT);
-            //         noRightCalibration++;
-            //         if(noRightCalibration % 3 == 2) canCalibrateDistance = true;
-            //     }
-            // } else {
-            //     lastCalibrate++;
-            // }
-            //At the 3rd movement, if ossible do right calibration first, then distance alibration
-            } else if(lastCalibrate >= 2){
-                if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
-                    lastCalibrate = 0;
-                    moveBot(MOVEMENT.CALIBRATE_RIGHT);
-                    canCalibrateDistance = true;
-                    // noRightCalibration++;
-                    // if(noRightCalibration % 3 == 2) canCalibrateDistance = true;
-                }
-            } else {
-                lastCalibrate++;
-            }
-            
-            if(canCalibrateDistance){
-                if (canCalibrateOnTheSpotFront(bot.getRobotCurDir())){
-                    moveBot(MOVEMENT.CALIBRATE_DISTANCE);
-                    if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
-                        moveBot(MOVEMENT.CALIBRATE_RIGHT);
-                    }
-                } else if (bot.checkRightNotPhantom()){
-                    DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir());  
-                    if(canCalibrateOnTheSpotFront(dirToCheck)){
-                        calibrateBot(dirToCheck, MOVEMENT.CALIBRATE_DISTANCE);
-                    }
-                    if(canCalibrateOnTheSpotRight(bot.getRobotCurDir())){
-                        moveBot(MOVEMENT.CALIBRATE_RIGHT);
-                    }
-                }
-                canCalibrateDistance = false;
-            }
-
-            if(lastCalibrate >= 5){
-                DIRECTION targetDir = getCalibrationDirection();
-                System.out.println(targetDir);
-                if (targetDir != null) {
-                    lastCalibrate = 0;
-                    if(bot.checkRightNotPhantom()) calibrateBot(targetDir, MOVEMENT.CALIBRATE_RIGHT);
+            if(!cornerCalibrate()){
+                if(lastCalibrate >= 2){
+                    normalCalibrate();
+                } else {
+                    lastCalibrate++;
                 }
             }
-            // if (canCalibrateOnTheSpot(bot.getRobotCurDir())) {
-            //     lastCalibrate = 0;
-            //     moveBot(MOVEMENT.CALIBRATE);
-            // } else {
-            //     lastCalibrate++;
-            //     // if (lastCalibrate >= 5) {
-            //     //     DIRECTION targetDir = getCalibrationDirection();
-            //     //     if (targetDir != null) {
-            //     //         lastCalibrate = 0;
-            //     //         calibrateBot(targetDir);
-            //     //     }
-            //     // }
-            // }
-
             calibrationMode = false;
         }
-        // senseAndRepaint();
+    }
+
+    /** At the 3rd movement, if possible do right calibration first, then distance alibration */
+    private void normalCalibrate(){
+        rightCalibrate();
+        if(canCalibrateOnTheSpotFront(bot.getRobotCurDir())){
+            distanceCalibrate(bot.getRobotCurDir());
+        } else {
+            DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir()); 
+            distanceCalibrate(dirToCheck);
+        }
+        lastCalibrate = 0;
+    }
+
+    /** This calibration is activated (distance both) when meet with a right angle. */
+    private boolean cornerCalibrate(){
+        DIRECTION origDir = bot.getRobotCurDir();
+        DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir()); 
+    
+        if(canCalibrateOnTheSpotFront(origDir) && canCalibrateOnTheSpotFront(dirToCheck)){
+            rightCalibrate(); 
+            distanceCalibrate(dirToCheck);
+            rightCalibrate(); 
+            distanceCalibrate(origDir);
+            lastCalibrate = 0;
+            return true;
+        }
+        return false;
+    }
+
+    /** Right calibration */
+    private void rightCalibrate(){
+        if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
+            moveBot(MOVEMENT.CALIBRATE_RIGHT);
+        }
+    }
+
+    /** Distance calibrate */
+    private void distanceCalibrate(DIRECTION dirToCheck){
+        DIRECTION origDir = bot.getRobotCurDir();
+        if (dirToCheck == origDir){
+            if(canCalibrateOnTheSpotFront(dirToCheck)){
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+            }
+        } else {
+            if(canCalibrateOnTheSpotFront(dirToCheck)){
+                turnBotDirection(dirToCheck);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+                turnBotDirection(origDir);
+            }
+        }
     }
 
     /**
@@ -461,58 +447,6 @@ public class ExplorationAlgo {
         }
 
         return false;
-    }
-
-    /**
-     * Returns a possible direction for robot calibration or null, otherwise.
-     */
-    private DIRECTION getCalibrationDirection() {
-        DIRECTION origDir = bot.getRobotCurDir();
-        DIRECTION dirToCheck;
-
-        dirToCheck = DIRECTION.getNext(origDir);                    // right turn
-
-        if (canCalibrateOnTheSpotRight(dirToCheck)){
-            return dirToCheck;
-        }
-
-        if (canCalibrateOnTheSpotFront(dirToCheck)) {
-            return dirToCheck;
-        }
-
-        dirToCheck = DIRECTION.getPrevious(origDir);                // left turn
-        
-        if (canCalibrateOnTheSpotRight(dirToCheck)){
-            return dirToCheck;
-        }
-
-        if (canCalibrateOnTheSpotFront(dirToCheck)) {
-            return dirToCheck;
-        }
-
-        dirToCheck = DIRECTION.getPrevious(dirToCheck);             // u turn
-        if (canCalibrateOnTheSpotRight(dirToCheck)){
-            return dirToCheck;
-        }
-
-        if (canCalibrateOnTheSpotFront(dirToCheck)) {
-            return dirToCheck;
-        }
-
-        return null;
-    }
-
-    /**
-     * Turns the bot in the needed direction and sends the CALIBRATE movement. Once calibrated, the bot is turned back
-     * to its original direction.
-     */
-    private void calibrateBot(DIRECTION targetDir, MOVEMENT move) {
-        DIRECTION origDir = bot.getRobotCurDir();
-
-        turnBotDirection(targetDir);
-        if(move == MOVEMENT.CALIBRATE_RIGHT) moveBot(MOVEMENT.CALIBRATE_RIGHT);
-        else moveBot(MOVEMENT.CALIBRATE_DISTANCE);
-        turnBotDirection(origDir);
     }
 
     /**
