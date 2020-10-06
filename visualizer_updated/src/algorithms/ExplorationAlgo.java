@@ -69,7 +69,7 @@ public class ExplorationAlgo {
         if (bot.getRealBot()) {
             CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
         }
-        senseAndRepaint();
+        senseAndRepaint(true);
 
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
@@ -107,27 +107,27 @@ public class ExplorationAlgo {
     private void nextMove() {
         if (lookRight()) {
             movement.add(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT);
+            moveBot(MOVEMENT.RIGHT, true);
             if (lookForward()) {
                 movement.add(MOVEMENT.FORWARD);
-                moveBot(MOVEMENT.FORWARD);
+                moveBot(MOVEMENT.FORWARD, true);
             }
         } else if (lookForward()) {
             movement.add(MOVEMENT.FORWARD);
-            moveBot(MOVEMENT.FORWARD);
+            moveBot(MOVEMENT.FORWARD, true);
         } else if (lookLeft()) {
             movement.add(MOVEMENT.LEFT);
-            moveBot(MOVEMENT.LEFT);
+            moveBot(MOVEMENT.LEFT, true);
             if (lookForward()) {
                 movement.add(MOVEMENT.FORWARD);
-                moveBot(MOVEMENT.FORWARD);
+                moveBot(MOVEMENT.FORWARD, true);
             }
         }
         else {
             movement.add(MOVEMENT.RIGHT);
             movement.add(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT);
+            moveBot(MOVEMENT.RIGHT, true);
+            moveBot(MOVEMENT.RIGHT, true);
         }
     }
 
@@ -328,11 +328,11 @@ public class ExplorationAlgo {
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
-    private void moveBot(MOVEMENT m) {
+    private void moveBot(MOVEMENT m, boolean canSense) {
         bot.move(m);
-        exploredMap.repaint();
-        if (m != MOVEMENT.CALIBRATE_FRONT && m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
-            senseAndRepaint();
+        if(canSense) exploredMap.repaint();
+        if (m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
+            senseAndRepaint(canSense);
         } 
         else {
             CommMgr commMgr = CommMgr.getCommMgr();
@@ -383,7 +383,7 @@ public class ExplorationAlgo {
     /** Right calibration */
     private void rightCalibrate(){
         if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
-            moveBot(MOVEMENT.CALIBRATE_RIGHT);
+            moveBot(MOVEMENT.CALIBRATE_RIGHT, false);
         }
     }
 
@@ -392,12 +392,12 @@ public class ExplorationAlgo {
         DIRECTION origDir = bot.getRobotCurDir();
         if (dirToCheck == origDir){
             if(canCalibrateOnTheSpotFront(dirToCheck)){
-                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);
             }
         } else {
             if(canCalibrateOnTheSpotFront(dirToCheck)){
                 turnBotDirection(dirToCheck);
-                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);
                 turnBotDirection(origDir);
             }
         }
@@ -406,10 +406,17 @@ public class ExplorationAlgo {
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    private void senseAndRepaint() {
-        bot.setSensors();
-        bot.sense(exploredMap, realMap);
-        exploredMap.repaint();
+    private void senseAndRepaint(boolean canSense) {
+        if(canSense){
+            bot.setSensors();
+            bot.sense(exploredMap, realMap);
+            exploredMap.repaint();
+        }
+        else {
+            CommMgr comm = CommMgr.getCommMgr();
+            String msg = comm.recvMsg();
+            System.out.println("Rotating right to calibrate: "+msg);
+        }
     }
 
     /**
@@ -458,13 +465,13 @@ public class ExplorationAlgo {
 
         if (numOfTurn == 1) {
             if (DIRECTION.getNext(bot.getRobotCurDir()) == targetDir) {
-                moveBot(MOVEMENT.RIGHT);
+                moveBot(MOVEMENT.RIGHT, false);
             } else {
-                moveBot(MOVEMENT.LEFT);
+                moveBot(MOVEMENT.LEFT, false);
             }
         } else if (numOfTurn == 2) {
-            moveBot(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT);
+            moveBot(MOVEMENT.RIGHT, false);
+            moveBot(MOVEMENT.RIGHT, false);
         }
     }
 }

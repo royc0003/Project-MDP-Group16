@@ -53,7 +53,7 @@ public class RobotConstants {
     }
 
     public enum MOVEMENT {
-        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_FRONT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE, ERROR;
+        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE, ERROR;
 
         public static char print(MOVEMENT m) {
             switch (m) {

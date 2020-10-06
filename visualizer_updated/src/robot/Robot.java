@@ -177,7 +177,7 @@ public class Robot {
             case LEFT:
                 robotDir = findNewDirection(m);
                 break;
-            case CALIBRATE_FRONT:
+            case CALIBRATE_DISTANCE:
             case CALIBRATE_RIGHT:
                 break;
             default:
@@ -238,14 +238,10 @@ public class Robot {
     private void sendMovement(MOVEMENT m, boolean sendMoveToAndroid) {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
-        if ((m != MOVEMENT.CALIBRATE_FRONT || m != MOVEMENT.CALIBRATE_RIGHT) && sendMoveToAndroid) {
-            //comm.sendMsg(this.getRobotPosRow() + TO_ANDROID"," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
-            // comm.sendMsg(this.getRobotPosCol() + "," + this.getRobotPosRow() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
             String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
             comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
             // String imgToSend = "|["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]|"+getCameraDirection(this.getRobotCurDir())+"|";
             // comm.sendMsg(imgToSend, CommMgr.CAMERA);
-        }
     }
 
     /**

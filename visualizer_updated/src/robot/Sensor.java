@@ -116,13 +116,13 @@ public class Sensor {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
         // If above fails, check if starting point is valid for sensors with lowerRange > 1.
-        for (int i = 1; i < this.lowerRange; i++) {
-            int row = this.sensorPosRow + (rowInc * i);
-            int col = this.sensorPosCol + (colInc * i);
+        // for (int i = 1; i < this.lowerRange; i++) {
+        //     int row = this.sensorPosRow + (rowInc * i);
+        //     int col = this.sensorPosCol + (colInc * i);
 
-            if (!exploredMap.checkValidCoordinates(row, col)) return;
-            if (exploredMap.getCell(row, col).getIsObstacle()) return;
-        }
+        //     if (!exploredMap.checkValidCoordinates(row, col)) return;
+        //     if (exploredMap.getCell(row, col).getIsObstacle()) return;
+        // }
 
         // Update map according to sensor's value.
         for (int i = this.lowerRange; i <= this.upperRange; i++) {
@@ -134,16 +134,15 @@ public class Sensor {
             exploredMap.getCell(row, col).setIsExplored(true);
 
             if (sensorVal == i) {
-                if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
-                    return;
-                }
+                // if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
+                //     return;
+                // }
                 exploredMap.setObstacleCell(row, col, true);
                 break;
             }
 
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.getCell(row, col).getIsObstacle()) {
-                //|| id.equals("SRRT") || id.equals("SRRB")
                 if (id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")) {
                     exploredMap.setObstacleCell(row, col, false);
                 } else {
