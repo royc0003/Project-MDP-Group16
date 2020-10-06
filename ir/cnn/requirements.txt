@@ -1,0 +1,6 @@
+numpy
+opencv-python
+matplotlib
+tensorflow==1.15.4
+keras
+joblib
