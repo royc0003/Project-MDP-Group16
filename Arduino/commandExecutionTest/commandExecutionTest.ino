@@ -29,7 +29,12 @@ DualVNH5019MotorShield md;
 
 #define NUM_SENSOR_READINGS_CALI 49
 
-#define CALI_DISTANCE_OFFSET 0
+#define CALI_DISTANCE_OFFSET -0.5
+
+#define ERROR_RIGHT 0.06
+#define ERROR_FRONT 0
+
+int RUN = 32;
 
 const int maxCalibrationTrial = 30;
 boolean calibration = true;
@@ -38,27 +43,22 @@ int caliReading[49]; //sensor readings for calibration
 
 
 double Distance[29];
-String gridsToRpi;
+String gridsToRpi = "";
+
+
 volatile int left_encoder_val = 0, right_encoder_val = 0, left_encoder_val2 = 0;
 
 float prevError = 0.0;
 float integral = 0.0;
 
-float testSpeed = 300; //180                              //
-float PID_KP =  0.52; // lower = right, higher = left     // computePID() //-1.3 //software project lab
-//float PID_KP = 0.52; //lounge
-//float PID_KP = 5.6; // for own arena use with only arduino loaded
-float PID_KI = 0.026;//0.4;  //0.01        //software project lab                               // computePID()
-//float PID_KI = 0.02;
-//float PID_KI = 0.21; //for own arena use with only arduino loaded
-//float PID_KD = 0.005;  //0.05  // computePID()
-float PID_KD = 0;
-float GRID_DISTANCE[6] = {10.15, 20.3, 30.45, 40, 50, 120};   // moveByGrids(int)
-//float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
-
-float DG_GRID_DISTANCE[5] = {10, 20, 30, 40, 50};
-float LEFT_ROTATION_DEGREE_OFFSET = 1.1;//2.4;                   // rotateLeft(int)
-float RIGHT_ROTATION_DEGREE_OFFSET = 1.1;//3.48;                  // rotateRight(int)
+float testSpeed = 320; //180                              //
+float PID_KP = 1.6; // lower = right, higher = left     // computePID() //-1.3
+float PID_KI = 0.0019;  //0.01                                       // computePID()
+float PID_KD = 0; //0.05                                       // computePID()
+float GRID_DISTANCE[5] = {10.15, 20.3, 29.7, 40.1, 51};   // moveByGrids(int)
+float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
+float LEFT_ROTATION_DEGREE_OFFSET = -3.5;                   // rotateLeft(int)
+float RIGHT_ROTATION_DEGREE_OFFSET = -2.6;                  // rotateRight(int)
 int NUM_OF_SENSOR_READINGS_TO_TAKE = 15;                  // getDistance()
 int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calDistance()
 int COMMAND_DELAY = 60;
@@ -111,43 +111,29 @@ void setup()
 void loop()
 {
 
-  /*
+  
   
   if (Serial.available() > 0)
   {
     commandExecution(char(Serial.read()));
   }
-
-  */
   
-  
-  moveByGrids(1);
-  delay(100);
-  moveByGrids(1);
-  delay(100);
-  moveByGrids(1);
-  delay(100);
-  moveByGrids(1);
-  while(1)
-  {
-    delay(10000);
-  }
+ 
   
     //Serial.println(calculateGrids(RB));
-  
+ //aliAngleRight();
   /*
   float reading;
    for (int i = 0; i < 29; i++)
       {
-        Distance[i] = rb.distance();
+        Distance[i] = ll.distance();
       }
-      insertionsort(Distance, 29);
+      timSort(Distance, 29);
 
       reading =  Distance[29 / 2];
     Serial.println(reading);
    delay(200);
    */
-   
 }
 
 void commandExecution(char cmd)
@@ -186,28 +172,36 @@ void commandExecution(char cmd)
       rotateRight(90);
       delay(200);
       caliAngleRight();
+      delay(100);
       caliDistanceFront();
+      delay(100);
       caliAngleRight();
+      delay(100);
       rotateRight(90);
       delay(200);
       caliAngleFront();
+      delay(100);
       caliDistanceFront();
+      delay(100);
       caliAngleFront();
+      delay(100);
       rotateRight(90);
       delay(200);
       Serial.println("k");
       break;
     case 'X':
+//      delay(100);
       caliDistanceFront();
-      delay(200);
-      sendSensorReading();
-      //Serial.println("k");
+      //delay(100);
+      //sendSensorReading();
+      Serial.println("k");
       break;
     case 'Y':
+//      delay(100);
       caliAngleRight();
-      delay(200);
-      sendSensorReading();
-      //Serial.println("k");
+      //delay(100);
+      //sendSensorReading();
+      Serial.println("k");
       break;
 
   }
@@ -218,53 +212,56 @@ void commandExecution(char cmd)
 
 void sendSensorReading()
 {
-  gridsToRpi = "SDATA;1_" + calculateGrids(FL) + ";2_" + calculateGrids(FC) + ";3_" + calculateGrids(FR) + ";4_" + calculateGrids(RF) + ";5_" + calculateGrids(RB) + ";6_" + calculateGrids(LL);
+  for (int i = 0; i<5; i++)
+  {
+    gridsToRpi = gridsToRpi + "SDATA;1_" + calculateGrids(FL) + ";2_" + calculateGrids(FC) + ";3_" + calculateGrids(FR) + ";4_" + calculateGrids(RF) + ";5_" + calculateGrids(RB) + ";6_" + calculateGrids(LL) + ";";
+  }
+ 
   Serial.println(gridsToRpi);
+  gridsToRpi = "";
 }
 String calculateGrids(int sensor)
 {
+  int k, n;
   double reading;
   double sum = 0;
   switch (sensor) {
     case FL:
-
+      /*
       for (int i = 0; i < 29; i++)
       {
         Distance[i] = fl.distance();
       }
-      insertionsort(Distance, 29);
-
-
-      reading = Distance[29 / 2];
-      //reading = fl.distance();
+      */
+      reading = fl.distance();
       if (reading >= 7 && reading <= 17)
         return "1";
       else if (reading >= 18 && reading <= 29)
         return "2";
       else return "-1";
     case FC:
+    /*
       for (int i = 0; i < 29; i++)
       {
         Distance[i] = fc.distance();
       }
-      insertionsort(Distance, 29);
-
-      reading =  Distance[29 / 2];
-      //reading = fc.distance();
+    */
+      //reading =  Distance[29 / 2];
+      reading = fc.distance();
       if (reading >= 7 && reading <= 17)
         return "1";
       else if (reading >= 18 && reading <= 21)
         return "2";
       else return "-1";
     case FR:
+    /*
       for (int i = 0; i < 29; i++)
       {
         Distance[i] = fr.distance();
       }
-      insertionsort(Distance, 29);
-
-      reading =  Distance[29 / 2];
-      //reading = fr.distance();
+    */
+      //reading =  Distance[29 / 2];
+      reading = fr.distance();
       if (reading >= 7 && reading <= 14)
         return "1";
       else if (reading >= 15 && reading <= 27)
@@ -272,53 +269,95 @@ String calculateGrids(int sensor)
       else return "-1";
     case LL:
 
+      /*
       for (int i = 0; i < 29; i++)
       {
         Distance[i] = ll.distance();
       }
-      insertionsort(Distance, 29);
-
-      reading =  Distance[29 / 2];
-      //reading = ll.distance();
-      if (reading >= 18 && reading <= 23)
+      */
+     
+      //reading =  Distance[29 / 2];
+      reading = ll.distance();
+      if (reading >= 17 && reading <= 24)
         return "1";
-      else if (reading >= 24 && reading <= 31)
+      else if (reading >= 25 && reading <= 33)
         return "2";
-      else if (reading >= 32 && reading <= 42 )
+      else if (reading >= 34 && reading <= 43 )
         return "3";
       else return "-1";
-    case RF:
+    case RF:/*
       for (int i = 0; i < 9; i++)
       {
         Distance[i] = rf.distance();
       }
-      insertionsort(Distance, 9);
-
-      reading =  Distance[9 / 2];
-      //reading = rf.distance();
+      */
+      
+      //reading =  Distance[9 / 2];
+      reading = rf.distance();
       if (reading >= 7  && reading <= 16)
         return "1";
       else if (reading >= 17 && reading <= 27)
         return "2";
       else return "-1";
     case RB:
+    /*
       for (int i = 0; i < 29; i++)
       {
         Distance[i] = rb.distance();
       }
-      insertionsort(Distance, 29);
+     */
+     
 
-      reading =  Distance[29 / 2];
-      //reading = rb.distance();
-      if (reading >= 8 && reading <= 16)
+      //reading =  Distance[29 / 2];
+      reading = rb.distance();
+      if (reading >= 7 && reading <= 21)
         return "1";
-      else if (reading >= 17 && reading <= 28)
+      else if (reading >= 22 && reading <= 34)
         return "2";
       else return "-1";
   }
 }
+void qselect(double A[], int start, int end, int k) {
+  if (start == end) {
+    return A[start];
+  }
 
-void insertionsort(double array[], int length)
+  int left = start, right = end;
+  int index = (left + right) / 2;
+  float pivot = A[index];
+
+  while (left <= right) {
+    while (left <= right && A[left] > pivot) {
+      left++;
+    }
+
+    while (left <= right && A[right] < pivot) {
+      right--;
+    }
+
+    if (left <= right) {
+      float tmp = A[left];
+      A[left] = A[right];
+      A[right] = tmp;
+
+      left++;
+      right--;
+    }
+  }
+
+  if (k >= start && k <= right) {
+    return qselect(A, start, right, k);
+  }
+  if (k >= left && k <= end) {
+    return qselect(A, left, end, k);
+  }
+  
+  
+  return A[right + 1];
+}
+
+/*
+void insertionSort(double array[], int length)
 {
   int i, j;
   double temp;
@@ -334,6 +373,99 @@ void insertionsort(double array[], int length)
     }
   }
 }
+*/
+void insertionSort(double arr[], int left, int right)
+{
+    for (int i = left + 1; i <= right; i++)
+    {
+        int temp = arr[i];
+        int j = i - 1;
+        while (j >= left && arr[j] > temp)
+        {
+            arr[j+1] = arr[j];
+            j--;
+        }
+        arr[j+1] = temp;
+    }
+}
+
+void merge(double arr[], int l, int m, int r)
+{
+    // original array is broken in two parts
+    // left and right array
+    int len1 = m - l + 1, len2 = r - m;
+    int left[len1], right[len2];
+    for (int i = 0; i < len1; i++)
+        left[i] = arr[l + i];
+    for (int i = 0; i < len2; i++)
+        right[i] = arr[m + 1 + i];
+
+    int i = 0;
+    int j = 0;
+    int k = l;
+
+    // after comparing, we merge those two array
+    // in larger sub array
+    while (i < len1 && j < len2)
+    {
+        if (left[i] <= right[j])
+        {
+            arr[k] = left[i];
+            i++;
+        }
+        else
+        {
+            arr[k] = right[j];
+            j++;
+        }
+        k++;
+    }
+
+    // copy remaining elements of left, if any
+    while (i < len1)
+    {
+        arr[k] = left[i];
+        k++;
+        i++;
+    }
+
+    // copy remaining element of right, if any
+    while (j < len2)
+    {
+        arr[k] = right[j];
+        k++;
+        j++;
+    }
+}
+
+void timSort(double arr[], int n)
+{
+    // Sort individual subarrays of size RUN
+    for (int i = 0; i < n; i+=RUN)
+        insertionSort(arr, i, min((i+31), (n-1)));
+
+    // start merging from size RUN (or 32). It will merge
+    // to form size 64, then 128, 256 and so on ....
+    for (int size = RUN; size < n; size = 2*size)
+    {
+        // pick starting point of left sub array. We
+        // are going to merge arr[left..left+size-1]
+        // and arr[left+size, left+2*size-1]
+        // After every merge, we increase left by 2*size
+        for (int left = 0; left < n; left += 2*size)
+        {
+            // find ending point of left sub array
+            // mid+1 is starting point of right sub array
+            int mid = left + size - 1;
+            int right = min((left + 2*size - 1), (n-1));
+
+            // merge sub array arr[left.....mid] &
+            // arr[mid+1....right]
+            merge(arr, left, mid, right);
+        }
+    }
+}
+
 
 
 
@@ -348,13 +480,13 @@ void caliAngleFront()
   error = flDistance - frDistance;
  
 
-  while (abs(error) > 0.2 && counter < 30)
+  while (abs(error) > 0.1 && counter < 30)
   {
     //Serial.println(error);
     if (error > 0)
     {
       md.setSpeeds(-100, 100);
-      delay(abs(error * 60));
+      delay(abs(error * 50));
       md.setBrakes(300, 300);
     }
     else
@@ -376,11 +508,11 @@ void caliAngleFront()
 void caliDistanceFront()
 {
   float targetDistance = 5 +CALI_DISTANCE_OFFSET;
-  float actualDistance = sensorCaliDistance(FR);
+  float actualDistance = sensorCaliDistance(FL);
   float difference;
   int counter = 0;
   difference = targetDistance - actualDistance;
-  while (abs(difference) > 0.3 && counter < 30)
+  while (abs(difference) > 0.075 && counter < 30)
   {
     if (difference > 0)
     {
@@ -390,6 +522,7 @@ void caliDistanceFront()
     {
       moveForwardCali(); //move backward for 0.2cm
     }
+    delay(10);
     actualDistance = sensorCaliDistance(FR);
     difference = targetDistance - actualDistance;
     counter ++;
@@ -407,18 +540,18 @@ void caliAngleRight()
   rbDistance = sensorCaliDistance(RB);
   error = rfDistance - rbDistance;
 
-  while (abs(error) > 0.1 && counter < 30)
+  while (abs(error) > ERROR_RIGHT && counter < 30)
   {
     if (error > 0)
     {
       md.setSpeeds(-100, 100);
-      delay(abs(error * 50));
+      delay(abs(error * 40));
       md.setBrakes(300, 300);
     }
     else
     {
       md.setSpeeds(100, -100);
-      delay(abs(error * 50));
+      delay(abs(error * 40));
       md.setBrakes(300, 300);
     }
     delay(10);
@@ -427,8 +560,7 @@ void caliAngleRight()
     error = rfDistance - rbDistance;
     counter ++;
   }
-  if (counter == 30)
-    calibration = false;
+  
 }
 
 float sensorCaliDistance(int sensor)
@@ -441,11 +573,12 @@ float sensorCaliDistance(int sensor)
       {
         caliReading[i] = analogRead(FL);
       }
-      insertionSort(caliReading, NUM_SENSOR_READINGS_CALI);
+      Sort(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
       voltage = (float) caliReading[49 / 2] / 1023 * 5;
 
-      Distance = -2.6088 * pow(voltage, 3) + 19.238 * voltage * voltage -51.816 * voltage + 54.092;
+      //Distance = -2.0927 * pow(voltage, 3) + 16.475 * voltage * voltage -47.533 * voltage + 52.481;
+      Distance = -6.3295 * pow(voltage, 3) + 45.689 * voltage * voltage -113.84 * voltage + 101.02;
       //distance =
       return Distance;
 
@@ -454,10 +587,11 @@ float sensorCaliDistance(int sensor)
       {
         caliReading[i] = analogRead(FR);
       }
-      insertionSort(caliReading, NUM_SENSOR_READINGS_CALI);
+      Sort(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
       voltage = (float) caliReading[49 / 2] / 1023 * 5;
-      Distance = -3.004 * pow(voltage, 3) + 22.008 * voltage * voltage -58.315 * voltage + 59.076;
+      //Distance = -4.4405 * pow(voltage, 3) + 30.795 * voltage * voltage -76.011 * voltage + 70.041;
+      Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage -43.971 * voltage + 49.982;
       //distance =
       return Distance;
     case RF:
@@ -465,10 +599,10 @@ float sensorCaliDistance(int sensor)
       {
         caliReading[i] = analogRead(RF);
       }
-      insertionSort(caliReading, NUM_SENSOR_READINGS_CALI);
+      Sort(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
       voltage = (float) caliReading[49 / 2] / 1023 * 5;
-      Distance = -2.7786 * pow(voltage, 3) + 20.482 * voltage * voltage + -54.993 * voltage + 57.055;
+      Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage + -43.971 * voltage + 49.982;
       //distance =
       return Distance;
     case RB:
@@ -476,10 +610,10 @@ float sensorCaliDistance(int sensor)
       {
         caliReading[i] = analogRead(RB);
       }
-      insertionSort(caliReading, NUM_SENSOR_READINGS_CALI);
+      Sort(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
       voltage = (float) caliReading[49 / 2] / 1023 * 5;
-      Distance = -3.2551* pow(voltage, 3) + 23.387 * voltage * voltage -60.415 * voltage + 61.158; //doenst works when distance less than 2.5cm
+      Distance = -3.3307* pow(voltage, 3) + 24.122 * voltage * voltage -62.573 * voltage + 63.155; //doenst works when distance less than 2.5cm
       //distance =
       return Distance;
 
@@ -487,7 +621,7 @@ float sensorCaliDistance(int sensor)
 
 }
 
-void insertionSort(int array[], int length)//sort integers
+void Sort(int array[], int length)//sort integers
 {
   int i, j;
   int temp;
@@ -590,8 +724,8 @@ void Brake() {
 void rotateLeft(int degree) {
   float output;
   float dis = (degree + LEFT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 200;
-  int right_speed = 200;
+  int left_speed = 280;
+  int right_speed = 280;
   float actual_distance = (dis * 405);
 
   delay(1);
@@ -615,8 +749,8 @@ void rotateLeft(int degree) {
 void rotateRight(int degree) {
   float output;
   float dis = (degree + RIGHT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 200;
-  int right_speed = 200 ;
+  int left_speed = 280;
+  int right_speed = 280 ;
   float actual_distance = (dis * 405);
 
   delay(1);
