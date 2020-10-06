@@ -43,7 +43,7 @@ public class Map extends JPanel {
     /*
     * Returns all unexplored cells
     * */
-    public void getAllUnExplored() {
+    public ArrayList<Cell> getAllUnExplored() {
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[0].length; col++) {
                 if(!grid[row][col].getIsExplored()){
@@ -51,6 +51,7 @@ public class Map extends JPanel {
                 }
             }
         }
+        return unExplored;
     }
 
     /**

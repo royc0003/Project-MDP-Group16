@@ -59,7 +59,9 @@ public class Cell {
     public boolean getIsExplored() {
         return this.isExplored;
     }
-
+/*
+-Reward base system
+* */
     public int getReward() {
         return reward;
     }
@@ -80,7 +82,7 @@ public class Cell {
     }
 
     public void givePenaltyReward() {
-        this.reward -= 10;
+        this.reward -= 1;
     }
     public boolean isRewarded(){
         if(this.reward >0){
