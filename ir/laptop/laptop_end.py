@@ -5,10 +5,10 @@ import cv2
 app = Flask(__name__)
 api = Api(app)
 
-left_cascade = cv2.CascadeClassifier('left_cascade.xml')
-up_cascade = cv2.CascadeClassifier('up_cascade.xml')
-right_cascade = cv2.CascadeClassifier('right_cascade.xml')
-down_cascade = cv2.CascadeClassifier('down_cascade.xml')
+left_cascade = cv2.CascadeClassifier('../models/left_cascade.xml')
+up_cascade = cv2.CascadeClassifier('../models/up_cascade.xml')
+right_cascade = cv2.CascadeClassifier('../models/right_cascade.xml')
+down_cascade = cv2.CascadeClassifier('../models/down_cascade.xml')
 
 cam = cv2.VideoCapture(0)
 
