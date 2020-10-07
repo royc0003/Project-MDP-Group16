@@ -10,10 +10,19 @@
 docker run -ti --device=/dev/vcsm \
     --device=/dev/vchiq \
     -e DISPLAY=$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \ 
-    -v /home/pi/Desktop/repo/ir/rpi:/home/pi/Desktop/repo/ir/rpi \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    -v /home/pi/Desktop/repo/ir:/home/pi/Desktop/repo/ir \
     -p 5000:5000 \
-    ir-endpoint
+    sgtwilko/rpi-raspbian-opencv:latest
+
+
+
+docker run -ti --device=/dev/vcsm \
+    --device=/dev/vchiq \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    -v hostDirectoryPath:containerDirectory \
+    sgtwilko/rpi-raspbian-opencv:latest
 
 ```
 
