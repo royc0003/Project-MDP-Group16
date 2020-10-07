@@ -95,6 +95,10 @@ if __name__ == "__main__":
 
         original_centre = (img_width // 2, img_height // 2)  # original centre. full shape is 1280, 760
 
+
+        gray_copy2 = gray   #for countours for non-rotating
+
+
         gray_copy = imutils.rotate_bound(gray, angle=-45)
         copy_height, copy_width = gray_copy.shape
         copy_centre = (copy_width // 2, copy_height // 2)
@@ -108,13 +112,21 @@ if __name__ == "__main__":
         # print("offset")
         # print(offset)
 
-
+        ## for countours that are rotated
         thresh0 = cv2.adaptiveThreshold(
             gray_copy, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 51, 0)
         contours, _ = cv2.findContours(
             thresh0, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-        # Find bounding box of contours
+        ## for countours that are not rotated
+        thresh1 = cv2.adaptiveThreshold(
+            gray_copy2, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 51, 0)
+        contours_nom, _ = cv2.findContours(
+            thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+
+
+        # Find bounding box of contours for rotated
         bbs = []
         for contour in contours:
             rect = cv2.boundingRect(contour)  # rect is (x, y, width, height)
@@ -143,28 +155,47 @@ if __name__ == "__main__":
                 int(rotated_translated_centre[0] + (rect[2] / 2) + 55), int(rotated_translated_centre[1] + (rect[3] / 2) + 55))
 
 
-                if rotated_bb[0] > 0:
+                if (rotated_bb[0] > 0 and rotated_bb[1] > 0):
                     bbs.append(rotated_bb)
-
+        #
                 # print(rotated_bb)
-                # bottom_left = (bb[0], bb[1])
-                # new_bottom_left = translate_rotate_point(bottom_left, (img_width/2, img_height/2), 45)
-                # top_right = (bb[2], bb[3])
-                # new_top_right = translate_rotate_point(top_right, (img_width/2, img_height/2), 45)
+        #         # bottom_left = (bb[0], bb[1])
+        #         # new_bottom_left = translate_rotate_point(bottom_left, (img_width/2, img_height/2), 45)
+        #         # top_right = (bb[2], bb[3])
+        #         # new_top_right = translate_rotate_point(top_right, (img_width/2, img_height/2), 45)
+        #
+        #         # gray_copy = cv2.rectangle(gray_copy,
+        #         #                           (rect[0], rect[1]),
+        #         #                           (rect[0] + rect[2], rect[1] + rect[3]),
+        #         #                           (255, 255, 0), 2)
+        #         # gray = cv2.rectangle(gray,
+        #         #                      (rotated_bb[0], rotated_bb[1]),
+        #         #                      (rotated_bb[2],  rotated_bb[3]),
+        #         #                      (255, 255, 0), 2)
+        #
+        #         # cv2.putText(gray, str(area), (rect[0], rect[1] + rect[3] + 40), font, 2, (255, 255, 255), 2)
+        #
 
-                # gray_copy = cv2.rectangle(gray_copy,
-                #                           (rect[0], rect[1]),
-                #                           (rect[0] + rect[2], rect[1] + rect[3]),
-                #                           (255, 255, 0), 2)
-                # gray = cv2.rectangle(gray,
-                #                      (rotated_bb[0], rotated_bb[1]),
-                #                      (rotated_bb[2],  rotated_bb[3]),
-                #                      (255, 255, 0), 2)
-
-                # cv2.putText(gray, str(area), (rect[0], rect[1] + rect[3] + 40), font, 2, (255, 255, 255), 2)
+        ## find contours that are not rotated
+        for contour in contours_nom:
+            rect = cv2.boundingRect(contour)  # rect is (x, y, width, height)
+            area = rect[2] * rect[3]
+            ratio = float(rect[2]) / float(rect[3])
+            if 1.2 >= ratio >= 0.8 and 250000 >= area >= 5000:
+                # print(rect)
+                x = rect[0]
+                y = rect[1]
+                w = rect[2]
+                h = rect[3]
+                bb = x - 50, y - 50, x + w + 50, y + h + 50
+                # print("bb = " + str(bb))
+                if ((bb[0] > 0 and bb[1] > 0)):
+                    bbs.append(bb)
 
 
         potential_images = []  # list to hold potential images
+
+        # print("bbs = " + str(bbs))
         for rotated_bb in bbs:
             # print("slice--------------")
             # print(rotated_bb)
@@ -174,7 +205,7 @@ if __name__ == "__main__":
 
             # print(potential_image.shape)
             height, width = potential_image.shape
-            if height != 0:
+            if ((height or width) != 0):
                 # print("here")
                 # potential_image = cv2.resize(potential_image, (64, 64), interpolation=cv2.INTER_CUBIC)
                 # potential_image = potential_image / 255
@@ -204,7 +235,8 @@ if __name__ == "__main__":
                 if (len(reg_img) != 0):
                     x, y, w, h = bb
                     cv2.rectangle(gray, (bb[0], bb[1]), (bb[2], bb[3]), (255, 255, 255), 2)
-                    cv2.putText(gray, category + "" + str(bb[2] * bb[3]), (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
+                    # cv2.putText(gray, category + "" + str(bb[2] * bb[3]), (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
+                    cv2.putText(gray, category, (bb[0], bb[1] + 40), font, 2, (255, 255, 255), 2)
 
 
 
