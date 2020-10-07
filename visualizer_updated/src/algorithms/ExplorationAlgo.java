@@ -328,10 +328,11 @@ public class ExplorationAlgo {
 
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
+     * canSense == on Calibration don't paint
      */
     private void moveBot(MOVEMENT m, boolean canSense) {
         bot.move(m);
-        if(canSense) exploredMap.repaint();
+        exploredMap.repaint(); //fixed 7th october
         if (m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
             senseAndRepaint(canSense);
         } 
@@ -376,7 +377,7 @@ public class ExplorationAlgo {
         DIRECTION origDir = bot.getRobotCurDir();
         DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir()); 
     
-        if(canCalibrateOnTheSpotFront(origDir) && canCalibrateOnTheSpotFront(dirToCheck)){
+        if(canCalibrateOnTheSpotFront(origDir) && canCalibrateOnTheSpotFront(dirToCheck)){ //check front and check right
             rightCalibrate(); 
             distanceCalibrate(dirToCheck);
             rightCalibrate(); 
@@ -398,11 +399,12 @@ public class ExplorationAlgo {
     /** Distance calibrate */
     private void distanceCalibrate(DIRECTION dirToCheck){
         DIRECTION origDir = bot.getRobotCurDir();
-        if (dirToCheck == origDir){
+        if (dirToCheck.equals(origDir)){ // fixed bug 7th October
             if(canCalibrateOnTheSpotFront(dirToCheck)){
                 moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);
             }
-        } else {
+        }
+        else {
             if(canCalibrateOnTheSpotFront(dirToCheck)){
                 turnBotDirection(dirToCheck);
                 moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);

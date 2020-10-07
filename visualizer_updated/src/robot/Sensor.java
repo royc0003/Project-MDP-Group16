@@ -115,14 +115,14 @@ public class Sensor {
     private void processSensorVal(Map exploredMap, int sensorVal, int rowInc, int colInc) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
-        // If above fails, check if starting point is valid for sensors with lowerRange > 1.
-        // for (int i = 1; i < this.lowerRange; i++) {
-        //     int row = this.sensorPosRow + (rowInc * i);
-        //     int col = this.sensorPosCol + (colInc * i);
-
-        //     if (!exploredMap.checkValidCoordinates(row, col)) return;
-        //     if (exploredMap.getCell(row, col).getIsObstacle()) return;
-        // }
+         //If above fails, check if starting point is valid for sensors with lowerRange > 1.
+//         for (int i = 1; i < this.lowerRange; i++) {
+//             int row = this.sensorPosRow + (rowInc * i);
+//             int col = this.sensorPosCol + (colInc * i);
+//
+//             if (!exploredMap.checkValidCoordinates(row, col)) return;
+//             if (exploredMap.getCell(row, col).getIsObstacle()) return;
+//         }
 
         // Update map according to sensor's value.
         for (int i = this.lowerRange; i <= this.upperRange; i++) {
@@ -130,8 +130,12 @@ public class Sensor {
             int col = this.sensorPosCol + (colInc * i);
 
             if (!exploredMap.checkValidCoordinates(row, col)) continue;
+            // if is explored, don't set obstacle
             if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && exploredMap.getCell(row, col).getIsExplored()) continue;
 
+            if(sensorVal == -1 ){ //handle sensor value if -1; to prevent from going beyond set obstacle; don't explore beyond
+                if (exploredMap.getCell(row, col).getIsObstacle()) return;
+            }
             exploredMap.getCell(row, col).setIsExplored(true);
 
             if (sensorVal == i) {
