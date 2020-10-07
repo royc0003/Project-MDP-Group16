@@ -130,6 +130,7 @@ public class Sensor {
             int col = this.sensorPosCol + (colInc * i);
 
             if (!exploredMap.checkValidCoordinates(row, col)) continue;
+            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && exploredMap.getCell(row, col).getIsExplored()) continue;
 
             exploredMap.getCell(row, col).setIsExplored(true);
 
@@ -144,6 +145,7 @@ public class Sensor {
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.getCell(row, col).getIsObstacle()) {
                 if (id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")) {
+                    System.out.println("Overwriting: [row, col]: "+row+" "+col);
                     exploredMap.setObstacleCell(row, col, false);
                 } else {
                     break;

@@ -28,6 +28,7 @@ public class ExplorationAlgo {
     private ArrayList<MOVEMENT> movement = new ArrayList<MOVEMENT>();
     private int prevLocRow;
     private int prevLocCol;
+    private boolean firstRotate = true;
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Robot bot, int coverageLimit, int timeLimit) {
         this.exploredMap = exploredMap;
@@ -341,10 +342,15 @@ public class ExplorationAlgo {
 
         if (bot.getRealBot() && !calibrationMode) {
             calibrationMode = true;
+            if(firstRotate){
+                rightCalibrate();
+                firstRotate = false;
+            }
             if(!cornerCalibrate()){
                 if(lastCalibrate >= 2){
                     normalCalibrate();
                 } else {
+                    rightCalibrate();
                     lastCalibrate++;
                 }
             }
@@ -361,6 +367,7 @@ public class ExplorationAlgo {
             DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir()); 
             distanceCalibrate(dirToCheck);
         }
+        rightCalibrate();
         lastCalibrate = 0;
     }
 
@@ -374,6 +381,7 @@ public class ExplorationAlgo {
             distanceCalibrate(dirToCheck);
             rightCalibrate(); 
             distanceCalibrate(origDir);
+            rightCalibrate();
             lastCalibrate = 0;
             return true;
         }
