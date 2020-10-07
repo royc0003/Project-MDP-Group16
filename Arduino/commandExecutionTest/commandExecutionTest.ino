@@ -29,7 +29,9 @@ DualVNH5019MotorShield md;
 
 #define NUM_SENSOR_READINGS_CALI 49
 
-#define CALI_DISTANCE_OFFSET -0.5
+#define CALI_DISTANCE_OFFSET 0
+#define FL_OFFSET 0.9
+#define RF_OFFSET 0.5
 
 #define ERROR_RIGHT 0.06
 #define ERROR_FRONT 0
@@ -118,10 +120,17 @@ void loop()
     commandExecution(char(Serial.read()));
   }
   
- 
-  
+ /*
+ for(int i = 0; i< 11; i++)
+ {
+  Serial.println(ll.distance());
+  delay(100);
+ }
+ delay(10000);
+  */
     //Serial.println(calculateGrids(RB));
  //aliAngleRight();
+ 
   /*
   float reading;
    for (int i = 0; i < 29; i++)
@@ -134,6 +143,35 @@ void loop()
     Serial.println(reading);
    delay(200);
    */
+   /*
+  rotateRight(90);
+      rotateRight(90);
+      delay(200);
+      caliAngleRight();
+      delay(100);
+      caliDistanceFront();
+      delay(100);
+      caliAngleRight();
+      delay(100);
+      rotateRight(90);
+      delay(200);
+      caliAngleFront();
+      delay(100);
+      caliDistanceFront();
+      delay(100);
+      caliAngleFront();
+      delay(100);
+      rotateRight(90);
+      delay(200);
+      rotateRight(90);
+      delay(100);
+      caliAngleRight();
+      delay(100);
+      moveByGrids(3);
+      
+  */
+  //Serial.println(ll.distance());
+      
 }
 
 void commandExecution(char cmd)
@@ -212,9 +250,10 @@ void commandExecution(char cmd)
 
 void sendSensorReading()
 {
-  for (int i = 0; i<5; i++)
+  for (int i = 0; i<11; i++)
   {
     gridsToRpi = gridsToRpi + "SDATA;1_" + calculateGrids(FL) + ";2_" + calculateGrids(FC) + ";3_" + calculateGrids(FR) + ";4_" + calculateGrids(RF) + ";5_" + calculateGrids(RB) + ";6_" + calculateGrids(LL) + ";";
+    delay(100);
   }
  
   Serial.println(gridsToRpi);
@@ -234,9 +273,9 @@ String calculateGrids(int sensor)
       }
       */
       reading = fl.distance();
-      if (reading >= 7 && reading <= 17)
+      if (reading >= 7 && reading <= 24)
         return "1";
-      else if (reading >= 18 && reading <= 29)
+      else if (reading >= 25 && reading <= 37)
         return "2";
       else return "-1";
     case FC:
@@ -248,9 +287,9 @@ String calculateGrids(int sensor)
     */
       //reading =  Distance[29 / 2];
       reading = fc.distance();
-      if (reading >= 7 && reading <= 17)
+      if (reading >= 7 && reading <= 23)
         return "1";
-      else if (reading >= 18 && reading <= 21)
+      else if (reading >= 24 && reading <= 36)
         return "2";
       else return "-1";
     case FR:
@@ -262,9 +301,9 @@ String calculateGrids(int sensor)
     */
       //reading =  Distance[29 / 2];
       reading = fr.distance();
-      if (reading >= 7 && reading <= 14)
+      if (reading >= 7 && reading <= 23)
         return "1";
-      else if (reading >= 15 && reading <= 27)
+      else if (reading >= 24 && reading <= 33)
         return "2";
       else return "-1";
     case LL:
@@ -280,9 +319,9 @@ String calculateGrids(int sensor)
       reading = ll.distance();
       if (reading >= 17 && reading <= 24)
         return "1";
-      else if (reading >= 25 && reading <= 33)
+      else if (reading >= 25 && reading <= 34)
         return "2";
-      else if (reading >= 34 && reading <= 43 )
+      else if (reading >= 35 && reading <= 43 )
         return "3";
       else return "-1";
     case RF:/*
@@ -475,28 +514,28 @@ void caliAngleFront()
   float flDistance, frDistance, error;
   int counter = 0;
   calibration = true;
-  flDistance = sensorCaliDistance(FL);
+  flDistance = sensorCaliDistance(FL)+FL_OFFSET;
   frDistance = sensorCaliDistance(FR);
   error = flDistance - frDistance;
  
 
-  while (abs(error) > 0.1 && counter < 30)
+  while (abs(error) > 0.2 && counter < 30)
   {
     //Serial.println(error);
     if (error > 0)
     {
       md.setSpeeds(-100, 100);
-      delay(abs(error * 50));
+      delay(abs(error * 40));
       md.setBrakes(300, 300);
     }
     else
     {
       md.setSpeeds(100, -100);
-      delay(abs(error * 50));
+      delay(abs(error * 40));
       md.setBrakes(300, 300);
     }
     delay(10);
-    flDistance = sensorCaliDistance(FL);
+    flDistance = sensorCaliDistance(FL) + FL_OFFSET;
     frDistance = sensorCaliDistance(FR);
     error = flDistance - frDistance;
     //Serial.println(error);
@@ -508,11 +547,11 @@ void caliAngleFront()
 void caliDistanceFront()
 {
   float targetDistance = 5 +CALI_DISTANCE_OFFSET;
-  float actualDistance = sensorCaliDistance(FL);
+  float actualDistance = sensorCaliDistance(FR);
   float difference;
   int counter = 0;
   difference = targetDistance - actualDistance;
-  while (abs(difference) > 0.075 && counter < 30)
+  while (abs(difference) > 0.1 && counter < 30)
   {
     if (difference > 0)
     {
@@ -536,7 +575,7 @@ void caliAngleRight()
   float error;
   int counter = 0;
   calibration = true;
-  rfDistance = sensorCaliDistance(RF);
+  rfDistance = sensorCaliDistance(RF)+RF_OFFSET;
   rbDistance = sensorCaliDistance(RB);
   error = rfDistance - rbDistance;
 
@@ -555,7 +594,7 @@ void caliAngleRight()
       md.setBrakes(300, 300);
     }
     delay(10);
-    rfDistance = sensorCaliDistance(RF);
+    rfDistance = sensorCaliDistance(RF)+RF_OFFSET;
     rbDistance = sensorCaliDistance(RB);
     error = rfDistance - rbDistance;
     counter ++;
@@ -708,12 +747,12 @@ void moveForward(int sped, float distance)  {
 
 void moveForwardCali()
 {
-  moveForward(testSpeed, 0.1);
+  moveForward(testSpeed, 0.075);
 }
 
 void moveBackwardCali()
 {
-  moveForward(-testSpeed, 0.1);
+  moveForward(-testSpeed, 0.075);
 }
 
 
