@@ -45,17 +45,14 @@ Keras-Preprocessing==1.1.2
 kiwisolver==1.1.0
 Markdown==3.2.2
 MarkupSafe==1.1.1
-matplotlib==3.0.3
 mistune==0.8.4
 nbconvert==5.6.1
 nbformat==5.0.7
 notebook==6.1.4
 numpy==1.18.5
 oauthlib==3.1.0
-opencv-python==4.4.0.42
 opt-einsum==3.3.0
 packaging==20.4
-pandas==0.25.3
 pandocfilters==1.4.2
 parso==0.7.1
 pexpect==4.8.0
