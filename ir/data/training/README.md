@@ -1,2 +1,0 @@
-# README
-Here we track what data has been trained with for the model in models directory. This enable us to examine and learn the best parameters for the models, such as rotation, resizing etc. Please do not amend data in this directory since model training is an iterative process and data here are often reference back.
