@@ -12,7 +12,7 @@ public class RobotConstants {
     public static final int START_COL = 1;                          // col no. of start cell
     public static final int MOVE_COST = 10;                         // cost of FORWARD, BACKWARD movement
     public static final int TURN_COST = 20;                         // cost of RIGHT, LEFT movement
-    public static final int SPEED = 978; //400;                     // delay between movements (ms)
+    public static final int SPEED = 100;//978; //400;                     // delay between movements (ms)
     public static final DIRECTION START_DIR = DIRECTION.NORTH;      // start direction
     public static final int SENSOR_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
     public static final int SENSOR_SHORT_RANGE_H = 2;               // range of short range sensor (cells)
@@ -53,7 +53,7 @@ public class RobotConstants {
     }
 
     public enum MOVEMENT {
-        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE, ERROR;
+        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE_LR, CALIBRATE_DISTANCE_LC, CALIBRATE_DISTANCE_RC, ERROR;
 
         public static char print(MOVEMENT m) {
             switch (m) {
@@ -67,8 +67,12 @@ public class RobotConstants {
                     return 'L';
                 case CALIBRATE_RIGHT:
                     return 'Y';
-                case CALIBRATE_DISTANCE:
+                case CALIBRATE_DISTANCE_LR:
                     return 'X';
+                case CALIBRATE_DISTANCE_LC:
+                    return 'Z';
+                case CALIBRATE_DISTANCE_RC:
+                    return 'A';
                 case ERROR:
                 default:
                     return 'E';

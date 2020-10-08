@@ -90,9 +90,10 @@ public class MapDescriptor {
                         Part2_bin.append("1");
                     else
                         Part2_bin.append("0");
-                } else {
-                    Part2_bin.append("0");
-                }
+                } 
+                //else {
+                    //Part2_bin.append("0");
+                //}
 
                 if (Part2_bin.length() == 4) {
                     Part2.append(binToHex(Part2_bin.toString()));

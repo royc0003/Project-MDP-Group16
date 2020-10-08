@@ -84,7 +84,7 @@ public class Robot {
     }
 
     public boolean checkRightNotPhantom(){
-        return SRRightTop.getSensorVal() == 1 && SRRightBottom.getSensorVal() == 1;
+        return SRRightTop.getRealSensorValue() == 1 && SRRightBottom.getRealSensorValue() == 1;
     }
 
     public char getCameraDirection(DIRECTION d){
@@ -177,7 +177,9 @@ public class Robot {
             case LEFT:
                 robotDir = findNewDirection(m);
                 break;
-            case CALIBRATE_DISTANCE:
+            case CALIBRATE_DISTANCE_LC:
+            case CALIBRATE_DISTANCE_LR:
+            case CALIBRATE_DISTANCE_RC:
             case CALIBRATE_RIGHT:
                 break;
             default:
