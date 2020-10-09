@@ -29,7 +29,7 @@ DualVNH5019MotorShield md;
 
 #define NUM_SENSOR_READINGS_CALI 50
 
-#define CALI_DISTANCE_OFFSET 0.4
+#define CALI_DISTANCE_OFFSET 0.3
 #define FL_OFFSET 0.9
 #define FC_OFFSET -10
 #define FR_OFFSET 6
@@ -56,13 +56,13 @@ float prevError = 0.0;
 float integral = 0.0;
 
 float testSpeed = 320; //180                              //
-float PID_KP = 1.5; // lower = right, higher = left     // computePID() //1.6
-float PID_KI = 0.025;  //0.01                                       // computePID()
+float PID_KP = 1.6; // lower = right, higher = left     // computePID() //1.6
+float PID_KI = 0.0022;  //0.01                                       // computePID()
 float PID_KD = 0; //0.05                                       // computePID()
 float GRID_DISTANCE[10] = {10.15, 20.3, 29.7, 40.1, 51, 60, 70, 80, 90,100};   // moveByGrids(int)
 float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
-float LEFT_ROTATION_DEGREE_OFFSET = -3.2;                   // rotateLeft(int)
-float RIGHT_ROTATION_DEGREE_OFFSET = -2.6;                  // rotateRight(int)
+float LEFT_ROTATION_DEGREE_OFFSET = -4.5;                   // rotateLeft(int)
+float RIGHT_ROTATION_DEGREE_OFFSET = -2.8;                  // rotateRight(int)
 int NUM_OF_SENSOR_READINGS_TO_TAKE = 15;                  // getDistance()
 int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calDistance()
 int COMMAND_DELAY = 60;
