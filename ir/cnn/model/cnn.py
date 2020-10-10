@@ -42,7 +42,7 @@ class CNN:
                 reg_img = self.predict(potential_image)
                 # print(reg_img)
                 category, prob = reg_img
-                if prob > 0.90:
+                if prob >= 0.99:
                     results.append((category, distance))
                     cv2.rectangle(gray, (rotated_bb[0], rotated_bb[1]), (rotated_bb[2], rotated_bb[3]), (255, 255, 255),
                                   2)
