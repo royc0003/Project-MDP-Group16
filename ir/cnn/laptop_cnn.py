@@ -18,6 +18,10 @@ def rotate(origin, point, angle):
     return qx, qy
 
 
+def estimate_coordinates():
+    return None
+
+
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
@@ -68,7 +72,6 @@ if __name__ == "__main__":
                 if rotated_bb[0] > 0:
                     bbs.append(rotated_bb)
 
-
         potential_images = []  # list to hold potential images
         for rotated_bb in bbs:
             potential_image = gray[rotated_bb[1]:rotated_bb[3], rotated_bb[0]:rotated_bb[2]]
@@ -82,8 +85,10 @@ if __name__ == "__main__":
                 category, prob = reg_img
                 if prob > 0.90:
                     x, y, w, h = rotated_bb
-                    cv2.rectangle(gray, (rotated_bb[0], rotated_bb[1]), (rotated_bb[2], rotated_bb[3]), (255, 255, 255), 2)
-                    cv2.putText(gray, category + "" + str(rotated_bb[2] * rotated_bb[3]), (rotated_bb[0], rotated_bb[1] + 40), font, 2, (255, 255, 255),
+                    cv2.rectangle(gray, (rotated_bb[0], rotated_bb[1]), (rotated_bb[2], rotated_bb[3]), (255, 255, 255),
+                                  2)
+                    cv2.putText(gray, category + "" + str(rotated_bb[2] * rotated_bb[3]),
+                                (rotated_bb[0], rotated_bb[1] + 40), font, 2, (255, 255, 255),
                                 2)
 
         cv2.imshow('gray', gray)
