@@ -26,7 +26,7 @@ class CNN:
         if self.version == "gray":
             self.channels = 1
             self.model = self.getArchitecture()
-            self.model.load_weights("./final.h5")  # load saved weights
+            self.model.load_weights("./model/final.h5")  # load saved weights
 
     # returns probability and class
     def predict(self, frame):

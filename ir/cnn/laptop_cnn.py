@@ -1,8 +1,6 @@
 import cv2
-import time
-from cnn import CNN
+from model.cnn import CNN
 import imutils
-import numpy as np
 import math
 
 
