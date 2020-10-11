@@ -1,6 +1,6 @@
 import socket
 
-# rpi_checklist's static pi
+# rpi's static pi
 host = '192.168.16.1'
 # port has to the same
 port = 5560
