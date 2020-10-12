@@ -317,6 +317,10 @@ public class Robot {
 
             // String msg = "SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_2;SDATA;1_2;2_1;3_-1;4_1;5_-1;6_3;SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_3;";
 
+            console.log(msg);
+
+            console.log("row: "+posRow);
+            
             String[] msgArr = msg.split(";");
             int i;
             
