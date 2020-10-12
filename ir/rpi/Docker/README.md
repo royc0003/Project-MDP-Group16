@@ -1,15 +1,15 @@
-# Image Recognition Docker
+# Image Recognition Docker on RPI
+### Environment setting (If you need the display to be shown on RPI)
+- Check if the environment variable has been set.
 
-ECHO $DISPLAY
+    `ECHO $DISPLAY`
 
-xhost +
+- If not set, 
+    `export DISPLAY=:0.0`
 
+- Allow docker clients to connect to host,
 
-cd Desktop/repo
-git checkout ir-optimize
-git pull origin ir-optimize
-cd <repo>/ir/Docker
-
+    `xhost +`
 
 
 
@@ -21,14 +21,7 @@ cd <repo>/ir/Docker
 
 #### Run the docker image
 
-0.1. cd ../.
-
-0.2. pwd
-
-/Users/ongcj/Dev/mdp/ir
-
-
-1. Check the path for IR repo (You need to ensure you are on the correct branch. ). This is the `hostDirectory` which need to be replaced in the bash below.
+1. Check the path for IR repo (You need to ensure you are on the correct branch.). This is the `hostDirectory` which need to be replaced in the bash below.
 2. Run the bash.
 ```bash
 sudo docker run -ti --device=/dev/vcsm \
@@ -36,6 +29,7 @@ sudo docker run -ti --device=/dev/vcsm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -v hostDirectoryPath:/home/pi/Desktop/repo/ir \
+    -p 5000:5000
     python-opencv:latest
 
 ```
