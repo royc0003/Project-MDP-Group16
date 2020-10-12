@@ -19,6 +19,8 @@ public class CommMgr {
     public static final String CALIBRATE = "C";             // PC --> Arduino
     public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
     public static final String CAMERA = "NID";              // PC --> Rpi
+    public static final String DONE_EX = "DONE_EX";         // PC --> Anroid
+    public static final String FP_READY = "FP_READY";       // PC --> Android
 
     private static CommMgr commMgr = null;
     private static Socket conn = null;
@@ -95,7 +97,11 @@ public class CommMgr {
             else if (msgType.equals(TO_ANDROID)){
             // else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)){
                 outputMsg = "2|0|" + msg + "\n";
-            } else if(msgType.equals(INSTRUCTIONS)) {
+            } 
+            else if (msgType.equals(DONE_EX) || msgType.equals(FP_READY)){
+                outputMsg = "2|0|STA|" + msg + "\n";   
+            }
+            else if(msgType.equals(INSTRUCTIONS)) {
                 outputMsg = "2|1|" + msg + "\n";
             }
             else if (msgType.equals(CAMERA)){

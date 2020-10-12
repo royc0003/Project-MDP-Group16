@@ -70,7 +70,7 @@ public class ExplorationAlgo {
         if (bot.getRealBot()) {
             CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
         }
-        senseAndRepaint(true);
+        senseAndRepaint();
 
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
@@ -108,27 +108,27 @@ public class ExplorationAlgo {
     private void nextMove() {
         if (lookRight()) {
             movement.add(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT, true);
+            moveBot(MOVEMENT.RIGHT);
             if (lookForward()) {
                 movement.add(MOVEMENT.FORWARD);
-                moveBot(MOVEMENT.FORWARD, true);
+                moveBot(MOVEMENT.FORWARD);
             }
         } else if (lookForward()) {
             movement.add(MOVEMENT.FORWARD);
-            moveBot(MOVEMENT.FORWARD, true);
+            moveBot(MOVEMENT.FORWARD);
         } else if (lookLeft()) {
             movement.add(MOVEMENT.LEFT);
-            moveBot(MOVEMENT.LEFT, true);
+            moveBot(MOVEMENT.LEFT);
             if (lookForward()) {
                 movement.add(MOVEMENT.FORWARD);
-                moveBot(MOVEMENT.FORWARD, true);
+                moveBot(MOVEMENT.FORWARD);
             }
         }
         else {
             movement.add(MOVEMENT.RIGHT);
             movement.add(MOVEMENT.RIGHT);
-            moveBot(MOVEMENT.RIGHT, true);
-            moveBot(MOVEMENT.RIGHT, true);
+            moveBot(MOVEMENT.RIGHT);
+            moveBot(MOVEMENT.RIGHT);
         }
     }
 
@@ -237,6 +237,13 @@ public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
 
+        /**
+         * Enter start zone finish timing 
+         */
+
+        CommMgr comm = CommMgr.getCommMgr();
+        comm.sendMsg("DONE", CommMgr.DONE_EX);
+
         if (bot.getRealBot()) {
             turnBotDirection(DIRECTION.WEST);
             turnBotDirection(DIRECTION.SOUTH);
@@ -330,11 +337,11 @@ public class ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      * canSense == on Calibration don't paint
      */
-    private void moveBot(MOVEMENT m, boolean canSense) {
+    private void moveBot(MOVEMENT m) {
         bot.move(m);
         exploredMap.repaint(); //fixed 7th october
         if (m != MOVEMENT.CALIBRATE_RIGHT && m != MOVEMENT.CALIBRATE_DISTANCE){
-            senseAndRepaint(canSense);
+            senseAndRepaint();
         } 
         else {
             CommMgr commMgr = CommMgr.getCommMgr();
@@ -348,7 +355,7 @@ public class ExplorationAlgo {
                 firstRotate = false;
             }
             if(!cornerCalibrate()){
-                if(lastCalibrate >= 2){
+                if(lastCalibrate >= 4){
                     normalCalibrate();
                 } else {
                     rightCalibrate();
@@ -392,7 +399,7 @@ public class ExplorationAlgo {
     /** Right calibration */
     private void rightCalibrate(){
         if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
-            moveBot(MOVEMENT.CALIBRATE_RIGHT, false);
+            moveBot(MOVEMENT.CALIBRATE_RIGHT);
         }
     }
 
@@ -401,13 +408,13 @@ public class ExplorationAlgo {
         DIRECTION origDir = bot.getRobotCurDir();
         if (dirToCheck.equals(origDir)){ // fixed bug 7th October
             if(canCalibrateOnTheSpotFront(dirToCheck)){
-                moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
             }
         }
         else {
             if(canCalibrateOnTheSpotFront(dirToCheck)){
                 turnBotDirection(dirToCheck);
-                moveBot(MOVEMENT.CALIBRATE_DISTANCE, false);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
                 turnBotDirection(origDir);
             }
         }
@@ -416,17 +423,10 @@ public class ExplorationAlgo {
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    private void senseAndRepaint(boolean canSense) {
-        if(canSense){
-            bot.setSensors();
-            bot.sense(exploredMap, realMap);
-            exploredMap.repaint();
-        }
-        else {
-            CommMgr comm = CommMgr.getCommMgr();
-            String msg = comm.recvMsg();
-            System.out.println("Rotating right to calibrate: "+msg);
-        }
+    private void senseAndRepaint() {
+        bot.setSensors();
+        bot.sense(exploredMap, realMap);
+        exploredMap.repaint();
     }
 
     /**
@@ -475,13 +475,13 @@ public class ExplorationAlgo {
 
         if (numOfTurn == 1) {
             if (DIRECTION.getNext(bot.getRobotCurDir()) == targetDir) {
-                moveBot(MOVEMENT.RIGHT, false);
+                moveBot(MOVEMENT.RIGHT);
             } else {
-                moveBot(MOVEMENT.LEFT, false);
+                moveBot(MOVEMENT.LEFT);
             }
         } else if (numOfTurn == 2) {
-            moveBot(MOVEMENT.RIGHT, false);
-            moveBot(MOVEMENT.RIGHT, false);
+            moveBot(MOVEMENT.RIGHT);
+            moveBot(MOVEMENT.RIGHT);
         }
     }
 }
