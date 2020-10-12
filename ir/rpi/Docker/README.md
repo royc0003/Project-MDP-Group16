@@ -29,7 +29,7 @@ sudo docker run -ti --device=/dev/vcsm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -v hostDirectoryPath:/home/pi/Desktop/repo/ir \
-    -p 5000:5000
+    -p 5000:5000 \
     python-opencv:latest
 
 ```
