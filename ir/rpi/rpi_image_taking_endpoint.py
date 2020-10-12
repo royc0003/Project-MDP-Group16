@@ -8,7 +8,7 @@ import picamera.array
 
 app = Flask(__name__)
 api = Api(app)
-cnn_url = 'http://127.0.0.1:5000/predict/'
+cnn_url = 'http://192.168.16.10:5000/predict/'
 
 
 def takePic():
