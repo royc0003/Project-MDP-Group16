@@ -6,9 +6,9 @@ import picamera
 import picamera.array
 
 
+cnn_url = 'http://127.0.0.1:5000/predict'
 app = Flask(__name__)
 api = Api(app)
-cnn_url = 'http://127.0.0.1:5000/predict/'
 
 
 def takePic():
@@ -33,7 +33,7 @@ class ImgReg(Resource):
         return {"result": x.text}
 
 
-api.add_resource(ImgReg, "/ImgReg")
+api.add_resource(ImgReg, "/imgreg")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000)

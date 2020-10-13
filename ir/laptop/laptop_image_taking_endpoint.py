@@ -7,7 +7,7 @@ import pickle
 app = Flask(__name__)
 api = Api(app)
 cam = cv2.VideoCapture(0)
-cnn_url = 'http://127.0.0.1:5000/predict/'
+cnn_url = 'http://127.0.0.1:5001/predict/'
 
 
 def takePic():
@@ -30,4 +30,4 @@ class ImgReg(Resource):
 api.add_resource(ImgReg, "/ImgReg")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)

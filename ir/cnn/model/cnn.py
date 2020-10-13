@@ -7,7 +7,7 @@ import imutils
 import numpy as np
 import math
 from .helper import find_contour
-
+import os
 
 class CNN:
     def __init__(self, version):
@@ -51,6 +51,10 @@ class CNN:
                                 2)
 
         return gray, results
+
+    def save_to_local(self, img):
+
+
 
     # graph architecture of cnn
     def getArchitecture(self):
