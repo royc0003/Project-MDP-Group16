@@ -75,16 +75,13 @@ class Main(threading.Thread):
         while True:
             try:
                 sMsg = self.sr.read().decode('utf-8')
-                #length = len(sMsg)-2
-                #sMsg = sMsg[:length]
                 if not sMsg:
                     break
                 
                 #dataSplit = sMsg.split(';', 5)
                 #testString = dataSplit[4]
                 #if(testString[2] == '3' or testString[2] == '4'):
-                #    BASE = "http://127.0.0.1:5000/"
-                #    response = requests.get(BASE + "ImgReg")
+                #    response = requests.get("http://127.0.0.1:5000/ImgReg")
                 #    sMsg = sMsg + ';7_' + response.json().get('img')
                     
                 self.writePCMsg(str(sMsg))
