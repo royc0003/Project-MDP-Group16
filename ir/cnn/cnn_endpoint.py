@@ -27,6 +27,6 @@ class Predict(Resource):
         return make_response(jsonify(json_results), 201)
 
 
-api.add_resource(Predict, '/predict/')
+api.add_resource(Predict, '/predict')
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(host='0.0.0.0', debug=True, port=5001)

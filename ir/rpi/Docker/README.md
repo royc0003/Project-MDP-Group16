@@ -24,11 +24,12 @@
 1. Check the path for IR repo (You need to ensure you are on the correct branch.). This is the `hostDirectory` which need to be replaced in the bash below.
 2. Run the bash.
 ```bash
-sudo docker run -ti --device=/dev/vcsm \
+sudo docker run -ti \
+    --device=/dev/vcsm \
     --device=/dev/vchiq \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-    -v hostDirectoryPath:/home/pi/Desktop/repo/ir \
+    -v /home/pi/Desktop/repo/ir:/home/pi/Desktop/repo/ir \
     -p 5000:5000 \
     python-opencv:latest
 
