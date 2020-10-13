@@ -9,6 +9,7 @@ import math
 from .helper import find_contour
 import os
 
+
 class CNN:
     def __init__(self, version):
         self.dim = 64
@@ -16,7 +17,7 @@ class CNN:
                                         'w', 'x', 'y', 'z', 'zero'])
         self.version = version
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-
+        self.local_image_count = 0
         if self.version == "gray":
             self.channels = 1
             self.model = self.getArchitecture()
@@ -49,12 +50,11 @@ class CNN:
                     cv2.putText(gray, category + "" + str(distance),
                                 (rotated_bb[0], rotated_bb[1] + 40), self.font, 2, (255, 255, 255),
                                 2)
-
+        self.save_to_local(gray)
         return gray, results
 
     def save_to_local(self, img):
-
-
+        cv2.imwrite(os.path.join('reg_image', str(self.local_image_count) + '.jpg'), img)
 
     # graph architecture of cnn
     def getArchitecture(self):
