@@ -53,7 +53,7 @@ public class RobotConstants {
     }
 
     public enum MOVEMENT {
-        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE, ERROR;
+        FORWARD, BACKWARD, RIGHT, LEFT, CALIBRATE_RIGHT, CALIBRATE_DISTANCE, CALIBRATE_ANGLE_LR, CALIBRATE_ANGLE_LC, CALIBRATE_ANGLE_RC, ERROR;
 
         public static char print(MOVEMENT m) {
             switch (m) {
@@ -69,6 +69,12 @@ public class RobotConstants {
                     return 'Y';
                 case CALIBRATE_DISTANCE:
                     return 'X';
+                case CALIBRATE_ANGLE_LR:
+                    return 'O';
+                case CALIBRATE_ANGLE_LC:
+                    return 'P';
+                case CALIBRATE_ANGLE_RC:
+                    return 'Q';
                 case ERROR:
                 default:
                     return 'E';

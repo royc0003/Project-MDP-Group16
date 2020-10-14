@@ -177,8 +177,11 @@ public class Robot {
             case LEFT:
                 robotDir = findNewDirection(m);
                 break;
-            case CALIBRATE_DISTANCE:
             case CALIBRATE_RIGHT:
+            case CALIBRATE_DISTANCE:
+            case CALIBRATE_ANGLE_LR:
+            case CALIBRATE_ANGLE_LC:
+            case CALIBRATE_ANGLE_RC:
                 break;
             default:
                 System.out.println("Error in Robot.move()!");
@@ -317,9 +320,9 @@ public class Robot {
 
             // String msg = "SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_2;SDATA;1_2;2_1;3_-1;4_1;5_-1;6_3;SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_3;";
 
-            console.log(msg);
-
-            console.log("row: "+posRow);
+//            System.out.println(msg);
+//
+//            System.out.println("row: "+posRow);
             
             String[] msgArr = msg.split(";");
             int i;
