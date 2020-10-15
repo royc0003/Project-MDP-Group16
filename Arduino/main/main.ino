@@ -310,41 +310,46 @@ void commandExecution(char cmd)
       //Serial.println("k");
       
       break;
+      
+    case '1':
+      goStraightInGrids(1);
+      Serial.println("k");
+      break;
     case '2':
       goStraightInGrids(2);
-      
+      Serial.println("k");
       break;
     case '3':
       goStraightInGrids(3);
-      
+      Serial.println("k");
       break;
     case '4':
       goStraightInGrids(4);
-      
+      Serial.println("k");
       break;
     case '5':
       goStraightInGrids(5);
-      
+      Serial.println("k");
       break;
     case '6':
       goStraightInGrids(6);
-     
+     Serial.println("k");
       break;
     case '7':
       goStraightInGrids(7);
-     
+     Serial.println("k");
       break;
     case '8':
       goStraightInGrids(8);
-      
+      Serial.println("k");
       break;
     case '9':
       goStraightInGrids(9);
-      
+      Serial.println("k");
       break;
     case '0':
       goStraightInGrids(10);
-      
+      Serial.println("k");
       break;
 
     case 'L':
@@ -356,6 +361,10 @@ void commandExecution(char cmd)
       sendSensorReading();
       //Serial.println("L ok");
       break;
+    case 'A':
+      rotateLeft(90);
+      Serial.println("k");
+      break;
     case 'R':
       //md.setSpeeds(-100, 100);
       rotateRight(90);
@@ -365,7 +374,10 @@ void commandExecution(char cmd)
       sendSensorReading();
       //Serial.println("R ok");
       break;
-
+    case 'D':
+      rotateRight(90);
+      Serial.println("k");
+      break;
     case 'S':
       sendSensorReading();
       //Serial.println("S ok");
