@@ -85,7 +85,7 @@ public class ExplorationAlgo {
      */
     private void explorationLoop(int r, int c) {
         do {
-            //antiStuck();
+            antiStuck();
             nextMove();
 
             areaExplored = calculateAreaExplored();

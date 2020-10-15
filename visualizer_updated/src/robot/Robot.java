@@ -325,9 +325,8 @@ public class Robot {
 //
 //            System.out.println("row: "+posRow);
 
-            String[] msgArr1 = msg.split(";");
-            System.out.println(Arrays.toString(msgArr1));
-            String[] msgArr = Arrays.copyOfRange(msgArr1, 0, msgArr1.length -2);
+            String[] msgArr = msg.split(";");
+//            String[] msgArr = Arrays.copyOfRange(msgArr1, 0, msgArr1.length -2);
 
             int i;
             
