@@ -81,8 +81,7 @@ class Main(threading.Thread):
                 #dataSplit = sMsg.split(';', 5)
                 #testString1 = dataSplit[4]
                 #testString2 = dataSplit[5]
-                #if(testString[2] == '3' or testString[2] == '4'):
-                #if()
+                #if((testString[2] == '3' or testString[2] == '4') and (testString[3] == '3' or testString[3] == '4')):
                 #    response = requests.get("http://127.0.0.1:5000/ImgReg")
                 #    sMsg = sMsg + ';7_' + response.json().get('img')
                     
