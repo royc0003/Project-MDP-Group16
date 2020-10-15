@@ -243,13 +243,13 @@ public class ExplorationAlgo {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg("DONE", CommMgr.DONE_EX);
 
-        if (bot.getRealBot()) {
-            turnBotDirection(DIRECTION.WEST);
-            turnBotDirection(DIRECTION.SOUTH);
-            turnBotDirection(DIRECTION.WEST);
-        }
+//        if (bot.getRealBot()) {
+//            turnBotDirection(DIRECTION.WEST);
+//            turnBotDirection(DIRECTION.SOUTH);
+//            turnBotDirection(DIRECTION.WEST);
+//        }
         turnBotDirection(DIRECTION.NORTH);
-
+        CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
     }
 
 

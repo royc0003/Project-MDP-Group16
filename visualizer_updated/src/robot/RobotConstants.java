@@ -12,7 +12,7 @@ public class RobotConstants {
     public static final int START_COL = 1;                          // col no. of start cell
     public static final int MOVE_COST = 10;                         // cost of FORWARD, BACKWARD movement
     public static final int TURN_COST = 20;                         // cost of RIGHT, LEFT movement
-    public static final int SPEED = 978; //400;                     // delay between movements (ms)
+    public static final int SPEED = 200; //400; 978                 // delay between movements (ms)
     public static final DIRECTION START_DIR = DIRECTION.NORTH;      // start direction
     public static final int SENSOR_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
     public static final int SENSOR_SHORT_RANGE_H = 2;               // range of short range sensor (cells)

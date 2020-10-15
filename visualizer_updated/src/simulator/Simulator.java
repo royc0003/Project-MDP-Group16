@@ -39,7 +39,7 @@ public class Simulator {
     private static int WP_Col;
 
     private static final CommMgr comm = CommMgr.getCommMgr();
-    private static final boolean realRun = true;
+    private static final boolean realRun = false;
 
     private static final boolean isExploring = true;
 
@@ -204,9 +204,11 @@ public class Simulator {
                 fastestPathToWP = new FastestPathAlgo(exploredMap, bot);
                 fastestPathToDestination = new FastestPathAlgo(exploredMap, bot);
 
-                fastestPathToWP.runFastestPath(WP_Row, WP_Col);
-                fastestPathToDestination.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
+                String result1 = fastestPathToWP.runFastestPath(WP_Row, WP_Col);
+                String result2 = fastestPathToDestination.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
 
+                System.out.println(result1);
+                System.out.println(result2);
                 CommMgr comm = CommMgr.getCommMgr();
                 comm.sendMsg("DONE", CommMgr.DONE_EX);
 
