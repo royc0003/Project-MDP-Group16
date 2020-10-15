@@ -78,10 +78,10 @@ class Main(threading.Thread):
                 if not sMsg:
                     break
                 
-                #dataSplit = sMsg.split(';', 5)
+                #dataSplit = sMsg.split(';', 6)
                 #testString1 = dataSplit[4]
                 #testString2 = dataSplit[5]
-                #if((testString1[2] == '3' or testString1[2] == '4') and (testString2[3] == '3' or testString2[3] == '4')):
+                #if((testString1[2] == '3' or testString1[2] == '4') and (testString2[2] == '3' or testString2[2] == '4')):
                 #    response = requests.get("http://127.0.0.1:5000/ImgReg")
                 #    sMsg = sMsg + ';7_' + response.json().get('img')
                     
