@@ -7,6 +7,7 @@ import robot.Robot;
 import robot.RobotConstants;
 import robot.RobotConstants.DIRECTION;
 import robot.RobotConstants.MOVEMENT;
+import utils.CommMgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ public class FastestPathAlgo {
     private final Map realMap;
     private int loopCount;
     private boolean explorationMode;
+    private int startRow;
+    private int startCol;
 
     public FastestPathAlgo(Map exploredMap, Robot bot) {
         this.realMap = null;
@@ -172,10 +175,13 @@ public class FastestPathAlgo {
     public String runFastestPath(int goalRow, int goalCol) {
         System.out.println("Calculating fastest path from (" + current.getRow() + ", " + current.getCol() + ") to goal (" + goalRow + ", " + goalCol + ")...");
 
+        startRow = current.getRow();
+        startCol = current.getCol();
+
         Stack<Cell> path;
         do {
             loopCount++;
-
+            System.out.println("loop: "+loopCount);
             // Get cell with minimum cost from toVisit and assign it to current.
             current = minimumCostCell(goalRow, goalCol);
 
@@ -191,7 +197,9 @@ public class FastestPathAlgo {
                 System.out.println("Goal visited. Path found!");
                 path = getPath(goalRow, goalCol);
                 printFastestPath(path);
-                return executePath(path, goalRow, goalCol);
+                String result = executePath(path, goalRow, goalCol);
+                turnBotDirection(DIRECTION.NORTH);
+                return result;
             }
 
             // Setup neighbors of current cell. [Top, Bottom, Left, Right].
@@ -276,7 +284,7 @@ public class FastestPathAlgo {
 
         ArrayList<MOVEMENT> movements = new ArrayList<>();
 
-        Robot tempBot = new Robot(1, 1, false);
+        Robot tempBot = new Robot(startRow, startCol, false);
         tempBot.setSpeed(0);
         while ((tempBot.getRobotPosRow() != goalRow) || (tempBot.getRobotPosCol() != goalCol)) {
             if (tempBot.getRobotPosRow() == temp.getRow() && tempBot.getRobotPosCol() == temp.getCol()) {
@@ -325,23 +333,32 @@ public class FastestPathAlgo {
                     fCount++;
                     if (fCount == 10) {
                         bot.moveForwardMultiple(fCount);
+                        CommMgr.getCommMgr().recvMsg();
                         fCount = 0;
                         exploredMap.repaint();
                     }
                 } else if (x == MOVEMENT.RIGHT || x == MOVEMENT.LEFT) {
                     if (fCount > 0) {
                         bot.moveForwardMultiple(fCount);
+                        CommMgr.getCommMgr().recvMsg();
                         fCount = 0;
                         exploredMap.repaint();
                     }
-
-                    bot.move(x);
+                    if(x == MOVEMENT.RIGHT) {
+                        bot.move(MOVEMENT.SPECIAL_RIGHT);
+                        CommMgr.getCommMgr().recvMsg();
+                    }
+                    else if(x == MOVEMENT.LEFT) {
+                        bot.move(MOVEMENT.SPECIAL_LEFT);
+                        CommMgr.getCommMgr().recvMsg();
+                    }
                     exploredMap.repaint();
                 }
             }
 
             if (fCount > 0) {
                 bot.moveForwardMultiple(fCount);
+                CommMgr.getCommMgr().recvMsg();
                 exploredMap.repaint();
             }
         }
@@ -468,6 +485,22 @@ public class FastestPathAlgo {
                 System.out.print(";");
             }
             System.out.println("\n");
+        }
+    }
+
+    private void turnBotDirection(DIRECTION targetDir) {
+        int numOfTurn = Math.abs(bot.getRobotCurDir().ordinal() - targetDir.ordinal());
+        if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
+
+        if (numOfTurn == 1) {
+            if (DIRECTION.getNext(bot.getRobotCurDir()) == targetDir) {
+                bot.move(MOVEMENT.RIGHT);
+            } else {
+                bot.move(MOVEMENT.LEFT);
+            }
+        } else if (numOfTurn == 2) {
+            bot.move(MOVEMENT.RIGHT);
+            bot.move (MOVEMENT.RIGHT);
         }
     }
 }
