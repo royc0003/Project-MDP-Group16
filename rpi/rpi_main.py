@@ -83,7 +83,7 @@ class Main(threading.Thread):
                 #testString2 = dataSplit[5]
                 #if((testString1[2] == '3' or testString1[2] == '4') and (testString2[2] == '3' or testString2[2] == '4')):
                 #    response = requests.get("http://127.0.0.1:5000/ImgReg")
-                #    sMsg = sMsg + ';7_' + response.json().get('img')
+                #    sMsg = sMsg + ';7_' + response.json().get('img') + ';8' + response.json.get(pos)
                     
                 self.writePCMsg(str(sMsg))
             except Exception as e:
