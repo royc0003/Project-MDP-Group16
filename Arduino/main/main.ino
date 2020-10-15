@@ -26,11 +26,11 @@ SharpIR fr =  SharpIR(FR, SRmodel);
 //=================  for calibration ======================
 #define NUM_SENSOR_READINGS_CALI 50
 
-#define CALI_DISTANCE_OFFSET 0.3 //offset for distance calibration using front sensor
-#define LR_OFFSET 0.9 //offset for angle calibration using FR and FL sensor
-#define LC_OFFSET 1.2 //offset for angle calibration using FL and FC sensor
-#define CR_OFFSET -0.7 //offset for angle calibration using FR and FC sensor
-#define R_OFFSET 0.6 //offset for andle calibration using right sensors
+#define CALI_DISTANCE_OFFSET 0//-0.7//0.3 //offset for distance calibration using front sensor
+#define LR_OFFSET 0.78//0.75//0.8//0.85//0.9//1.2//1.1//0.5//0.9 //offset for angle calibration using FR and FL sensor
+#define LC_OFFSET 0.7//1.2 //offset for angle calibration using FL and FC sensor
+#define CR_OFFSET -0.4 //offset for angle calibration using FR and FC sensor
+#define R_OFFSET 1.9//1.8//1.2////1.4//1.6//1.4//1.1//-0.5 //offset for andle calibration using right sensors
 #define RF_OFFSET 0.5
 
 #define ERROR_RIGHT 0
@@ -57,12 +57,12 @@ float integral = 0.0;
 
 float testSpeed = 320; //180                              //
 float PID_KP = 1.6; // lower = right, higher = left     // computePID() //1.6
-float PID_KI = 0.0022;  //0.01                                       // computePID()
+float PID_KI = 0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
 float PID_KD = 0; //0.05                                       // computePID()
-float GRID_DISTANCE[10] = {10.15, 20.3, 29.7, 40.1, 51, 60, 70, 80, 90,100};   // moveByGrids(int)
+float GRID_DISTANCE[10] = {10.15, 20.3, 29.7, 40.1, 51, 60, 70, 80, 90, 100};  // moveByGrids(int)
 float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
-float LEFT_ROTATION_DEGREE_OFFSET = -4.5;                   // rotateLeft(int)
-float RIGHT_ROTATION_DEGREE_OFFSET = -2.8;                  // rotateRight(int)
+float LEFT_ROTATION_DEGREE_OFFSET = -6.5;//-4.5                   // rotateLeft(int)
+float RIGHT_ROTATION_DEGREE_OFFSET = -8.2;//-8.3;//-8.8;////-7.8//-3.8;   //-2.8               // rotateRight(int)
 //int NUM_OF_SENSOR_READINGS_TO_TAKE = 15;                  // getDistance()
 int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calDistance()
 //int COMMAND_DELAY = 60;
@@ -71,11 +71,68 @@ int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calD
 const float WHEELCCF = 2 * PI * 3;
 
 
+//=================================for new PID===================================
+
+int encoder_val_R = 0, encoder_val_L = 0;
+int counter_MR = 0, counter_ML = 0;
+int currentTime;
+unsigned long startTime_MR, endTime_MR, duration_MR;
+unsigned long startTime_ML, endTime_ML, duration_ML;
+String fastestString, calibrateString;
+char header, func;
+
+double input_MR = 0, input_ML = 0;
+double pidOutput_MR = 0, pidOutput_ML = 0;
+double prev_pidOutput_MR = 0, prev_pidOutput_ML = 0;
+double error_MR = 0, error_ML = 0;
+double prev_error_MR = 0, prev_error_ML = 0;
+double prev_prev_error_MR = 0, prev_prev_error_ML = 0;
+double total_Dis = 0;
+
+float kp_MR = 2.2;//0.085;
+float ki_MR = 0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
+float kd_MR = 0;//0;//0.160;
+//float kp_ML = 0.110;
+// NOTE MOTOR_LEFT (Purple Line)
+float kp_ML = 1.5;//0.085;//0.085;//0.0100;//0.025;//0.065;//0.075;//0.11;
+float ki_ML =0.13;//0.14;//0.12;// 0.11;//0.12;//0.15;//0.1;//0.10;//0.09;//0.065;//0.080;
+float kd_ML = 0;//0.160;//0.014;
+double setpoint = 130;
+double setpoint_RT = 100;
+
+float MIN_DISTANCE_CALIBRATE = 9.5;
+float ANGLE_CALIBRATION_THRESHOLD = 0.05;
+float LEFT_TO_WALL_DISTANCE_THRESHOLD[2] = {MIN_DISTANCE_CALIBRATE - 0.05, MIN_DISTANCE_CALIBRATE + 0.05};  // calDistance()
+float RIGHT_TO_WALL_DISTANCE_THRESHOLD[2] = {MIN_DISTANCE_CALIBRATE - 0.05, MIN_DISTANCE_CALIBRATE + 0.05}; // calDistance()
+float FRONT_TO_WALL_DISTANCE_THRESHOLD[2] = {MIN_DISTANCE_CALIBRATE - 0.05, MIN_DISTANCE_CALIBRATE + 0.05}; // calDistanceFront()
+const int AVERAGE_FRONT = 0;
+const int AVERAGE_READINGS = 1;
+const int AVERAGE_DISCRETE = 2;
+const int AVERAGE_FRONT_DISCRETE = 3;
+int SENSOR_READING_TYPE = AVERAGE_FRONT_DISCRETE;
+const int FRONT_LEFT_SENSOR = 1;
+const int FRONT_MIDDLE_SENSOR = 2;
+const int FRONT_RIGHT_SENSOR = 3;
+const int LEFT_SHORT_SENSOR = 4;
+const int LEFT_LONG_SENSOR = 5;
+const int RIGHT_SHORT_SENSOR = 6;
+const int NUM_SAMPLES = 10;
+bool initial = true;
+const int initial_Speed = 150;
+const int rotate_left_Lspeed = 180;///150;//130;//140;
+const int rotate_left_Rspeed = 230;//190;//200;//180;//150;//180;//170//160;
+int rotate_left_LspeedInitial = rotate_left_Lspeed;
+int rotate_left_RspeedInitial = rotate_left_Rspeed;
+int rotate_left_LUpdate = 0;
+int rotate_left_RUpdate = 0;
+int rotate_left_counter = 0;
+
+
 
 void setup()
 {
-  //Serial.begin(115200);
-  Serial.begin(9600);
+  Serial.begin(115200);
+  //Serial.begin(9600);
   Serial.println("From Arduino: Communicating with Rpi");
 
   pinMode(motor_R_enconder, INPUT);
@@ -84,32 +141,99 @@ void setup()
   md.init();
   md.setSpeeds(0, 0);
 
-  PCintPort::attachInterrupt(motor_R_enconder, lTick, RISING);
-  PCintPort::attachInterrupt(motor_L_enconder, rTick, RISING);
+  PCintPort::attachInterrupt(motor_R_enconder, countPulse_MR, RISING);
+  PCintPort::attachInterrupt(motor_L_enconder, countPulse_ML, RISING);
 
   delay(2000);
 }
 
 void loop()
 {
-
-
   /*
-    if (Serial.available() > 0)
-    {
-    commandExecution(char(Serial.read()));
-    }
-  */
-  for(int i = 0; i <5; i++)
+  for(int i = 0; i<5; i++)
   {
-    moveByGrids(1);
-    delay(5000);
+    goStraightInGrids(1);
+    delay(500);
   }
-  
+
   while(1)
   {
     delay(10000);
   }
+ */
+  //Full calibration
+  /*
+      rotateRight(90);
+      rotateRight(90);
+      delay(100);
+      caliAngleRight();
+      delay(100);
+      caliDistanceFront();
+      delay(100);
+      caliAngleRight();
+      delay(100);
+      rotateRight(90);
+      delay(100);
+      caliAngleFrontLR();
+      delay(100);
+      caliDistanceFront();
+      delay(100);
+      caliAngleFrontLR();
+      delay(100);
+      rotateRight(90);
+      delay(100);
+      Serial.println("k");
+        
+  delay(2000);
+      rotateRight(90);
+      delay(100);
+      caliAngleRight();
+  delay(2000);
+  */
+     // goStraightInGrids(1);
+      //delay(100);
+      //caliAngleRight();
+      //delay(10000);
+  /*
+  delay(2000);
+      goStraightInGrids(1);
+      delay(100);
+      caliAngleRight();
+  delay(2000);
+      rotateLeft(90);
+  delay(2000);
+      goStraightInGrids(1);
+      delay(100);
+  delay(2000);
+      rotateRight(90);
+      goStraightInGrids(1);
+      delay(100);
+  delay(2000);
+      caliAngleFrontCR();
+      delay(100);
+      caliDistanceFront();
+   */
+  // Movement Check
+  //goStraightInGrids(1);
+  //rotateLeft(90);
+  //rotateRight(90);
+
+  //Calibration Angle Check
+ // caliAngleFrontLR();
+ // caliAngleFrontLC();
+ //caliAngleFrontCR();
+ //caliAngleRight();
+
+ // Calibration Disance Check
+ //caliDistanceFront();
+  //delay(1000);
+
+  if (Serial.available() > 0)
+  {
+    commandExecution(char(Serial.read()));
+  }
+    
+  
 }
 
 void commandExecution(char cmd)
@@ -117,53 +241,53 @@ void commandExecution(char cmd)
   switch (cmd) {
     case 'F':
       //md.setSpeeds(100,100);
-      moveByGrids(1);
+      goStraightInGrids(1);
       delay(100);
       sendSensorReading();
       //Serial.println("k");
       break;
     case '2':
-      moveByGrids(2);
+      goStraightInGrids(2);
       delay(100);
       sendSensorReading();
       break;
     case '3':
-      moveByGrids(3);
+      goStraightInGrids(3);
       delay(100);
       sendSensorReading();
       break;
     case '4':
-      moveByGrids(4);
+      goStraightInGrids(4);
       delay(100);
       sendSensorReading();
       break;
-   case '5':
-      moveByGrids(5);
+    case '5':
+      goStraightInGrids(5);
       delay(100);
       sendSensorReading();
       break;
-  case '6':
-    moveByGrids(6);
+    case '6':
+      goStraightInGrids(6);
       delay(100);
       sendSensorReading();
       break;
     case '7':
-      moveByGrids(7);
+      goStraightInGrids(7);
       delay(100);
       sendSensorReading();
       break;
     case '8':
-      moveByGrids(8);
+      goStraightInGrids(8);
       delay(100);
       sendSensorReading();
       break;
-   case '9':
-      moveByGrids(9);
+    case '9':
+      goStraightInGrids(9);
       delay(100);
       sendSensorReading();
       break;
-  case '0':
-      moveByGrids(10);
+    case '0':
+      goStraightInGrids(10);
       delay(100);
       sendSensorReading();
       break;
@@ -212,25 +336,42 @@ void commandExecution(char cmd)
       Serial.println("k");
       break;
     case 'X':
-      //      delay(100);
+      // delay(100);
       caliDistanceFront();
-      //delay(100);
+      delay(100);
       //sendSensorReading();
       Serial.println("k");
       break;
     case 'Y':
       //      delay(100);
       caliAngleRight();
-      //delay(100);
+      delay(100);
       //sendSensorReading();
       Serial.println("k");
       break;
-  
-      //   default:
-      //      moveByGrids(2);
+    case 'O':
       //      delay(100);
-      //      sensorReading();
-      //      break;
+      caliAngleFrontLR();
+      delay(100);
+      //sendSensorReading();
+      Serial.println("k");
+      break;
+
+    case 'P':
+      //      delay(100);
+      caliAngleFrontLC();
+      delay(100);
+      //sendSensorReading();
+      Serial.println("k");
+      break;
+
+    case 'Q':
+      //      delay(100);
+      caliAngleFrontCR();
+      delay(100);
+      //sendSensorReading();
+      Serial.println("k");
+      break;
 
   }
 }
@@ -378,7 +519,7 @@ void caliAngleFrontLR()
   error = flDistance - frDistance;
 
 
-  while (abs(error) > 0.2 && counter < 30)
+  while (abs(error) > 0.1 && counter < 30)
   {
     //Serial.println(error);
     if (error > 0)
@@ -432,7 +573,7 @@ void caliAngleFrontCR()
     fcDistance = sensorCaliDistance(FC) + CR_OFFSET;
     frDistance = sensorCaliDistance(FR);
     error = fcDistance - frDistance;
-    Serial.println(error);
+    //Serial.println(error);
     counter++;
 
   }
@@ -467,7 +608,7 @@ void caliAngleFrontLC()
     flDistance = sensorCaliDistance(FL) + LC_OFFSET;
     fcDistance = sensorCaliDistance(FC);
     error = flDistance - fcDistance;
-    Serial.println(error);
+    //Serial.println(error);
     counter++;
 
   }
@@ -548,11 +689,16 @@ void caliDistanceFront()
   {
     if (difference > 0)
     {
-      moveBackwardCali(); //move forward for 0.2cm
+      //moveBackwardCali(); //move forward for 0.2cm
+      md.setSpeeds(150, 150);
+      delay(abs(difference * 40));
+      md.setBrakes(300, 300);
     }
     else
     {
-      moveForwardCali(); //move backward for 0.2cm
+      md.setSpeeds(-150, -150);
+      delay(abs(difference * 40));
+      md.setBrakes(300, 300); //move backward for 0.2cm
     }
     delay(10);
     actualDistance = sensorCaliDistance(FR);
@@ -621,7 +767,7 @@ float sensorCaliDistance(int sensor)
       Distance = -3.3307 * pow(voltage, 3) + 24.122 * voltage * voltage - 62.573 * voltage + 63.155; //doenst works when distance less than 2.5cm
       //distance =
       return Distance;
-   case FC:
+    case FC:
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
         caliReading[i] = analogRead(FC);
@@ -720,110 +866,222 @@ void resetPID() {
   resetCounter();
 }
 
-float pidControlForward(int left_encoder_val, int right_encoder_val) {
-  //P = High correction to value, D = Add resistance to P, I = Correct error value to original value
-  float error = left_encoder_val - right_encoder_val;
-  float derivative, output;
-
-  integral += error;
-  derivative = error - prevError;
-  output = PID_KP * error + PID_KI * integral + PID_KD * derivative;
-  prevError = error;
-
-  return output;
-}
-
-void moveByGrids(int grids) {
-  moveForward(testSpeed, GRID_DISTANCE[grids - 1]);
-  //Serial.println("finish moving");
-}
-
-void moveByDgGrids(int grids) {
-  moveForward(testSpeed, DG_GRID_DISTANCE[grids - 1]);
-}
-
-void moveForward(int sped, float distance)  {
-  float output;
-  float distanceInTicks;
-
-  distanceInTicks = (distance / WHEELCCF) * 526.25;
-  md.setSpeeds(-sped, -sped);
-  resetPID();
-  while (left_encoder_val2 < distanceInTicks)  {
-    output = pidControlForward(left_encoder_val, right_encoder_val);
-    delay(1);
-    md.setSpeeds(-(sped), -(sped - output));
-    Serial.println(-(sped - output));
-    //  qwd c.println("output");
-    //Serial.println(output);
-    //Serial.println("left_encoder_val2, distanceInTicks");
-    //Serial.println(left_encoder_val2);
-    //Serial.println(distanceInTicks);
-  }
-  //Serial.println("End moving");
-  md.setBrakes(375, 375);
-  //  if(!FP_FLAG)
-  //      delay(50);
-  resetPID();
-}
-
-void moveForwardCali()
-{
-  moveForward(testSpeed, 0.075);
-}
-
-void moveBackwardCali()
-{
-  moveForward(-testSpeed, 0.075);
-}
-
-
 void Brake() {
   md.setBrakes(400, 400);
 }
+
+void goStraightInGrids(long grids) {
+  long distance = grids * 9700;//9800;//9900;//10100;//10200;//10300//10500;//10800;
+
+  while (true) {
+    if (total_Dis >= distance) {
+      total_Dis = 0;
+      md.setBrakes(400, 400);
+      break;
+    } else {
+      moveForward();
+      //Serial.print(input_MR); //Serial.print(", R  ||  L ,");
+      //Serial.print("R || L");
+      //Serial.println(input_ML); //Serial.print(", L\n");
+      total_Dis = total_Dis + input_ML + input_MR;
+    }
+  }
+  delay(50);
+  restartPID();
+}
+
+void goStraightInGridsFast(long grids) {
+  long distance = grids * 11175;
+  while (true) {
+    if (total_Dis >= distance) {
+      total_Dis = 0;
+      md.setBrakes(400, 400);
+      break;
+    } else {
+      moveForward();
+      //Serial.print(input_MR); Serial.print(", R  ||  ");
+      //Serial.print(input_ML); Serial.print(", L\n");
+      total_Dis = total_Dis + input_ML + input_MR;
+    }
+  }
+  delay(50);
+  restartPID();
+}
+
+void goBackInGrids(long grids) {
+  long distance = grids * 10100;
+  while (true) {
+    if (total_Dis >= distance) {
+      total_Dis = 0;
+      md.setBrakes(400, 400);
+      break;
+    } else {
+      moveBackward();
+      //Serial.print(input_MR); Serial.print(", R  ||  ");
+      //Serial.print(input_ML); Serial.print(", L\n");
+      total_Dis = total_Dis + input_ML + input_MR;
+    }
+  }
+  delay(50);
+  restartPID();
+}
+
+
+
+
+// ==============================   Motor Functions   ==============================
+void countPulse_MR() {
+  counter_MR++;
+  right_encoder_val++;
+  if (counter_MR == 1) startTime_MR = micros();
+  else if (counter_MR == 11) {
+    endTime_MR = micros();
+    duration_MR = (endTime_MR - startTime_MR) / 10.0;
+    input_MR = calculateRPM(duration_MR);
+    counter_MR = 0;
+  }
+}
+
+void countPulse_ML() {
+  counter_ML++;
+  left_encoder_val2++;
+  left_encoder_val++;
+  if (counter_ML == 1) startTime_ML = micros();
+  else if (counter_ML == 11) {
+    endTime_ML = micros();
+    duration_ML = (endTime_ML - startTime_ML) / 10.0;
+    input_ML = calculateRPM(duration_ML);
+    counter_ML = 0;
+  }
+}
+
+double calculateRPM(double pulse) {
+  if (pulse == 0) return 0;
+  else return 60.00 / (pulse *  562.25 / 1000000.00);
+}
+
+
+void pidCalculation(float kp_MR, float ki_MR, float kd_MR, float kp_ML, float ki_ML, float kd_ML, double setpoint) {
+
+  // calculate k1, k2, k3 for both motors
+  double k1_MR = kp_MR + ki_MR + kd_MR;
+  double k2_MR = -kp_MR - 2 * kd_MR;
+  double k3_MR = kd_MR;
+
+  double k1_ML = kp_ML + ki_ML + kd_ML;
+  double k2_ML = -kp_ML - 2 * kd_ML;
+  double k3_ML = kd_ML;
+
+  // calculate error values
+  error_MR = (setpoint - input_MR) / 130.0; //150
+  error_ML = (setpoint - input_ML) / 130.0; //150
+
+  // compute PID controller output
+  pidOutput_MR = prev_pidOutput_MR + k1_MR * error_MR + k2_MR * prev_error_MR + k3_MR * prev_prev_error_MR;
+  pidOutput_ML = prev_pidOutput_ML + k1_ML * error_ML + k2_ML * prev_error_ML + k3_ML * prev_prev_error_ML;
+
+  // save current data into memory
+  prev_prev_error_MR = prev_error_MR;
+  prev_prev_error_ML = prev_error_ML;
+  prev_error_MR = error_MR;
+  prev_error_ML = error_ML;
+  prev_pidOutput_MR = pidOutput_MR;
+  prev_pidOutput_ML = pidOutput_ML;
+}
+
+void restartPID() {
+  prev_prev_error_MR = prev_prev_error_ML = 0;
+  prev_error_MR = prev_error_ML = 0;
+  error_MR = error_ML = 0;
+  prev_pidOutput_MR = prev_pidOutput_ML = 0;
+  pidOutput_MR = pidOutput_ML = 0;
+  input_MR = input_ML = 0;
+}
+
+void moveForward() {
+  /*if (initial) {
+    pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
+    md.setSpeeds(-pidOutput_ML * initial_Speed, -pidOutput_MR * initial_Speed);
+  }*/
+  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
+  md.setSpeeds(-pidOutput_ML * 150, -pidOutput_MR * 150);
+
+
+
+  //Serial.print(input_ML);
+  //Serial.print(" L || R ");
+  //Serial.print(",");
+  //Serial.println(input_MR);
+
+  delayMicroseconds(5000);
+}
+
+void moveForwardSlow() {
+  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint / 2);
+  md.setSpeeds(pidOutput_MR * 150, -pidOutput_ML * 150);
+  delayMicroseconds(5000);
+}
+
+void moveBackward() {
+  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
+  md.setSpeeds(-pidOutput_MR * 150, pidOutput_ML * 150);
+  delayMicroseconds(5000);
+}
+
+void moveBackwardSlow() {
+  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint / 2);
+  md.setSpeeds(-pidOutput_MR * 150, pidOutput_ML * 150);
+  delayMicroseconds(5000);
+}
+
 // ================ ROTATION =====================
-void rotateLeft(int degree) {
+void rotateLeft(int degree)
+{
   float output;
   float dis = (degree + LEFT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 280;
-  int right_speed = 280;
+  int left_speed = 380;
+  int right_speed = 380;
   float actual_distance = (dis * 405);
 
   delay(1);
   md.setSpeeds(left_speed, -right_speed);
-  resetPID();
+  resetCounter();
   while (left_encoder_val2 < actual_distance) {
-    output = pidControlForward(left_encoder_val, right_encoder_val);
+    //output = pidControlForward(left_encoder_val, right_encoder_val);
     delay(1);
     //Serial.println(output);
-    md.setSpeeds(left_speed, -right_speed + output);
+    //Serial.println(left_encoder_val2);
+    md.setSpeeds(left_speed, -right_speed);
     if (left_encoder_val2 > actual_distance)
     {
       break;
     }
   }
   md.setBrakes(400, 400);
-  resetPID();
-  //delay(75);
+  
 }
 
-void rotateRight(int degree) {
+void rotateRight(int degree)
+{
   float output;
   float dis = (degree + RIGHT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 280;
-  int right_speed = 280 ;
+  int left_speed = 380;
+  int right_speed = 380;
   float actual_distance = (dis * 405);
 
   delay(1);
   md.setSpeeds(-left_speed, right_speed);
-  resetPID();
+  resetCounter();
   while (left_encoder_val2 < actual_distance) {
-    output = pidControlForward(left_encoder_val, right_encoder_val);
+    //output = pidControlForward(left_encoder_val, right_encoder_val);
     delay(1);
-
-    md.setSpeeds(-left_speed, right_speed - output);
+    //Serial.println(output);
+    md.setSpeeds(-left_speed, right_speed);
+    if (left_encoder_val2 > actual_distance)
+    {
+      break;
+    }
   }
   md.setBrakes(400, 400);
-  resetPID();
-
+  
 }
