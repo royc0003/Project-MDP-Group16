@@ -54,7 +54,8 @@ class CNN:
         return gray, results
 
     def save_to_local(self, img):
-        cv2.imwrite(os.path.join('reg_image', str(self.local_image_count) + '.jpg'), img)
+        cv2.imwrite('/Users/khoapham/Desktop/Projects/Project-MDP-Group16/ir/cnn/model/reg_image/' +  str(self.local_image_count) + '.jpg', img)
+        self.local_image_count += 1
 
     # graph architecture of cnn
     def getArchitecture(self):

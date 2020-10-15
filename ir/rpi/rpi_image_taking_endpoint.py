@@ -29,7 +29,7 @@ class ImgReg(Resource):
         data = takePic()
         headers = {"Content-type": "text/plain"}
         x = requests.post(cnn_url, data=data.tostring(), headers=headers)
-        print(x.text)
+        print(x)
         return {"result": x.text}
 
 

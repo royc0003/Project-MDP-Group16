@@ -318,13 +318,17 @@ public class Robot {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
 
+            //String msg = myMsg.substring(myMsg.length()-4, myMsg.length()-1);
             // String msg = "SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_2;SDATA;1_2;2_1;3_-1;4_1;5_-1;6_3;SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_3;";
 
 //            System.out.println(msg);
 //
 //            System.out.println("row: "+posRow);
-            
-            String[] msgArr = msg.split(";");
+
+            String[] msgArr1 = msg.split(";");
+            System.out.println(Arrays.toString(msgArr1));
+            String[] msgArr = Arrays.copyOfRange(msgArr1, 0, msgArr1.length -2);
+
             int i;
             
             for(i=1;i<7;i++){

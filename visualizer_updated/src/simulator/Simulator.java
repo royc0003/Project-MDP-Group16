@@ -54,6 +54,7 @@ public class Simulator {
 
             //WP|X|Y (col|row)
 
+            msg = comm.recvMsg();
             System.out.println("Waiting for way point");
             msg = comm.recvMsg();
             String[] msgArr = msg.split(";");
