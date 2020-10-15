@@ -19,7 +19,7 @@ import static utils.MapDescriptor.loadMapFromDisk;
 /**
  * Simulator for robot navigation in virtual arena.
  *
- */
+*/
 
 public class Simulator {
     private static JFrame _appFrame = null;         // application JFrame
@@ -35,14 +35,35 @@ public class Simulator {
     private static int timeLimit = 3600;            // time limit
     private static int coverageLimit = 300;         // coverage limit
 
+    private static int WP_Row;
+    private static int WP_Col;
+
     private static final CommMgr comm = CommMgr.getCommMgr();
     private static final boolean realRun = true;
+
+    private static final boolean isExploring = true;
 
     /**
      * Initialises the different maps and displays the application.
      */
     public static void main(String[] args) {
-        if (realRun) comm.openConnection();
+        if (realRun) {
+            comm.openConnection();
+
+            String msg = comm.recvMsg();
+
+            //WP|X|Y (col|row)
+
+            System.out.println("Waiting for way point");
+            msg = comm.recvMsg();
+            String[] msgArr = msg.split(";");
+
+            WP_Row = Integer.parseInt(msgArr[1]);
+            WP_Col = Integer.parseInt(msgArr[2]);
+
+            System.out.println(WP_Row);
+            System.out.println(WP_Col);
+        }
 
         bot = new Robot(RobotConstants.START_ROW, RobotConstants.START_COL, realRun);
 
@@ -55,6 +76,7 @@ public class Simulator {
         exploredMap.setAllUnexplored();
 
         displayEverything();
+
     }
 
     /**
@@ -178,10 +200,15 @@ public class Simulator {
                     }
                 }
 
-                FastestPathAlgo fastestPath;
-                fastestPath = new FastestPathAlgo(exploredMap, bot);
+                FastestPathAlgo fastestPathToWP, fastestPathToDestination;
+                fastestPathToWP = new FastestPathAlgo(exploredMap, bot);
+                fastestPathToDestination = new FastestPathAlgo(exploredMap, bot);
 
-                fastestPath.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
+                fastestPathToWP.runFastestPath(WP_Row, WP_Col);
+                fastestPathToDestination.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
+
+                CommMgr comm = CommMgr.getCommMgr();
+                comm.sendMsg("DONE", CommMgr.DONE_EX);
 
                 return 222;
             }
@@ -209,6 +236,11 @@ public class Simulator {
                 generateMapDescriptor(exploredMap);
 
                 if (realRun) {
+                    /** 
+                     * After calibration done, bot ready to go FP
+                     */
+
+                    comm.sendMsg("RDY", CommMgr.FP_READY);
                     new FastestPath().execute();
                 }
 

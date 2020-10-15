@@ -8,19 +8,19 @@ import utils.CommMgr;
 import utils.MapDescriptor;
 
 import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 // @formatter:off
 /**
- * Represents the robot moving in the arena.
- *
- * The robot is represented by a 3 x 3 cell space as below:
- *
+ * 
  *          ^   ^   ^
  *         SR  SR  SR
- *       < SR
- *        [X] [X] [X]
+ *  
  *   < LR [X] [X] [X] SR >
- *        [X] [X] [X]
+ *        [X] [X] [X] 
+ *        [X] [X] [X] SR >
+ *
+ * (Long range on top )
  *
  * SR = Short Range Sensor, LR = Long Range Sensor
  *
@@ -35,11 +35,12 @@ public class Robot {
     private final Sensor SRFrontLeft;       // north-facing front-left SR
     private final Sensor SRFrontCenter;     // north-facing front-center SR
     private final Sensor SRFrontRight;      // north-facing front-right SR
-    private final Sensor SRLeft;            // west-facing left SR
-    private final Sensor SRRight;           // east-facing right SR
+    private final Sensor SRRightTop;        // east-facing right SR
+    private final Sensor SRRightBottom;     //NOTE: This is for SRRight-Bottom             // west-facing left SR    
     private final Sensor LRLeft;            // west-facing left LR
     private boolean touchedGoal;
     private final boolean realBot;
+    private String explorationMapString;
 
     public Robot(int row, int col, boolean realBot) {
         posRow = row;
@@ -52,9 +53,9 @@ public class Robot {
         SRFrontLeft = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, this.robotDir, "SRFL");
         SRFrontCenter = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol, this.robotDir, "SRFC");
         SRFrontRight = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.robotDir, "SRFR");
-        SRLeft = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "SRL");
-        SRRight = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT), "SRR");
-        LRLeft = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "LRL");
+        SRRightTop = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT), "SRRT");
+        SRRightBottom = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT), "SRRB");
+        LRLeft = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT), "LRL");
     }
 
     public void setRobotPos(int row, int col) {
@@ -80,6 +81,37 @@ public class Robot {
 
     public DIRECTION getRobotCurDir() {
         return robotDir;
+    }
+
+    public boolean checkRightNotPhantom(){
+        return SRRightTop.getSensorVal() == 1 && SRRightBottom.getSensorVal() == 1;
+    }
+
+    public char getCameraDirection(DIRECTION d){
+        switch(d){
+            case NORTH:
+                return 'R';
+            case EAST:
+                return 'D';
+            case SOUTH:
+                return 'L';
+            case WEST:
+                return 'U';
+        }
+        return '-';
+    }
+    public char getAndroidCurDir(DIRECTION d){
+        switch(d){
+            case NORTH:
+                return 'U';
+            case EAST:
+                return 'R';
+            case SOUTH:
+                return 'D';
+            case WEST:
+                return 'L';
+        }
+        return '-';
     }
 
     public boolean getRealBot() {
@@ -108,8 +140,6 @@ public class Robot {
                 System.out.println("Something went wrong in Robot.move()!");
             }
         }
-        System.out.println(posRow);
-        System.out.println(posCol);
         switch (m) {
             case FORWARD:
                 switch (robotDir) {
@@ -147,14 +177,18 @@ public class Robot {
             case LEFT:
                 robotDir = findNewDirection(m);
                 break;
-            case CALIBRATE:
+            case CALIBRATE_RIGHT:
+            case CALIBRATE_DISTANCE:
+            case CALIBRATE_ANGLE_LR:
+            case CALIBRATE_ANGLE_LC:
+            case CALIBRATE_ANGLE_RC:
                 break;
             default:
                 System.out.println("Error in Robot.move()!");
                 break;
         }
 
-        if (realBot) sendMovement(m, sendMoveToAndroid);
+        if (realBot) sendMovement(m, sendMoveToAndroid); // this is to adrunio
         else System.out.println("Move: " + MOVEMENT.print(m));
 
         updateTouchedGoal();
@@ -196,7 +230,8 @@ public class Robot {
                     break;
             }
 
-            comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            //comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
+            // comm.sendMsg(this.getRobotPosCol() + "," + this.getRobotPosRow() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
         }
     }
 
@@ -206,9 +241,10 @@ public class Robot {
     private void sendMovement(MOVEMENT m, boolean sendMoveToAndroid) {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
-        if (m != MOVEMENT.CALIBRATE && sendMoveToAndroid) {
-            comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
-        }
+            String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
+            comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
+            // String imgToSend = "|["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]|"+getCameraDirection(this.getRobotCurDir())+"|";
+            // comm.sendMsg(imgToSend, CommMgr.CAMERA);
     }
 
     /**
@@ -220,33 +256,33 @@ public class Robot {
                 SRFrontLeft.setSensor(this.posRow + 1, this.posCol - 1, this.robotDir);
                 SRFrontCenter.setSensor(this.posRow + 1, this.posCol, this.robotDir);
                 SRFrontRight.setSensor(this.posRow + 1, this.posCol + 1, this.robotDir);
-                SRLeft.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
-                LRLeft.setSensor(this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
-                SRRight.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightTop.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightBottom.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                LRLeft.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
                 break;
             case EAST:
                 SRFrontLeft.setSensor(this.posRow + 1, this.posCol + 1, this.robotDir);
                 SRFrontCenter.setSensor(this.posRow, this.posCol + 1, this.robotDir);
                 SRFrontRight.setSensor(this.posRow - 1, this.posCol + 1, this.robotDir);
-                SRLeft.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT));
-                LRLeft.setSensor(this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.LEFT));
-                SRRight.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightTop.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightBottom.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                LRLeft.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT));
                 break;
             case SOUTH:
                 SRFrontLeft.setSensor(this.posRow - 1, this.posCol + 1, this.robotDir);
                 SRFrontCenter.setSensor(this.posRow - 1, this.posCol, this.robotDir);
                 SRFrontRight.setSensor(this.posRow - 1, this.posCol - 1, this.robotDir);
-                SRLeft.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT));
-                LRLeft.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.LEFT));
-                SRRight.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightTop.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightBottom.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                LRLeft.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT));
                 break;
             case WEST:
                 SRFrontLeft.setSensor(this.posRow - 1, this.posCol - 1, this.robotDir);
                 SRFrontCenter.setSensor(this.posRow, this.posCol - 1, this.robotDir);
                 SRFrontRight.setSensor(this.posRow + 1, this.posCol - 1, this.robotDir);
-                SRLeft.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
-                LRLeft.setSensor(this.posRow - 1, this.posCol, findNewDirection(MOVEMENT.LEFT));
-                SRRight.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightTop.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT));
+                SRRightBottom.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT));
+                LRLeft.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
                 break;
         }
 
@@ -266,7 +302,7 @@ public class Robot {
     /**
      * Calls the .sense() method of all the attached sensors and stores the received values in an integer array.
      *
-     * @return [SRFrontLeft, SRFrontCenter, SRFrontRight, SRLeft, SRRight, LRLeft]
+     * @return [SRFrontLeft, SRFrontCenter, SRFrontRight, SRRightTop, SRRightBottom, LRLeft]
      */
     public int[] sense(Map explorationMap, Map realMap) {
         int[] result = new int[6];
@@ -275,32 +311,63 @@ public class Robot {
             result[0] = SRFrontLeft.sense(explorationMap, realMap);
             result[1] = SRFrontCenter.sense(explorationMap, realMap);
             result[2] = SRFrontRight.sense(explorationMap, realMap);
-            result[3] = SRLeft.sense(explorationMap, realMap);
-            result[4] = SRRight.sense(explorationMap, realMap);
+            result[3] = SRRightTop.sense(explorationMap, realMap);
+            result[4] = SRRightBottom.sense(explorationMap, realMap);
             result[5] = LRLeft.sense(explorationMap, realMap);
         } else {
             CommMgr comm = CommMgr.getCommMgr();
             String msg = comm.recvMsg();
-            String[] msgArr = msg.split(";");
 
-            if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
-                result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
-                result[1] = Integer.parseInt(msgArr[2].split("_")[1]);
-                result[2] = Integer.parseInt(msgArr[3].split("_")[1]);
-                result[3] = Integer.parseInt(msgArr[4].split("_")[1]);
-                result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
-                result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
+            // String msg = "SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_2;SDATA;1_2;2_1;3_-1;4_1;5_-1;6_3;SDATA;1_2;2_-1;3_-1;4_1;5_-1;6_3;";
+
+//            System.out.println(msg);
+//
+//            System.out.println("row: "+posRow);
+            
+            String[] msgArr = msg.split(";");
+            int i;
+            
+            for(i=1;i<7;i++){
+            int n = msgArr.length / 7;
+            int j;
+            HashMap<Integer, Integer> freq = new HashMap<Integer, Integer>();
+            int mostFreq = Integer.parseInt(msgArr[i].split("_")[1]);
+
+            for(j=0;j<n;j++){
+                int value = Integer.parseInt(msgArr[i+7*j].split("_")[1]);
+                if(!freq.containsKey(value)){
+                    freq.put(value, 1);
+                } else freq.put(value, freq.get(value)+1);
+                
+                if(freq.get(value) > freq.get(mostFreq)) mostFreq = value;
             }
+            result[i-1] = mostFreq;
+            }
+
+            // if (msgArr[0].equals(CommMgr.SENSOR_DATA)) {
+            //     result[0] = Integer.parseInt(msgArr[1].split("_")[1]);
+            //     result[1] = Integer.parseInt(msgArr[2].split("_")[1]);
+            //     result[2] = Integer.parseInt(msgArr[3].split("_")[1]);
+            //     result[3] = Integer.parseInt(msgArr[4].split("_")[1]);
+            //     result[4] = Integer.parseInt(msgArr[5].split("_")[1]);
+            //     result[5] = Integer.parseInt(msgArr[6].split("_")[1]);
+            // }
+
+            // //Fantom block due to poor center sensor
+            // if(result[0] == result[2]) result[1] = result[0];
+
+            System.out.println(Arrays.toString(result));
 
             SRFrontLeft.senseReal(explorationMap, result[0]);
             SRFrontCenter.senseReal(explorationMap, result[1]);
             SRFrontRight.senseReal(explorationMap, result[2]);
-            SRLeft.senseReal(explorationMap, result[3]);
-            SRRight.senseReal(explorationMap, result[4]);
+            SRRightTop.senseReal(explorationMap, result[3]);
+            SRRightBottom.senseReal(explorationMap, result[4]);
             LRLeft.senseReal(explorationMap, result[5]);
 
             String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
-            comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+            //comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+            this.explorationMapString = mapStrings[0] + "|" + mapStrings[1] + "|";
         }
 
         return result;
