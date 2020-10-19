@@ -14,7 +14,7 @@ api = Api(app)
 
 def takePic():
     with picamera.PiCamera() as camera:
-        camera.resolution = (640, 480)
+        camera.resolution = (640, 240)
         with picamera.array.PiRGBArray(camera) as stream:
             camera.start_preview()
             camera.capture(stream, format='bgr')
