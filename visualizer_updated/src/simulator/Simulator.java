@@ -41,7 +41,7 @@ public class Simulator {
     private static final CommMgr comm = CommMgr.getCommMgr();
     private static final boolean realRun = true;
 
-    private static final boolean isExploring = true;
+    private static final boolean isExploring = false;
 
     /**
      * Initialises the different maps and displays the application.
@@ -51,16 +51,15 @@ public class Simulator {
             comm.openConnection();
 
             String msg = comm.recvMsg();
-
             //WP|X|Y (col|row)
 
-            msg = comm.recvMsg();
+//          msg = comm.recvMsg();
             System.out.println("Waiting for way point");
             msg = comm.recvMsg();
             String[] msgArr = msg.split(";");
 
-            WP_Row = Integer.parseInt(msgArr[1]);
-            WP_Col = Integer.parseInt(msgArr[2]);
+            WP_Col = Integer.parseInt(msgArr[1]);
+            WP_Row = Integer.parseInt(msgArr[2]);
 
             System.out.println(WP_Row);
             System.out.println(WP_Col);
@@ -203,11 +202,14 @@ public class Simulator {
 
                 FastestPathAlgo fastestPathToWP, fastestPathToDestination;
                 fastestPathToWP = new FastestPathAlgo(exploredMap, bot);
+                String result1 = fastestPathToWP.runFastestPath(WP_Row, WP_Col);
+
+                bot.setRobotPos(WP_Row, WP_Col);
                 fastestPathToDestination = new FastestPathAlgo(exploredMap, bot);
+                String result2 = fastestPathToDestination.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
 
-                fastestPathToWP.runFastestPath(WP_Row, WP_Col);
-                fastestPathToDestination.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
-
+                System.out.println(result1);
+                System.out.println(result2);
                 CommMgr comm = CommMgr.getCommMgr();
                 comm.sendMsg("DONE", CommMgr.DONE_EX);
 
@@ -234,6 +236,7 @@ public class Simulator {
                 }
 
                 exploration.runExploration();
+
                 generateMapDescriptor(exploredMap);
 
                 if (realRun) {

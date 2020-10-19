@@ -175,6 +175,8 @@ public class Robot {
                 break;
             case RIGHT:
             case LEFT:
+            case SPECIAL_RIGHT:
+            case SPECIAL_LEFT:
                 robotDir = findNewDirection(m);
                 break;
             case CALIBRATE_RIGHT:
@@ -205,9 +207,9 @@ public class Robot {
      * Sends a number instead of 'F' for multiple continuous forward movements.
      */
     public void moveForwardMultiple(int count) {
-        if (count == 1) {
-            move(MOVEMENT.FORWARD);
-        } else {
+//        if (count == 1) {
+//            move(MOVEMENT.FORWARD);
+//        } else {
             CommMgr comm = CommMgr.getCommMgr();
             if (count == 10) {
                 comm.sendMsg("0", CommMgr.INSTRUCTIONS);
@@ -232,7 +234,7 @@ public class Robot {
 
             //comm.sendMsg(this.getRobotPosRow() + "," + this.getRobotPosCol() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
             // comm.sendMsg(this.getRobotPosCol() + "," + this.getRobotPosRow() + "," + DIRECTION.print(this.getRobotCurDir()), CommMgr.BOT_POS);
-        }
+        //}
     }
 
     /**
@@ -242,7 +244,7 @@ public class Robot {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
             String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
-            comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
+            if(this.explorationMapString != null) comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
             // String imgToSend = "|["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]|"+getCameraDirection(this.getRobotCurDir())+"|";
             // comm.sendMsg(imgToSend, CommMgr.CAMERA);
     }
@@ -292,7 +294,7 @@ public class Robot {
      * Uses the current direction of the robot and the given movement to find the new direction of the robot.
      */
     private DIRECTION findNewDirection(MOVEMENT m) {
-        if (m == MOVEMENT.RIGHT) {
+        if (m == MOVEMENT.RIGHT || m == MOVEMENT.SPECIAL_RIGHT) {
             return DIRECTION.getNext(robotDir);
         } else {
             return DIRECTION.getPrevious(robotDir);
@@ -325,9 +327,8 @@ public class Robot {
 //
 //            System.out.println("row: "+posRow);
 
-            String[] msgArr1 = msg.split(";");
-            System.out.println(Arrays.toString(msgArr1));
-            String[] msgArr = Arrays.copyOfRange(msgArr1, 0, msgArr1.length -2);
+            String[] msgArr = msg.split(";");
+//            String[] msgArr = Arrays.copyOfRange(msgArr1, 0, msgArr1.length -2);
 
             int i;
             

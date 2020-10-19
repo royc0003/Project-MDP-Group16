@@ -128,16 +128,20 @@ public class Sensor {
         for (int i = this.lowerRange; i <= this.upperRange; i++) {
             int row = this.sensorPosRow + (rowInc * i);
             int col = this.sensorPosCol + (colInc * i);
+            int prevRow = this.sensorPosRow + (rowInc * (i-1));
+            int prevCol = this.sensorPosCol + (colInc * (i-1));
 
             if (!exploredMap.checkValidCoordinates(row, col)) continue;
             // if is explored, don't set obstacle
-            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && exploredMap.getCell(row, col).getIsExplored()) continue;
 
-            if(sensorVal == -1 ){ //handle sensor value if -1; to prevent from going beyond set obstacle; don't explore beyond
-                int prevRow = this.sensorPosRow + (rowInc * (i-1));
-                int prevCol = this.sensorPosCol + (colInc * (i-1));
-                if (exploredMap.getCell(prevRow, prevCol).getIsObstacle()) return;
-            }
+            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && exploredMap.getCell(row, col).getIsExplored()) continue;
+//            if (id.equals("LRL") && exploredMap.getCell(row, col).getIsExplored()) continue;
+
+//            if(sensorVal == -1 ){ //handle sensor value if -1; to prevent from going beyond set obstacle; don't explore beyond
+
+            if(exploredMap.getCell(prevRow, prevCol).getIsObstacle()) return;
+
+            //}
             exploredMap.getCell(row, col).setIsExplored(true);
 
             if (sensorVal == i) {
