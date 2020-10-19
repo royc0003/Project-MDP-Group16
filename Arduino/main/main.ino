@@ -1,6 +1,7 @@
 #include <DualVNH5019MotorShield.h>
 #include <SharpIR.h>
 #include <PinChangeInt.h>
+#include <RunningMedian.h>
 
 DualVNH5019MotorShield md;
 
@@ -23,16 +24,21 @@ SharpIR fc =  SharpIR(FC, SRmodel);
 SharpIR rb =  SharpIR(RB, SRmodel);
 SharpIR fr =  SharpIR(FR, SRmodel);
 
-//=================  for calibration ======================
-#define NUM_SENSOR_READINGS_CALI 50
 
-#define CALI_DISTANCE_OFFSET_R -0.1//-0.7//0.3 //offset for distance calibration using front sensor
-#define CALI_DISTANCE_OFFSET_L -0.2//-0.1//0//0.1//0
+//=================  for calibration ======================
+#define NUM_SENSOR_READINGS_CALI 19
+
+#define CALI_DISTANCE_OFFSET_R -0.1//-0.3//-0.2//-0.1//-0.7//0.3 //offset for distance calibration using front sensor
+#define CALI_DISTANCE_OFFSET_L -0.4//-0.2//-0.1//0//0.1//0
 #define LR_OFFSET 0.78//0.75//0.8//0.85//0.9//1.2//1.1//0.5//0.9 //offset for angle calibration using FR and FL sensor
 #define LC_OFFSET 0.7//1.2 //offset for angle calibration using FL and FC sensor
 #define CR_OFFSET -0.4 //offset for angle calibration using FR and FC sensor
-#define R_OFFSET 1.9//1.8//1.2////1.4//1.6//1.4//1.1//-0.5 //offset for andle calibration using right sensors
+#define R_OFFSET 2.68//2.6//2.5//2.4//2.68//1.8//1.9//1.8//1.2////1.4//1.6//1.4//1.1//-0.5 //offset for angle calibration using right sensors
 #define RF_OFFSET 0.5
+
+#define BRAKE_FC 10
+#define BRAKE_FL 10
+#define BRAKE_FR 10
 
 #define ERROR_RIGHT 0
 #define ERROR_FRONT 0
@@ -52,18 +58,23 @@ String gridsToRpi = "";
 
 volatile int left_encoder_val = 0, right_encoder_val = 0, left_encoder_val2 = 0;
 
+float error = 0.0;
 float prevError = 0.0;
 float integral = 0.0;
-
+float output = 0.0;
 
 float testSpeed = 320; //180                              //
 float PID_KP = 1.6; // lower = right, higher = left     // computePID() //1.6
-float PID_KI = 0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
-float PID_KD = 0; //0.05                                       // computePID()
+float PID_KI = 0.25;//0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
+float PID_KD = 0; //0.05     
+
+float PID_KP_R = 1.6; // lower = right, higher = left     // computePID() //1.6
+float PID_KI_R = 0.3;//0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
+float PID_KD_R = 0; //0.05   // computePID()
 float GRID_DISTANCE[10] = {10.15, 20.3, 29.7, 40.1, 51, 60, 70, 80, 90, 100};  // moveByGrids(int)
 float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
-float LEFT_ROTATION_DEGREE_OFFSET = -6.5;//-4.5                   // rotateLeft(int)
-float RIGHT_ROTATION_DEGREE_OFFSET = -8.2;//-8.3;//-8.8;////-7.8//-3.8;   //-2.8               // rotateRight(int)
+float LEFT_ROTATION_DEGREE_OFFSET = -5.0;//-4.9;//-4.6;//-4.5;//-6.5;//-4.5                   // rotateLeft(int)
+float RIGHT_ROTATION_DEGREE_OFFSET = -7.9;//-7.7;//-7.5;//-8.5;//-7.0;//-7.5;//-8.5;//-8.2;//-8.3;//-8.8;////-7.8//-3.8;   //-2.8               // rotateRight(int)
 //int NUM_OF_SENSOR_READINGS_TO_TAKE = 15;                  // getDistance()
 int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calDistance()
 //int COMMAND_DELAY = 60;
@@ -71,6 +82,10 @@ int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calD
 
 const float WHEELCCF = 2 * PI * 3;
 
+
+float derivative;
+//float prevError = 0.0;
+//float integral = 0.0;
 
 //=================================for new PID===================================
 
@@ -91,7 +106,7 @@ double prev_prev_error_MR = 0, prev_prev_error_ML = 0;
 double total_Dis = 0;
 
 float kp_MR = 2.2;//0.085;
-float ki_MR = 0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
+float ki_MR = 0.13;//0.11;//0.15;//0.13;//0.15;//0.1;//0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
 float kd_MR = 0;//0;//0.160;
 //float kp_ML = 0.110;
 // NOTE MOTOR_LEFT (Purple Line)
@@ -257,6 +272,7 @@ void loop()
       
 */
 
+ //goStraightInGrids(1);//1
  //Calibration Angle Check
 
   //Calibration Angle Check
@@ -275,16 +291,53 @@ void loop()
   //rotateRight(90);
 
 
-      
+//  Serial.print(sensorCaliDistance(RF));
+//  Serial.print(",");
+//  Serial.println(sensorCaliDistance(RB));
 
+  
   if (Serial.available() > 0)
   {
+  
     commandExecution(char(Serial.read()));
   }
-
-
-    
   
+  
+  /*
+  for(int i = 0; i<8; i++)
+  {
+    //rotateLeft(90);
+    goStraightInGrids(1);
+    //Serial.println("inside the loop");
+    delay(100);
+  }
+  
+  
+
+  
+   while(1)
+ {
+  delay(10000);
+ }
+  */
+  //caliFront();
+   
+  //caliAngleRight();
+ //Serial.println(ll.distance());
+/*
+ for(int i = 0; i<6; i++)
+ {
+  goStraightInGrids(1);
+  delay(100);
+ }
+
+ while(1)
+ {
+  delay(10000);
+ }
+  
+}
+*/
 }
 
 void commandExecution(char cmd)
@@ -304,8 +357,8 @@ void commandExecution(char cmd)
       //delay(100);
       //calibration_counter = 0;
       //}
+      caliAngleRight();
       specialCalibrate();
-      delay(100);
       sendSensorReading();
       //Serial.println("k");
       
@@ -356,8 +409,10 @@ void commandExecution(char cmd)
       //md.setSpeeds(100, -100);
       rotateLeft(90);
       delay(100);
+
       specialCalibrate();
-      delay(100);
+      
+      //delay(100);
       sendSensorReading();
       //Serial.println("L ok");
       break;
@@ -369,8 +424,10 @@ void commandExecution(char cmd)
       //md.setSpeeds(-100, 100);
       rotateRight(90);
       delay(100);
+      
       specialCalibrate();
-      delay(100);
+      
+      //delay(100);
       sendSensorReading();
       //Serial.println("R ok");
       break;
@@ -481,6 +538,7 @@ void specialCalibrate(){
          front_calibration_counter = 0;
       }
       rotateLeft(90); 
+      delay(100);
     }
   }
     
@@ -565,6 +623,8 @@ String calculateGrids(int sensor)
         return "2";
       else if (reading >= 30 && reading <= 40 )
         return "3";
+        else if (reading >= 41 && reading <= 52)
+        return "4";
       else return "-1";
     case RF:/*
       for (int i = 0; i < 9; i++)
@@ -621,6 +681,29 @@ String calculateGrids(int sensor)
 
 
 //========================================================Calibration==========================================================
+void caliFront(){
+  String f_l = calculateGrids(FL);
+  String f_r = calculateGrids(FR); 
+  String f_c = calculateGrids(FC);
+
+   if(f_l == "1" && f_c == "1"){
+    caliAngleFrontLC();
+    caliDistanceFrontL();
+    caliAngleFrontLC();
+    delay(100);
+   } else if(f_c == "1" && f_r == "1"){
+    caliAngleFrontCR();
+    caliDistanceFrontR();
+    caliAngleFrontCR();
+    delay(100);
+   } else if(f_l == "1" && f_r == "1"){
+    caliAngleFrontLR();
+    caliDistanceFrontL();
+    caliAngleFrontLR();
+    delay(100);
+   }
+}
+
 void caliAngleFrontLR()
 {
   float flDistance, frDistance, error;
@@ -775,6 +858,7 @@ void caliAngleRight()
     error = rfDistance - rbDistance;
     counter ++;
   }
+  delay(100);
   }
 
 }
@@ -880,68 +964,93 @@ void caliDistanceFrontL()
 float sensorCaliDistance(int sensor)
 {
   float Distance, voltage, middle;
+  RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
+  
   switch (sensor)
   {
+    
     case FL:
+     //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-        caliReading[i] = analogRead(FL);
+    
+        med.add(analogRead(FL));
+        //Serial.println(analogRead(FL));
       }
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
+      middle = med.getMedian();
       //add formula for distance calculation
       voltage = middle / 1023 * 5;
-
+       //voltage = med.getMedian();
+       
       //Distance = -2.0927 * pow(voltage, 3) + 16.475 * voltage * voltage -47.533 * voltage + 52.481;
       Distance = -6.3295 * pow(voltage, 3) + 45.689 * voltage * voltage - 113.84 * voltage + 101.02;
       //distance =
       return Distance;
 
     case FR:
+      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-        caliReading[i] = analogRead(FR);
+    
+        med.add(analogRead(FR));
       }
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
+      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
+      middle = med.getMedian();
       voltage = middle / 1023 * 5;
+      //voltage = med.getMedian();
       //Distance = -4.4405 * pow(voltage, 3) + 30.795 * voltage * voltage -76.011 * voltage + 70.041;
       Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage - 43.971 * voltage + 49.982;
       //distance =
       return Distance;
     case RF:
+      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-        caliReading[i] = analogRead(RF);
+    
+        med.add(analogRead(RF));
       }
-      middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
+      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
+     // voltage = middle / 1023 * 5; middle = med.getMedian();
+      middle = med.getMedian();
       voltage = middle / 1023 * 5;
+      //voltage = middle / 1023 * 5;
       Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage + -43.971 * voltage + 49.982;
       //distance =
       return Distance;
     case RB:
+      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-        caliReading[i] = analogRead(RB);
+    
+        med.add(analogRead(RB));
       }
-      middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
+      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
+     // voltage = middle / 1023 * 5;
+        middle = med.getMedian();
       voltage = middle / 1023 * 5;
+      //voltage = middle / 1023 * 5;
       Distance = -3.3307 * pow(voltage, 3) + 24.122 * voltage * voltage - 62.573 * voltage + 63.155; //doenst works when distance less than 2.5cm
       //distance =
       return Distance;
     case FC:
+     //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-        caliReading[i] = analogRead(FC);
+    
+        med.add(analogRead(FC));
       }
-      middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
+      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
       //add formula for distance calculation
+     // voltage = middle / 1023 * 5;
+       middle = med.getMedian();
       voltage = middle / 1023 * 5;
       Distance = -1.6918 * pow(voltage, 3) + 13.651 * voltage * voltage - 40.899 * voltage + 47.82; //doenst works when distance less than 2.5cm
       //distance =
@@ -1038,7 +1147,7 @@ void Brake() {
 }
 
 void goStraightInGrids(long grids) {
-  long distance = grids * 9600;//9500;//9700;//9800;//9900;//10100;//10200;//10300//10500;//10800;
+  long distance = grids * 9500;//9550;//9600;//9630;//9500;//9700;//9800;//9900;//10100;//10200;//10300//10500;//10800;
 
   while (true) {
     if (total_Dis >= distance) {
@@ -1128,8 +1237,24 @@ double calculateRPM(double pulse) {
 }
 
 
+/*
+bool eBrake()
+{
+  if (fc.distance() < BRAKE_FC || fl.distance() < BRAKE_FL || fr.distance() < BRAKE_FR)
+  {
+    md.setBrakes(400, 400);
+    delay(100);
+    caliAngleFrontLR();
+    return true;
+  }
+  return false;
+  
+}
+
+*/
 void pidCalculation(float kp_MR, float ki_MR, float kd_MR, float kp_ML, float ki_ML, float kd_ML, double setpoint) {
 
+  
   // calculate k1, k2, k3 for both motors
   double k1_MR = kp_MR + ki_MR + kd_MR;
   double k2_MR = -kp_MR - 2 * kd_MR;
@@ -1154,6 +1279,7 @@ void pidCalculation(float kp_MR, float ki_MR, float kd_MR, float kp_ML, float ki
   prev_error_ML = error_ML;
   prev_pidOutput_MR = pidOutput_MR;
   prev_pidOutput_ML = pidOutput_ML;
+
 }
 
 void restartPID() {
@@ -1172,6 +1298,7 @@ void moveForward() {
   }*/
   pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
   md.setSpeeds(-pidOutput_ML * 150, -pidOutput_MR * 150);
+  delayMicroseconds(5000);
 
 
 
@@ -1180,7 +1307,7 @@ void moveForward() {
   //Serial.print(",");
   //Serial.println(input_MR);
 
-  delayMicroseconds(5000);
+  
 }
 
 void moveForwardSlow() {
@@ -1202,6 +1329,8 @@ void moveBackwardSlow() {
 }
 
 // ================ ROTATION =====================
+
+/*
 void rotateLeft(int degree)
 {
   float output;
@@ -1251,4 +1380,65 @@ void rotateRight(int degree)
   }
   md.setBrakes(400, 400);
   
+}
+*/
+void rotateLeft(int degree) {
+  float output;
+  float dis = (degree + LEFT_ROTATION_DEGREE_OFFSET) / 90.0;
+  int left_speed = 380;
+  int right_speed = 380;
+  float actual_distance = (dis * 405);
+  delay(1);
+  md.setSpeeds(left_speed, -right_speed);
+  resetPID();
+  while (left_encoder_val2 < actual_distance) {
+    output = pidControlForward(left_encoder_val, right_encoder_val);
+    delay(1);
+    //Serial.println(output);
+    md.setSpeeds(left_speed, -right_speed + output);
+    if (left_encoder_val2 > actual_distance)
+    {
+      break;
+    }
+  }
+  md.setBrakes(400, 400);
+  resetPID();
+  //delay(75);
+}
+void rotateRight(int degree) {
+  float output;
+  float dis = (degree + RIGHT_ROTATION_DEGREE_OFFSET) / 90.0;
+  int left_speed = 380;
+  int right_speed = 380 ;
+  float actual_distance = (dis * 405);
+  delay(1);
+  md.setSpeeds(-left_speed, right_speed);
+  resetPID();
+  while (left_encoder_val2 < actual_distance) {
+    output = pidControlRight(left_encoder_val, right_encoder_val);
+    delay(1);
+   md.setSpeeds(-left_speed, right_speed - output);
+  }
+  md.setBrakes(400, 400);
+  resetPID();
+}
+
+
+float pidControlForward(int left_encoder_val, int right_encoder_val) {
+  derivative = error - prevError;
+  output = PID_KP * error + PID_KI * integral + PID_KD * derivative;
+  prevError = error;
+  
+
+  return output;
+}
+
+
+float pidControlRight(int left_encoder_val, int right_encoder_val) {
+  derivative = error - prevError;
+  output = PID_KP_R * error + PID_KI_R * integral + PID_KD_R * derivative;
+  prevError = error;
+  
+
+  return output;
 }
