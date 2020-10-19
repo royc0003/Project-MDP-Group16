@@ -287,7 +287,6 @@ public class Robot {
                 LRLeft.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT));
                 break;
         }
-
     }
 
     /**

@@ -85,7 +85,6 @@ public class ExplorationAlgo {
      */
     private void explorationLoop(int r, int c) {
         do {
-            antiStuck();
             nextMove();
 
             areaExplored = calculateAreaExplored();
@@ -340,6 +339,7 @@ public class ExplorationAlgo {
     private void moveBot(MOVEMENT m) {
         bot.move(m);
         exploredMap.repaint(); //fixed 7th october
+//        capturePhoto();
         if (m != MOVEMENT.CALIBRATE_RIGHT && m!= MOVEMENT.CALIBRATE_DISTANCE
                 && m!= MOVEMENT.CALIBRATE_ANGLE_LR && m!= MOVEMENT.CALIBRATE_ANGLE_LC
                 && m!= MOVEMENT.CALIBRATE_ANGLE_RC ){
@@ -473,6 +473,13 @@ public class ExplorationAlgo {
         bot.setSensors();
         bot.sense(exploredMap, realMap);
         exploredMap.repaint();
+    }
+
+    private void capturePhoto(){
+        System.out.println("Receiving photo");
+        CommMgr comm = CommMgr.getCommMgr();
+        String msg = comm.recvMsg();
+        System.out.println(msg);
     }
 
 //    public MOVEMENT canCalibrateOnTheSpot(DIRECTION dirToCheck){

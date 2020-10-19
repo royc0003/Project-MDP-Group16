@@ -115,7 +115,7 @@ public class Sensor {
     private void processSensorVal(Map exploredMap, int sensorVal, int rowInc, int colInc) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
-         //If above fails, check if starting point is valid for sensors with lowerRange > 1.
+        //If above fails, check if starting point is valid for sensors with lowerRange > 1.
 //         for (int i = 1; i < this.lowerRange; i++) {
 //             int row = this.sensorPosRow + (rowInc * i);
 //             int col = this.sensorPosCol + (colInc * i);
@@ -148,6 +148,9 @@ public class Sensor {
                 // if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
                 //     return;
                 // }
+                if(!exploredMap.getCell(row, col).getIsObstacle()){ /** Override the empty grid, set it as obstacle if detected*/
+                    System.out.println("Shakingggggg .........");
+                }
                 exploredMap.setObstacleCell(row, col, true);
                 break;
             }
