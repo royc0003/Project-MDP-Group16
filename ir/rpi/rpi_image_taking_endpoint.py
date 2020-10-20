@@ -4,6 +4,7 @@ import requests
 import cv2
 import picamera
 import picamera.array
+import json
 
 
 cnn_url = 'http://192.168.16.6:5000/predict'
@@ -13,7 +14,7 @@ api = Api(app)
 
 def takePic():
     with picamera.PiCamera() as camera:
-        camera.resolution = (640, 480)
+        camera.resolution = (640, 240)
         with picamera.array.PiRGBArray(camera) as stream:
             camera.start_preview()
             camera.capture(stream, format='bgr')
@@ -29,8 +30,7 @@ class ImgReg(Resource):
         data = takePic()
         headers = {"Content-type": "text/plain"}
         x = requests.post(cnn_url, data=data.tostring(), headers=headers)
-        print(x.text)
-        return {"result": x.text}
+        return {"result": json.loads(x.text)}
 
 
 api.add_resource(ImgReg, "/imgreg")

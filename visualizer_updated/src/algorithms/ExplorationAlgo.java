@@ -1,5 +1,7 @@
 package algorithms;
 
+import java.util.*;
+
 import map.Cell;
 import map.Map;
 import map.MapConstants;
@@ -20,8 +22,12 @@ public class ExplorationAlgo {
     private int areaExplored;
     private long startTime;
     private long endTime;
-    private int lastCalibrate;
+    private int lastFrontCalibrate = 0;
     private boolean calibrationMode;
+    private DIRECTION prevDir = DIRECTION.NORTH;
+    private ArrayList<MOVEMENT> movement = new ArrayList<MOVEMENT>();
+    private int prevLocRow;
+    private int prevLocCol;
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Robot bot, int coverageLimit, int timeLimit) {
         this.exploredMap = exploredMap;
@@ -40,27 +46,19 @@ public class ExplorationAlgo {
 
             CommMgr.getCommMgr().recvMsg();
             if (bot.getRealBot()) {
-                bot.move(MOVEMENT.LEFT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.LEFT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.RIGHT, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.CALIBRATE, false);
-                CommMgr.getCommMgr().recvMsg();
-                bot.move(MOVEMENT.RIGHT, false);
+                CommMgr.getCommMgr().sendMsg(null, CommMgr.CALIBRATE);
+            }
+            while(true){
+                System.out.println("Waiting for Calibration_Ok...");
+                String msg = CommMgr.getCommMgr().recvMsg();
+                if (msg.equals("k")) break;
             }
 
-//            while (true) {
-//                System.out.println("Waiting for EX_START...");
-//                String msg = CommMgr.getCommMgr().recvMsg();
-//                String[] msgArr = msg.split(";");
-//                if (msgArr[0].equals(CommMgr.EX_START)) break;
-//            }
+            while (true) {
+                System.out.println("Waiting for EX_START...");
+                String msg = CommMgr.getCommMgr().recvMsg();
+                if (msg.equals(CommMgr.EX_START)) break;
+            }
         }
 
         System.out.println("Starting exploration...");
@@ -107,14 +105,26 @@ public class ExplorationAlgo {
      */
     private void nextMove() {
         if (lookRight()) {
+            movement.add(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
-            if (lookForward()) moveBot(MOVEMENT.FORWARD);
+            if (lookForward()) {
+                movement.add(MOVEMENT.FORWARD);
+                moveBot(MOVEMENT.FORWARD);
+            }
         } else if (lookForward()) {
+            movement.add(MOVEMENT.FORWARD);
             moveBot(MOVEMENT.FORWARD);
         } else if (lookLeft()) {
+            movement.add(MOVEMENT.LEFT);
             moveBot(MOVEMENT.LEFT);
-            if (lookForward()) moveBot(MOVEMENT.FORWARD);
-        } else {
+            if (lookForward()) {
+                movement.add(MOVEMENT.FORWARD);
+                moveBot(MOVEMENT.FORWARD);
+            }
+        }
+        else {
+            movement.add(MOVEMENT.RIGHT);
+            movement.add(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
         }
@@ -225,15 +235,64 @@ public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
 
-        if (bot.getRealBot()) {
-            turnBotDirection(DIRECTION.WEST);
-            moveBot(MOVEMENT.CALIBRATE);
-            turnBotDirection(DIRECTION.SOUTH);
-            moveBot(MOVEMENT.CALIBRATE);
-            turnBotDirection(DIRECTION.WEST);
-            moveBot(MOVEMENT.CALIBRATE);
-        }
+        /**
+         * Enter start zone finish timing
+         */
+
+        CommMgr comm = CommMgr.getCommMgr();
+        comm.sendMsg("DONE", CommMgr.DONE_EX);
+
+//        if (bot.getRealBot()) {
+//            turnBotDirection(DIRECTION.WEST);
+//            turnBotDirection(DIRECTION.SOUTH);
+//            turnBotDirection(DIRECTION.WEST);
+//        }
         turnBotDirection(DIRECTION.NORTH);
+        CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
+    }
+
+
+    /**
+     *
+     Anti stuck
+     */
+
+    public void antiStuck(){
+        if(!lookRight()){
+            System.out.println("I'm in look right");
+            this.prevLocRow = bot.getRobotPosRow();
+            this.prevLocCol = bot.getRobotPosCol();
+
+            if (prevLocRow == 1)
+                prevDir = DIRECTION.SOUTH;
+            else if (prevLocRow == 13)
+                prevDir = DIRECTION.NORTH;
+            else if (prevLocCol == 1)
+                prevDir = DIRECTION.EAST;
+            else if (prevLocCol == 18)
+                prevDir = DIRECTION.WEST;
+        }
+
+        if (stuckInLoop()) {
+            //A*
+            System.out.println(Arrays.toString(movement.toArray()));
+            System.out.println("Prev loc: "+this.prevLocRow+"   "+this.prevLocCol);
+            System.out.println("Running A* to go back...");
+            FastestPathAlgo goToUnstuckLocation = new FastestPathAlgo(exploredMap, bot, realMap);
+            goToUnstuckLocation .runFastestPath(this.prevLocRow, this.prevLocCol);
+            turnBotDirection(this.prevDir);
+            movement.clear();
+        }
+    }
+
+    public boolean stuckInLoop(){
+        if (movement.size() >= 4)
+            if (movement.get(movement.size() - 1) == MOVEMENT.FORWARD &&
+                    movement.get(movement.size() - 2) == MOVEMENT.RIGHT &&
+                    movement.get(movement.size() - 3) == MOVEMENT.FORWARD &&
+                    movement.get(movement.size() - 4) == MOVEMENT.RIGHT)
+                return true;
+        return false;
     }
 
     /**
@@ -275,67 +334,117 @@ public class ExplorationAlgo {
 
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
+     * canSense == on Calibration don't paint
      */
     private void moveBot(MOVEMENT m) {
         bot.move(m);
-        exploredMap.repaint();
-        if (m != MOVEMENT.CALIBRATE) {
+        exploredMap.repaint(); //fixed 7th october
+//        capturePhoto();
+        if (m != MOVEMENT.CALIBRATE_RIGHT && m!= MOVEMENT.CALIBRATE_DISTANCE
+                && m!= MOVEMENT.CALIBRATE_ANGLE_LR && m!= MOVEMENT.CALIBRATE_ANGLE_LC
+                && m!= MOVEMENT.CALIBRATE_ANGLE_RC ){
             senseAndRepaint();
-        } else {
+        }
+        else {
             CommMgr commMgr = CommMgr.getCommMgr();
             commMgr.recvMsg();
         }
 
         if (bot.getRealBot() && !calibrationMode) {
             calibrationMode = true;
-
-            if (canCalibrateOnTheSpot(bot.getRobotCurDir())) {
-                lastCalibrate = 0;
-                moveBot(MOVEMENT.CALIBRATE);
-            } else {
-                lastCalibrate++;
-                if (lastCalibrate >= 5) {
-                    DIRECTION targetDir = getCalibrationDirection();
-                    if (targetDir != null) {
-                        lastCalibrate = 0;
-                        calibrateBot(targetDir);
-                    }
-                }
-            }
-
+            rightCalibrate();
+            frontCalibrate();
+//            cornerCalibrate();
+//            lastFrontCalibrate++;
+//            if(lastCalibrate >= 5){
+//                normalCalibrate();
+//            } else {
+//                rightCalibrate();
+//                lastCalibrate++;
+//            }
+//            if (lastFrontCalibrate >= 5) {
+//                DIRECTION targetDir = getCalibrationDirection();
+//                if (targetDir != null) {
+//                    lastFrontCalibrate = 0;
+//                    DIRECTION origDir = bot.getRobotCurDir();
+//                    turnBotDirection(targetDir);
+//                    frontCalibrate();
+//                    turnBotDirection(origDir);
+//                }
+//            }
             calibrationMode = false;
         }
     }
 
-    /**
-     * Sets the bot's sensors, processes the sensor data and repaints the map.
-     */
-    private void senseAndRepaint() {
-        bot.setSensors();
-        bot.sense(exploredMap, realMap);
-        exploredMap.repaint();
-    }
+    /** At the 3rd movement, if possible do right calibration first, then distance alibration */
+//    private void normalCalibrate(){
+//        rightCalibrate();
+//        MOVEMENT m = canCalibrateOnTheSpotFront(bot.getRobotCurDir());
+//        if(m != null){
+//            distanceCalibrate(bot.getRobotCurDir());
+//        } else {
+//            DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir());
+//            distanceCalibrate(dirToCheck);
+//        }
+//    }
 
-    /**
-     * Checks if the robot can calibrate at its current position given a direction.
-     */
-    private boolean canCalibrateOnTheSpot(DIRECTION botDir) {
-        int row = bot.getRobotPosRow();
-        int col = bot.getRobotPosCol();
+    /** This calibration is activated (distance both) when meet with a right angle. */
+    private void cornerCalibrate(){
+        DIRECTION origDir = bot.getRobotCurDir();
+        DIRECTION dirToCheck = DIRECTION.getNext(bot.getRobotCurDir());
 
-        switch (botDir) {
-            case NORTH:
-                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2, col) && exploredMap.getIsObstacleOrWall(row + 2, col + 1);
-            case EAST:
-                return exploredMap.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.getIsObstacleOrWall(row, col + 2) && exploredMap.getIsObstacleOrWall(row - 1, col + 2);
-            case SOUTH:
-                return exploredMap.getIsObstacleOrWall(row - 2, col - 1) && exploredMap.getIsObstacleOrWall(row - 2, col) && exploredMap.getIsObstacleOrWall(row - 2, col + 1);
-            case WEST:
-                return exploredMap.getIsObstacleOrWall(row + 1, col - 2) && exploredMap.getIsObstacleOrWall(row, col - 2) && exploredMap.getIsObstacleOrWall(row - 1, col - 2);
+        MOVEMENT m = canCalibrateOnTheSpotFront(dirToCheck);
+        if(canCalibrateOnTheSpotFront(origDir) != null){
+            if(m == MOVEMENT.CALIBRATE_ANGLE_LR || m == MOVEMENT.CALIBRATE_ANGLE_RC){
+                turnBotDirection(dirToCheck);
+                moveBot(m);
+                moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+                turnBotDirection(origDir);
+                rightCalibrate();
+            } else if(m == MOVEMENT.CALIBRATE_ANGLE_LC){
+                turnBotDirection(dirToCheck);
+                moveBot(m);
+                turnBotDirection(origDir);
+                rightCalibrate();
+
+            }
+
         }
 
-        return false;
+//        distanceCalibrate(dirToCheck); //check can calibrate right at corner first
+//        distanceCalibrate(origDir); // check can calibrate front at corner next
     }
+
+    /** Right calibration */
+    private void rightCalibrate(){
+        if(canCalibrateOnTheSpotRight(bot.getRobotCurDir()) && bot.checkRightNotPhantom()){
+            moveBot(MOVEMENT.CALIBRATE_RIGHT);
+//            lastCalibrate = 0;
+        }
+    }
+
+    /** Front calibration*/
+    private void frontCalibrate(){
+        MOVEMENT m = canCalibrateOnTheSpotFront(bot.getRobotCurDir());
+        if(m == MOVEMENT.CALIBRATE_ANGLE_LR || m == MOVEMENT.CALIBRATE_ANGLE_RC){
+            moveBot(m);
+            moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+        } else if(m == MOVEMENT.CALIBRATE_ANGLE_LC){
+            moveBot(m);
+        }
+    }
+
+    /** Distance calibrate */
+//    private void distanceCalibrate(DIRECTION dirToCheck){
+//        DIRECTION origDir = bot.getRobotCurDir();
+//        MOVEMENT calibrate = canCalibrateOnTheSpotFront(dirToCheck);
+//        if(calibrate != null) {
+//            turnBotDirection(dirToCheck);
+//            moveBot(calibrate);
+//            turnBotDirection(origDir);
+//            lastCalibrate = 0;
+//        }
+//    }
 
     /**
      * Returns a possible direction for robot calibration or null, otherwise.
@@ -345,27 +454,116 @@ public class ExplorationAlgo {
         DIRECTION dirToCheck;
 
         dirToCheck = DIRECTION.getNext(origDir);                    // right turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canCalibrateOnTheSpotFront(dirToCheck) != null) return dirToCheck;
 
         dirToCheck = DIRECTION.getPrevious(origDir);                // left turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canCalibrateOnTheSpotFront(dirToCheck) != null) return dirToCheck;
 
         dirToCheck = DIRECTION.getPrevious(dirToCheck);             // u turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canCalibrateOnTheSpotFront(dirToCheck) != null) return dirToCheck;
 
         return null;
     }
 
     /**
-     * Turns the bot in the needed direction and sends the CALIBRATE movement. Once calibrated, the bot is turned back
-     * to its original direction.
+     * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    private void calibrateBot(DIRECTION targetDir) {
-        DIRECTION origDir = bot.getRobotCurDir();
+    private void senseAndRepaint() {
+        System.out.println("Sensing and repainting");
+        bot.setSensors();
+        bot.sense(exploredMap, realMap);
+        exploredMap.repaint();
+    }
 
-        turnBotDirection(targetDir);
-        moveBot(MOVEMENT.CALIBRATE);
-        turnBotDirection(origDir);
+    private void capturePhoto(){
+        System.out.println("Receiving photo");
+        CommMgr comm = CommMgr.getCommMgr();
+        String msg = comm.recvMsg();
+        System.out.println(msg);
+    }
+
+//    public MOVEMENT canCalibrateOnTheSpot(DIRECTION dirToCheck){
+//        MOVEMENT m1 = canCalibrateOnTheSpotFront(dirToCheck);
+//        if(m1 != null) return m1;
+//        if(canCalibrateOnTheSpotRight(dirToCheck)) return MOVEMENT.CALIBRATE_RIGHT;
+//        return null;
+//    }
+
+    public MOVEMENT canCalibrateOnTheSpotFront(DIRECTION dirToCheck){
+        if(canCalibrateOnTheSpotFrontLeft_Right(dirToCheck)) return MOVEMENT.CALIBRATE_ANGLE_LR;
+         else if(canCalibrateOnTheSpotFrontLeft_Center(dirToCheck)) return MOVEMENT.CALIBRATE_ANGLE_LC;
+         else if(canCalibrateOnTheSpotFrontRight_Center(dirToCheck)) return MOVEMENT.CALIBRATE_ANGLE_RC;
+        return null;
+    }
+
+    /**
+     * Checks if the robot can calibrate at its current position given a direction.
+     */
+    private boolean canCalibrateOnTheSpotRight(DIRECTION botDir) {
+        int row = bot.getRobotPosRow();
+        int col = bot.getRobotPosCol();
+
+        switch (botDir) {
+            case NORTH:
+                return exploredMap.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.getIsObstacleOrWall(row - 1, col + 2);
+            case EAST:
+                return exploredMap.getIsObstacleOrWall(row - 2, col + 1) && exploredMap.getIsObstacleOrWall(row - 2 , col - 1);
+            case SOUTH:
+                return exploredMap.getIsObstacleOrWall(row - 1, col - 2) && exploredMap.getIsObstacleOrWall(row + 1, col - 2);
+            case WEST:
+                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2, col + 1);
+        }
+        return false;
+    }
+
+    public boolean canCalibrateOnTheSpotFrontLeft_Right(DIRECTION botDir){
+        int row = bot.getRobotPosRow();
+        int col = bot.getRobotPosCol();
+        switch (botDir) {
+            case NORTH:
+                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2, col + 1);
+            case EAST:
+                return exploredMap.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.getIsObstacleOrWall(row - 1, col + 2);
+            case SOUTH:
+                return exploredMap.getIsObstacleOrWall(row - 2, col - 1) && exploredMap.getIsObstacleOrWall(row - 2, col + 1);
+            case WEST:
+                return exploredMap.getIsObstacleOrWall(row + 1, col - 2) && exploredMap.getIsObstacleOrWall(row - 1, col - 2);
+        }
+
+        return false;
+    }
+    public boolean canCalibrateOnTheSpotFrontLeft_Center(DIRECTION botDir){
+        int row = bot.getRobotPosRow();
+        int col = bot.getRobotPosCol();
+        switch (botDir) {
+            case NORTH:
+                return exploredMap.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.getIsObstacleOrWall(row + 2, col);
+            case EAST:
+                return exploredMap.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.getIsObstacleOrWall(row, col + 2);
+            case SOUTH:
+                return exploredMap.getIsObstacleOrWall(row - 2, col - 1) && exploredMap.getIsObstacleOrWall(row - 2, col);
+            case WEST:
+                return exploredMap.getIsObstacleOrWall(row + 1, col - 2) && exploredMap.getIsObstacleOrWall(row, col - 2);
+        }
+
+        return false;
+    }
+
+    public boolean canCalibrateOnTheSpotFrontRight_Center(DIRECTION botDir){
+        int row = bot.getRobotPosRow();
+        int col = bot.getRobotPosCol();
+        switch (botDir) {
+            case NORTH:
+                return exploredMap.getIsObstacleOrWall(row + 2, col) && exploredMap.getIsObstacleOrWall(row + 2, col + 1);
+            case EAST:
+                return exploredMap.getIsObstacleOrWall(row, col + 2) && exploredMap.getIsObstacleOrWall(row - 1, col + 2);
+            case SOUTH:
+                return exploredMap.getIsObstacleOrWall(row - 2, col) && exploredMap.getIsObstacleOrWall(row - 2, col + 1);
+            case WEST:
+                return exploredMap.getIsObstacleOrWall(row, col - 2) && exploredMap.getIsObstacleOrWall(row - 1, col - 2);
+        }
+
+        return false;
     }
 
     /**
