@@ -66,6 +66,32 @@ class Main(threading.Thread):
     def writeSRMsg(self, msg_to_sr):
         self.sr.write(msg_to_sr)
         print("WriteSR: Sent to SR: %s" % msg_to_sr)
+    
+    def readImgMsg(self):
+        while True:
+            try: 
+                pMsg = self.pc.read()
+                if not pMsg:
+                    break
+                # note this is for taking image
+                if (pMsg[2] == '5'):
+                    response = requests.get("http://127.0.0.1:5000/imgreg")
+                    img_result = response.json().get("result")
+                    c = img_result.get("c")
+                    l = img_result.get("l")
+                    r = imge_result.get("r")
+                    if(c is None):
+                        c = "-1"
+                    if(l is None):
+                        l = "-1"
+                    if (r is None):
+                        r = "-1"
+                    pMsg = c+";"+l+";"+r
+                    self.writePCMsg(pMsg+'\n')
+            except Exception as e:
+                fmessage = '\nError in Img read: ' + str(e)
+                print(fmessage)
+                
     def readSerialMsg(self):
         while True:
             try:
@@ -131,6 +157,8 @@ if __name__ == "__main__":
     serReadThread = threading.Thread(target=testMain.readSerialMsg, name="Serial Read Thread")
     serWriteThread = threading.Thread(target=testMain.writeSRMsg, args=("",), name="Serial Write Thread")
 
+    imgReadThread = threading.Thread(target=testMain.readImgMsg, name="Img Read Thread")
+#readImgMsg
 
     pcReadThread.daemon = True
     pcWriteThread.daemon = True
@@ -141,6 +169,7 @@ if __name__ == "__main__":
     serReadThread.daemon = True
     serWriteThread.daemon = True
 
+    imgReadThread.daemon = True
 
     pcReadThread.start()
     pcWriteThread.start()
@@ -148,6 +177,7 @@ if __name__ == "__main__":
     blueWriteThread.start()
     serReadThread.start()
     serWriteThread.start()
+    imgReadThread.start()
 
     fmessage = '-------Begin testing now-------\n'
     print(fmessage)
@@ -160,6 +190,7 @@ if __name__ == "__main__":
             blueReadThread.join(0.1)
             #print("serReadThread running now...")
             serReadThread.join(0.1)
+            imgReadThread.join(0.1)
             time.sleep(1)
             if not pcReadThread.isAlive():
                 break
