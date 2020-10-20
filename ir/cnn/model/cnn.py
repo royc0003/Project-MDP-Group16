@@ -9,6 +9,24 @@ import math
 from .helper import find_contour
 import os
 
+model_id_mapping = {
+    "up": 1,
+    "down": 2,
+    "right": 3,
+    "left": 4,
+    "circle": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "zero": 10,
+    "v": 11,
+    "w": 12,
+    "x": 13,
+    "y": 14,
+    "z": 15
+}
+
 
 class CNN:
     def __init__(self, version):
@@ -50,7 +68,7 @@ class CNN:
 
                     if results.get(position) is None:
                         results[position] = {
-                            "category": category,
+                            "category": model_id_mapping.get(category),
                             "prob": prob
                         }
 
@@ -58,7 +76,7 @@ class CNN:
                         prev_prob = results.get(position).get("prob")
                         if prob > prev_prob:
                             results[position] = {
-                                "category": category,
+                                "category": model_id_mapping.get(category),
                                 "prob": prob
                             }
 
