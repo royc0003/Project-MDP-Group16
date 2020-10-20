@@ -9,6 +9,24 @@ import math
 from .helper import find_contour
 import os
 
+model_id_mapping = {
+    "up": 1,
+    "down": 2,
+    "right": 3,
+    "left": 4,
+    "circle": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "zero": 10,
+    "v": 11,
+    "w": 12,
+    "x": 13,
+    "y": 14,
+    "z": 15
+}
+
 
 class CNN:
     def __init__(self, version):
@@ -50,7 +68,7 @@ class CNN:
 
                     if results.get(position) is None:
                         results[position] = {
-                            "category": category,
+                            "category": model_id_mapping.get(category),
                             "prob": prob
                         }
 
@@ -58,14 +76,21 @@ class CNN:
                         prev_prob = results.get(position).get("prob")
                         if prob > prev_prob:
                             results[position] = {
-                                "category": category,
+                                "category": model_id_mapping.get(category),
                                 "prob": prob
                             }
 
-                    cv2.rectangle(gray, (rotated_bb[0], rotated_bb[1]), (rotated_bb[2], rotated_bb[3]), (255, 255, 255),
+                    cv2.rectangle(gray,
+                                  (rotated_bb[0], rotated_bb[1]),
+                                  (rotated_bb[2], rotated_bb[3]),
+                                  (255, 255, 255),
                                   2)
-                    cv2.putText(gray, category + " " + str(position),
-                                (rotated_bb[0], rotated_bb[1] + 40), self.font, 2, (255, 255, 255),
+                    cv2.putText(gray,
+                                category + "\n" + str(position) + "\n" + ,
+                                (rotated_bb[0], rotated_bb[1] + 40),
+                                self.font,
+                                2,
+                                (255, 255, 255),
                                 2)
 
         self.save_to_local(gray)
@@ -77,7 +102,7 @@ class CNN:
         return results
 
     def save_to_local(self, img):
-        cv2.imwrite('/Users/khoapham/Desktop/Projects/Project-MDP-Group16/ir/cnn/model/reg_image/' + str(
+        cv2.imwrite(os.path.abspath(os.getcwd()) + '/reg_image/' + str(
             self.local_image_count) + '.jpg', img)
         self.local_image_count += 1
 
