@@ -70,7 +70,6 @@ class Main(threading.Thread):
     def writeSRMsg(self, msg_to_sr):
         self.sr.write(msg_to_sr)
         print("WriteSR: Sent to SR: %s" % msg_to_sr)
-<<<<<<< HEAD
     
     def readImgMsg(self):
         while True:
@@ -97,19 +96,13 @@ class Main(threading.Thread):
                 fmessage = '\nError in Img read: ' + str(e)
                 print(fmessage)
                 
-=======
-
->>>>>>> 750e8fea2f60cf9168518b17fd3931f896a3cf8e
     def readSerialMsg(self):
         while True:
             try:
                 sMsg = self.sr.read().decode('utf-8')
-<<<<<<< HEAD
                 
-=======
                 # length = len(sMsg)-2
                 # sMsg = sMsg[:length]
->>>>>>> 750e8fea2f60cf9168518b17fd3931f896a3cf8e
                 if not sMsg:
                     break
                 
@@ -170,12 +163,8 @@ if __name__ == "__main__":
     serReadThread = threading.Thread(target=testMain.readSerialMsg, name="Serial Read Thread")
     serWriteThread = threading.Thread(target=testMain.writeSRMsg, args=("",), name="Serial Write Thread")
 
-<<<<<<< HEAD
     imgReadThread = threading.Thread(target=testMain.readImgMsg, name="Img Read Thread")
-#readImgMsg
 
-=======
->>>>>>> 750e8fea2f60cf9168518b17fd3931f896a3cf8e
     pcReadThread.daemon = True
     pcWriteThread.daemon = True
 
@@ -185,11 +174,8 @@ if __name__ == "__main__":
     serReadThread.daemon = True
     serWriteThread.daemon = True
 
-<<<<<<< HEAD
     imgReadThread.daemon = True
 
-=======
->>>>>>> 750e8fea2f60cf9168518b17fd3931f896a3cf8e
     pcReadThread.start()
     pcWriteThread.start()
     blueReadThread.start()
@@ -203,7 +189,6 @@ if __name__ == "__main__":
 
     while True:
         try:
-<<<<<<< HEAD
             #print("pcReadThread running now...")
             pcReadThread.join(0.1)
             #print("btReadThread running now...")
@@ -211,14 +196,12 @@ if __name__ == "__main__":
             #print("serReadThread running now...")
             serReadThread.join(0.1)
             imgReadThread.join(0.1)
-=======
             # print("pcReadThread running now...")
             # pcReadThread.join(0.1)
             # print("btReadThread running now...")
             # blueReadThread.join(0.1)
             # print("serReadThread running now...")
             # serReadThread.join(0.1)
->>>>>>> 750e8fea2f60cf9168518b17fd3931f896a3cf8e
             time.sleep(1)
             if not pcReadThread.isAlive():
                 break
