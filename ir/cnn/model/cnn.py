@@ -80,10 +80,17 @@ class CNN:
                                 "prob": prob
                             }
 
-                    cv2.rectangle(gray, (rotated_bb[0], rotated_bb[1]), (rotated_bb[2], rotated_bb[3]), (255, 255, 255),
+                    cv2.rectangle(gray,
+                                  (rotated_bb[0], rotated_bb[1]),
+                                  (rotated_bb[2], rotated_bb[3]),
+                                  (255, 255, 255),
                                   2)
-                    cv2.putText(gray, category + " " + str(position),
-                                (rotated_bb[0], rotated_bb[1] + 40), self.font, 2, (255, 255, 255),
+                    cv2.putText(gray,
+                                category + "\n" + str(position) + "\n" + ,
+                                (rotated_bb[0], rotated_bb[1] + 40),
+                                self.font,
+                                2,
+                                (255, 255, 255),
                                 2)
 
         self.save_to_local(gray)
