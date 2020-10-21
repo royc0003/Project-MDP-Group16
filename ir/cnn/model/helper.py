@@ -41,7 +41,7 @@ def find_contour_at_45(img):
         rect = cv2.boundingRect(contour)  # rect is (x, y, width, height)
         area = rect[2] * rect[3]
         ratio = float(rect[2]) / float(rect[3])
-        if 1.3 >= ratio >= 0.7 and 300000 >= area >= 8000:
+        if 1.3 >= ratio >= 0.7 and 12000 >= area >= 8000:
             # find the centre of the bounding box
             # print(area)
             bounding_box_centre = ((rect[0] + (rect[2] // 2)), (rect[1] + (rect[3] // 2)))
@@ -87,7 +87,7 @@ def find_contour(img):
         rect = cv2.boundingRect(contour)  # rect is (x, y, width, height)
         area = rect[2] * rect[3]
         ratio = float(rect[2]) / float(rect[3])
-        if 1.3 >= ratio >= 0.7 and 300000 >= area >= 8000:
+        if 1.3 >= ratio >= 0.7 and 30000 >= area >= 8000:
             mid_point = rect[0] + rect[2] // 2
             if mid_point < one_unit:
                 position = 'l'
