@@ -58,27 +58,28 @@ class Main(threading.Thread):
                     self.srQ.append(pcMsg[4])
                 # this is to tablet
                 elif(pcMsg[2] == '0'):
-                    #check for append
-                    if(len(pcMsg>105)):
-                        self.btQ.append(pcMsg[4:105])
-                        # check if is for img reg
-                        if(pcMsg[107] == '5'):
-                            self.srQ.append(pcMsg[105:])
-                    else:
-                        self.btQ.append(pcMsg[4:])
+                    self.btQ.append(pcMsg[4:])
                 # this is for imgrecognition
                 elif(pcMsg[2] == '5'):
                     response = requests.get("http://127.0.0.1:5000/imgreg")
                     img_result = response.json().get("result")
-                    c = img_result.get("c").get("category")
-                    l = img_result.get("l").get("category")
-                    r = img_result.get("r").get("category")
+                    c = img_result.get("c")
+                    l = img_result.get("l")
+                    r = img_result.get("r")
                     if(c is None):
                         c = "-1"
+                    else:
+                        c = c.get('category')
+
                     if(l is None):
                         l = "-1"
+                    else:
+                        l = l.get('category')
+
                     if (r is None):
                         r = "-1"
+                    else:
+                        r = r.get('category')
                     pcMsg = c+";"+l+";"+r
                     self.pcQ.append(pcMsg)
             except Exception as e:
