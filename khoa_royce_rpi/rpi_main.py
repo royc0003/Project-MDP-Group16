@@ -1,9 +1,10 @@
 import time
 import threading
+import requests
 from rpi_pc import *
 from rpi_bluetooth import *
 from rpi_arduino import *
-
+import json
 
 class Main(threading.Thread):
     def __init__(self):
@@ -69,22 +70,67 @@ class Main(threading.Thread):
     def writeSRMsg(self, msg_to_sr):
         self.sr.write(msg_to_sr)
         print("WriteSR: Sent to SR: %s" % msg_to_sr)
-
+    
+    def readImgMsg(self):
+        while True:
+            try: 
+                pMsg = self.pc.read()
+                if not pMsg:
+                    break
+                # note this is for taking image
+                if (pMsg[2] == '5'):
+                    response = requests.get("http://127.0.0.1:5000/imgreg")
+                    img_result = response.json().get("result")
+                    c = img_result.get("c")
+                    l = img_result.get("l")
+                    r = imge_result.get("r")
+                    if(c is None):
+                        c = "-1"
+                    if(l is None):
+                        l = "-1"
+                    if (r is None):
+                        r = "-1"
+                    pMsg = c+";"+l+";"+r
+                    self.writePCMsg(pMsg+'\n')
+            except Exception as e:
+                fmessage = '\nError in Img read: ' + str(e)
+                print(fmessage)
+                
     def readSerialMsg(self):
         while True:
             try:
                 sMsg = self.sr.read().decode('utf-8')
+                
                 # length = len(sMsg)-2
                 # sMsg = sMsg[:length]
                 if not sMsg:
                     break
-                # index some value;
-                # if some value >= 3 LRLeft
-                # -1 = x <= 2 || -1 <= y <= 4
-                # variable_image = call API end point to take image
-                # variable_value = variable_imeage['img']
-                # self.writePCMsg (str(sMsg)+variable_value)
-                self.writePCMsg(str(sMsg))
+                
+#                print(sMsg)
+ #               sMsg = sMsg.replace("\n","")
+                #print(sMsg)
+            
+                #response = requests.get("http://127.0.0.1:5000/imgreg")
+                #img_result = response.json().get('result')
+                #img_result= json.loads(img_result)
+                #if(len(img_result)>=1):
+                    #img_result = img_result[0]
+                    #img = img_result['image']
+                    #pos = img_result['position']
+                #else:
+  #              img = "-1"
+   #             pos = "-1"
+                    
+                #sMsg += "7_" + img + ";8_" + pos + '\n'
+                
+    #            sMsg2 = "7_" + img + ";8_" + pos + '\n'
+     #           print("sMsg = " + sMsg)
+      #          print("sMsg2 = " + sMsg2)
+       #         sMsg3 = sMsg + sMsg2
+        #        print("sMsg3 = " + sMsg3)
+                
+         #       print("Printing after append: " + sMsg)
+                self.writePCMsg(sMsg)
             except Exception as e:
                 fmessage = '\nError in Serial read: ' + str(e)
                 print(fmessage)
@@ -117,6 +163,8 @@ if __name__ == "__main__":
     serReadThread = threading.Thread(target=testMain.readSerialMsg, name="Serial Read Thread")
     serWriteThread = threading.Thread(target=testMain.writeSRMsg, args=("",), name="Serial Write Thread")
 
+    imgReadThread = threading.Thread(target=testMain.readImgMsg, name="Img Read Thread")
+
     pcReadThread.daemon = True
     pcWriteThread.daemon = True
 
@@ -126,18 +174,28 @@ if __name__ == "__main__":
     serReadThread.daemon = True
     serWriteThread.daemon = True
 
+    imgReadThread.daemon = True
+
     pcReadThread.start()
     pcWriteThread.start()
     blueReadThread.start()
     blueWriteThread.start()
     serReadThread.start()
     serWriteThread.start()
+    imgReadThread.start()
 
     fmessage = '-------Begin testing now-------\n'
     print(fmessage)
 
     while True:
         try:
+            #print("pcReadThread running now...")
+            pcReadThread.join(0.1)
+            #print("btReadThread running now...")
+            blueReadThread.join(0.1)
+            #print("serReadThread running now...")
+            serReadThread.join(0.1)
+            imgReadThread.join(0.1)
             # print("pcReadThread running now...")
             # pcReadThread.join(0.1)
             # print("btReadThread running now...")
