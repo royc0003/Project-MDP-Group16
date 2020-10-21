@@ -86,7 +86,7 @@ class CNN:
                                   (255, 255, 255),
                                   2)
                     cv2.putText(gray,
-                                category + "\n" + str(position) + "\n" + ,
+                                category + "\n" + str(position) + "\n" + str((rotated_bb[0] - rotated_bb[2]*(rotated_bb[1]-rotated_bb[3]))) ,
                                 (rotated_bb[0], rotated_bb[1] + 40),
                                 self.font,
                                 2,
@@ -102,7 +102,7 @@ class CNN:
         return results
 
     def save_to_local(self, img):
-        cv2.imwrite(os.path.abspath(os.getcwd()) + '/reg_image/' + str(
+        cv2.imwrite(os.path.abspath(os.getcwd()) + "/model/" + '/reg_image/' + str(
             self.local_image_count) + '.jpg', img)
         self.local_image_count += 1
 
