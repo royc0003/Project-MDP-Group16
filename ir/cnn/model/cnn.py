@@ -8,7 +8,6 @@ import numpy as np
 import math
 from .helper import find_contour
 import os
-import sys
 
 model_id_mapping = {
     "up": 1,
@@ -41,10 +40,6 @@ class CNN:
             self.channels = 1
             self.model = self.getArchitecture()
             self.model.load_weights("./model/final.h5")  # load saved weights
-        else:
-            self.channels = 3
-            self.model = self.getArchitecture()
-            self.model.load_weights("./model/final_colour_final_1.h5")  # load saved weights
 
     # returns probability and class
     def predict(self, frame):
@@ -54,12 +49,7 @@ class CNN:
 
     # take in raw img and predict
     def raw_predict(self, img):
-        if (self.channels == 1):
-            # sys.exit()
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        elif (self.channels == 3):
-            gray = img
-            # sys.exit()
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         bbs = find_contour(img)
         results = {
             "l": None,
@@ -68,10 +58,7 @@ class CNN:
         }
         for rotated_bb, position in bbs:
             potential_image = gray[rotated_bb[1]:rotated_bb[3], rotated_bb[0]:rotated_bb[2]]
-            if (self.channels == 1):
-                height, width = potential_image.shape
-            elif (self.channels == 3):
-                height, width , _ = potential_image.shape
+            height, width = potential_image.shape
             if height != 0:
                 potential_image = cv2.resize(potential_image, (64, 64), interpolation=cv2.INTER_CUBIC)
                 potential_image = potential_image / 255
