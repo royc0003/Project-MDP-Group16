@@ -134,7 +134,7 @@ public class Sensor {
             if (!exploredMap.checkValidCoordinates(row, col)) continue;
             // if is explored, don't set obstacle
 
-            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && exploredMap.getCell(row, col).getIsExplored()) continue;
+            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && !id.equals("SRRB") && exploredMap.getCell(row, col).getIsExplored()) continue;
 //            if (id.equals("LRL") && exploredMap.getCell(row, col).getIsExplored()) continue;
 
 //            if(sensorVal == -1 ){ //handle sensor value if -1; to prevent from going beyond set obstacle; don't explore beyond

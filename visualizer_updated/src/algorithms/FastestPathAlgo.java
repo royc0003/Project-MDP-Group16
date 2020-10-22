@@ -494,13 +494,13 @@ public class FastestPathAlgo {
 
         if (numOfTurn == 1) {
             if (DIRECTION.getNext(bot.getRobotCurDir()) == targetDir) {
-                bot.move(MOVEMENT.RIGHT);
+                bot.move(MOVEMENT.SPECIAL_RIGHT);
             } else {
-                bot.move(MOVEMENT.LEFT);
+                bot.move(MOVEMENT.SPECIAL_LEFT);
             }
         } else if (numOfTurn == 2) {
-            bot.move(MOVEMENT.RIGHT);
-            bot.move (MOVEMENT.RIGHT);
+            bot.move(MOVEMENT.SPECIAL_RIGHT);
+            bot.move (MOVEMENT.SPECIAL_RIGHT);
         }
     }
 }

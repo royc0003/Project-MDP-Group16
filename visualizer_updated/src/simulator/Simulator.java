@@ -39,7 +39,7 @@ public class Simulator {
     private static int WP_Col;
 
     private static final CommMgr comm = CommMgr.getCommMgr();
-    private static final boolean realRun = true;
+    private static final boolean realRun = false;
 
     private static final boolean isExploring = false;
 

@@ -200,7 +200,8 @@ public class Robot {
      * Overloaded method that calls this.move(MOVEMENT m, boolean sendMoveToAndroid = true).
      */
     public void move(MOVEMENT m) {
-        this.move(m, true);
+        if(m != MOVEMENT.SPECIAL_LEFT && m == MOVEMENT.SPECIAL_RIGHT) this.move(m, false);
+        else this.move(m, true);
     }
 
     /**
@@ -240,13 +241,14 @@ public class Robot {
     /**
      * Uses the CommMgr to send the next movement to the robot.
      */
+
     private void sendMovement(MOVEMENT m, boolean sendMoveToAndroid) {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
-            String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
+        String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
+        if(sendMoveToAndroid){
             if(this.explorationMapString != null) comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
-            // String imgToSend = "|["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]|"+getCameraDirection(this.getRobotCurDir())+"|";
-            // comm.sendMsg(imgToSend, CommMgr.CAMERA);
+        }
     }
 
     /**

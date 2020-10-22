@@ -22,12 +22,7 @@ public class ExplorationAlgo {
     private int areaExplored;
     private long startTime;
     private long endTime;
-    private int lastFrontCalibrate = 0;
     private boolean calibrationMode;
-    private DIRECTION prevDir = DIRECTION.NORTH;
-    private ArrayList<MOVEMENT> movement = new ArrayList<MOVEMENT>();
-    private int prevLocRow;
-    private int prevLocCol;
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Robot bot, int coverageLimit, int timeLimit) {
         this.exploredMap = exploredMap;
@@ -105,26 +100,19 @@ public class ExplorationAlgo {
      */
     private void nextMove() {
         if (lookRight()) {
-            movement.add(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
             if (lookForward()) {
-                movement.add(MOVEMENT.FORWARD);
                 moveBot(MOVEMENT.FORWARD);
             }
         } else if (lookForward()) {
-            movement.add(MOVEMENT.FORWARD);
             moveBot(MOVEMENT.FORWARD);
         } else if (lookLeft()) {
-            movement.add(MOVEMENT.LEFT);
             moveBot(MOVEMENT.LEFT);
             if (lookForward()) {
-                movement.add(MOVEMENT.FORWARD);
                 moveBot(MOVEMENT.FORWARD);
             }
         }
         else {
-            movement.add(MOVEMENT.RIGHT);
-            movement.add(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
             moveBot(MOVEMENT.RIGHT);
         }
@@ -242,57 +230,9 @@ public class ExplorationAlgo {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg("DONE", CommMgr.DONE_EX);
 
-//        if (bot.getRealBot()) {
-//            turnBotDirection(DIRECTION.WEST);
-//            turnBotDirection(DIRECTION.SOUTH);
-//            turnBotDirection(DIRECTION.WEST);
-//        }
         turnBotDirection(DIRECTION.NORTH);
+        moveBot(MOVEMENT.RIGHT);
         CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
-    }
-
-
-    /**
-     *
-     Anti stuck
-     */
-
-    public void antiStuck(){
-        if(!lookRight()){
-            System.out.println("I'm in look right");
-            this.prevLocRow = bot.getRobotPosRow();
-            this.prevLocCol = bot.getRobotPosCol();
-
-            if (prevLocRow == 1)
-                prevDir = DIRECTION.SOUTH;
-            else if (prevLocRow == 13)
-                prevDir = DIRECTION.NORTH;
-            else if (prevLocCol == 1)
-                prevDir = DIRECTION.EAST;
-            else if (prevLocCol == 18)
-                prevDir = DIRECTION.WEST;
-        }
-
-        if (stuckInLoop()) {
-            //A*
-            System.out.println(Arrays.toString(movement.toArray()));
-            System.out.println("Prev loc: "+this.prevLocRow+"   "+this.prevLocCol);
-            System.out.println("Running A* to go back...");
-            FastestPathAlgo goToUnstuckLocation = new FastestPathAlgo(exploredMap, bot, realMap);
-            goToUnstuckLocation .runFastestPath(this.prevLocRow, this.prevLocCol);
-            turnBotDirection(this.prevDir);
-            movement.clear();
-        }
-    }
-
-    public boolean stuckInLoop(){
-        if (movement.size() >= 4)
-            if (movement.get(movement.size() - 1) == MOVEMENT.FORWARD &&
-                    movement.get(movement.size() - 2) == MOVEMENT.RIGHT &&
-                    movement.get(movement.size() - 3) == MOVEMENT.FORWARD &&
-                    movement.get(movement.size() - 4) == MOVEMENT.RIGHT)
-                return true;
-        return false;
     }
 
     /**
@@ -339,11 +279,11 @@ public class ExplorationAlgo {
     private void moveBot(MOVEMENT m) {
         bot.move(m);
         exploredMap.repaint(); //fixed 7th october
-//        capturePhoto();
         if (m != MOVEMENT.CALIBRATE_RIGHT && m!= MOVEMENT.CALIBRATE_DISTANCE
                 && m!= MOVEMENT.CALIBRATE_ANGLE_LR && m!= MOVEMENT.CALIBRATE_ANGLE_LC
                 && m!= MOVEMENT.CALIBRATE_ANGLE_RC ){
             senseAndRepaint();
+            //capturePhoto();
         }
         else {
             CommMgr commMgr = CommMgr.getCommMgr();
@@ -353,7 +293,7 @@ public class ExplorationAlgo {
         if (bot.getRealBot() && !calibrationMode) {
             calibrationMode = true;
             rightCalibrate();
-            frontCalibrate();
+//            frontCalibrate();
 //            cornerCalibrate();
 //            lastFrontCalibrate++;
 //            if(lastCalibrate >= 5){
@@ -429,6 +369,7 @@ public class ExplorationAlgo {
         if(m == MOVEMENT.CALIBRATE_ANGLE_LR || m == MOVEMENT.CALIBRATE_ANGLE_RC){
             moveBot(m);
             moveBot(MOVEMENT.CALIBRATE_DISTANCE);
+            return;
         } else if(m == MOVEMENT.CALIBRATE_ANGLE_LC){
             moveBot(m);
         }
@@ -476,10 +417,21 @@ public class ExplorationAlgo {
     }
 
     private void capturePhoto(){
-        System.out.println("Receiving photo");
+        int row = bot.getRobotPosRow();
+        int col = bot.getRobotPosCol();
+        DIRECTION dir = bot.getRobotCurDir();
+
+        if(row == 1 && dir == DIRECTION.EAST) return;
+        else if(col == 13 && dir == DIRECTION.NORTH) return;
+        else if(row == 18 && dir == DIRECTION.WEST) return;
+        else if(col == 1 && dir == DIRECTION.SOUTH) return;
+
+        if(lookRight()) return;
         CommMgr comm = CommMgr.getCommMgr();
+        String str = "2|5|" + row + "|" + col;
+        comm.sendMsg(str, CommMgr.CAMERA);
+        System.out.println("Receiving photo");
         String msg = comm.recvMsg();
-        System.out.println(msg);
     }
 
 //    public MOVEMENT canCalibrateOnTheSpot(DIRECTION dirToCheck){
@@ -532,6 +484,8 @@ public class ExplorationAlgo {
 
         return false;
     }
+    
+
     public boolean canCalibrateOnTheSpotFrontLeft_Center(DIRECTION botDir){
         int row = bot.getRobotPosRow();
         int col = bot.getRobotPosCol();

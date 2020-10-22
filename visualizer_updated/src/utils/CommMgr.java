@@ -95,7 +95,6 @@ public class CommMgr {
                 outputMsg = "2|1|" + msgType + "\n";
             }
             else if (msgType.equals(TO_ANDROID)){
-            // else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)){
                 outputMsg = "2|0|" + msg + "\n";
             } 
             else if (msgType.equals(DONE_EX) || msgType.equals(FP_READY)){
@@ -105,8 +104,7 @@ public class CommMgr {
                 outputMsg = "2|1|" + msg + "\n";
             }
             else if (msgType.equals(CAMERA)){
-                // else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)){
-                    outputMsg = "2|4|" + msg + "\n"; 
+                    outputMsg = msg + "\n";
             }
             else {
                 outputMsg = msgType + "\n" + msg + "\n";
