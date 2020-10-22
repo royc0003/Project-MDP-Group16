@@ -36,10 +36,16 @@ class CNN:
         self.version = version
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.local_image_count = 0
+
         if self.version == "gray":
             self.channels = 1
             self.model = self.getArchitecture()
             self.model.load_weights("./model/final.h5")  # load saved weights
+
+        if self.version == "RGB":
+            self.channels = 3
+            self.model = self.getArchitecture()
+            self.model.load_weights("./model/final_colour_final_1.h5")  # load saved weights
 
     # returns probability and class
     def predict(self, frame):
@@ -49,7 +55,10 @@ class CNN:
 
     # take in raw img and predict
     def raw_predict(self, img):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        if (self.channels == 1):
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        elif (self.channels == 3):
+            gray = img
         bbs = find_contour(img)
         results = {
             "l": None,
@@ -58,7 +67,10 @@ class CNN:
         }
         for rotated_bb, position in bbs:
             potential_image = gray[rotated_bb[1]:rotated_bb[3], rotated_bb[0]:rotated_bb[2]]
-            height, width = potential_image.shape
+            if (self.channels == 1):
+                height, width = potential_image.shape
+            elif (self.channels == 3):
+                height, width, _ = potential_image.shape
             if height != 0:
                 potential_image = cv2.resize(potential_image, (64, 64), interpolation=cv2.INTER_CUBIC)
                 potential_image = potential_image / 255
@@ -86,7 +98,7 @@ class CNN:
                                   (255, 255, 255),
                                   2)
                     cv2.putText(gray,
-                                category + "\n" + str(position) + "\n" + str((rotated_bb[0] - rotated_bb[2]*(rotated_bb[1]-rotated_bb[3]))) ,
+                                category + "\n" + str(position) + "\n" + str(((rotated_bb[0] - rotated_bb[2])*(rotated_bb[1]-rotated_bb[3]))),
                                 (rotated_bb[0], rotated_bb[1] + 40),
                                 self.font,
                                 2,
