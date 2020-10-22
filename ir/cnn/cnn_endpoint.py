@@ -5,7 +5,7 @@ import numpy as np
 from model.cnn import CNN
 import cv2
 
-cnn = CNN("gray")
+cnn = CNN("RGB")
 app = Flask(__name__)
 api = Api(app)
 
