@@ -32,6 +32,7 @@ public class Robot {
     private int posCol; // center cell
     private DIRECTION robotDir;
     private int speed;
+    private boolean canTakePhoto;
     private final Sensor SRFrontLeft;       // north-facing front-left SR
     private final Sensor SRFrontCenter;     // north-facing front-center SR
     private final Sensor SRFrontRight;      // north-facing front-right SR
@@ -73,6 +74,10 @@ public class Robot {
 
     public void setRobotDir(DIRECTION dir) {
         robotDir = dir;
+    }
+
+    public void setCanTakePhoto(boolean val){
+        this.canTakePhoto = val;
     }
 
     public void setSpeed(int speed) {
@@ -200,7 +205,7 @@ public class Robot {
      * Overloaded method that calls this.move(MOVEMENT m, boolean sendMoveToAndroid = true).
      */
     public void move(MOVEMENT m) {
-        if(m != MOVEMENT.SPECIAL_LEFT && m == MOVEMENT.SPECIAL_RIGHT) this.move(m, false);
+        if(m == MOVEMENT.SPECIAL_LEFT || m == MOVEMENT.SPECIAL_RIGHT) this.move(m, false);
         else this.move(m, true);
     }
 
@@ -245,7 +250,12 @@ public class Robot {
     private void sendMovement(MOVEMENT m, boolean sendMoveToAndroid) {
         CommMgr comm = CommMgr.getCommMgr();
         comm.sendMsg(MOVEMENT.print(m) + "", CommMgr.INSTRUCTIONS);
-        String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir());
+
+        String takePhoto;
+        if(this.canTakePhoto) takePhoto = "1";
+        else takePhoto = "0";
+
+        String stringToSend = "EX|"+ this.explorationMapString+ "["+this.getRobotPosCol()+","+this.getRobotPosRow()+"]"+ "|" + getAndroidCurDir(this.getRobotCurDir()) + "|" + takePhoto;
         if(sendMoveToAndroid){
             if(this.explorationMapString != null) comm.sendMsg(stringToSend, CommMgr.TO_ANDROID);
         }

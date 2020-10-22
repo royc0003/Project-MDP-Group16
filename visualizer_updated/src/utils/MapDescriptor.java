@@ -38,8 +38,8 @@ public class MapDescriptor {
                     binPtr++;
                 }
             }
-
             map.setAllExplored();
+            System.out.println("Hello I'm Map descriptor");
         } catch (IOException e) {
             e.printStackTrace();
         }

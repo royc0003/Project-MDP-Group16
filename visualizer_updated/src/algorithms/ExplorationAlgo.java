@@ -37,9 +37,10 @@ public class ExplorationAlgo {
      */
     public void runExploration() {
         if (bot.getRealBot()) {
-            System.out.println("Starting calibration...");
 
             CommMgr.getCommMgr().recvMsg();
+            System.out.println("Starting calibration...");
+
             if (bot.getRealBot()) {
                 CommMgr.getCommMgr().sendMsg(null, CommMgr.CALIBRATE);
             }
@@ -209,13 +210,14 @@ public class ExplorationAlgo {
      * Returns the robot to START after exploration and points the bot northwards.
      */
     private void goHome() {
-        if (!bot.getTouchedGoal() && coverageLimit == 300 && timeLimit == 3600) {
-            FastestPathAlgo goToGoal = new FastestPathAlgo(exploredMap, bot, realMap);
-            goToGoal.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
-        }
-
-        FastestPathAlgo returnToStart = new FastestPathAlgo(exploredMap, bot, realMap);
-        returnToStart.runFastestPath(RobotConstants.START_ROW, RobotConstants.START_COL);
+        //Change back
+//        if (!bot.getTouchedGoal() && coverageLimit == 300 && timeLimit == 3600) {
+//            FastestPathAlgo goToGoal = new FastestPathAlgo(exploredMap, bot, realMap);
+//            goToGoal.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
+//        }
+//
+//        FastestPathAlgo returnToStart = new FastestPathAlgo(exploredMap, bot, realMap);
+//        returnToStart.runFastestPath(RobotConstants.START_ROW, RobotConstants.START_COL);
 
         System.out.println("Exploration complete!");
         areaExplored = calculateAreaExplored();
@@ -231,8 +233,8 @@ public class ExplorationAlgo {
         comm.sendMsg("DONE", CommMgr.DONE_EX);
 
         turnBotDirection(DIRECTION.NORTH);
-        moveBot(MOVEMENT.RIGHT);
-        CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
+        CommMgr.getCommMgr().sendMsg(null, CommMgr.CALIBRATE);
+        String msg = CommMgr.getCommMgr().recvMsg();
     }
 
     /**
@@ -277,13 +279,13 @@ public class ExplorationAlgo {
      * canSense == on Calibration don't paint
      */
     private void moveBot(MOVEMENT m) {
+        capturePhoto();
         bot.move(m);
         exploredMap.repaint(); //fixed 7th october
         if (m != MOVEMENT.CALIBRATE_RIGHT && m!= MOVEMENT.CALIBRATE_DISTANCE
                 && m!= MOVEMENT.CALIBRATE_ANGLE_LR && m!= MOVEMENT.CALIBRATE_ANGLE_LC
                 && m!= MOVEMENT.CALIBRATE_ANGLE_RC ){
             senseAndRepaint();
-            //capturePhoto();
         }
         else {
             CommMgr commMgr = CommMgr.getCommMgr();
@@ -417,6 +419,8 @@ public class ExplorationAlgo {
     }
 
     private void capturePhoto(){
+        bot.setCanTakePhoto(false);
+
         int row = bot.getRobotPosRow();
         int col = bot.getRobotPosCol();
         DIRECTION dir = bot.getRobotCurDir();
@@ -427,11 +431,8 @@ public class ExplorationAlgo {
         else if(col == 1 && dir == DIRECTION.SOUTH) return;
 
         if(lookRight()) return;
-        CommMgr comm = CommMgr.getCommMgr();
-        String str = "2|5|" + row + "|" + col;
-        comm.sendMsg(str, CommMgr.CAMERA);
-        System.out.println("Receiving photo");
-        String msg = comm.recvMsg();
+
+        bot.setCanTakePhoto(true);
     }
 
 //    public MOVEMENT canCalibrateOnTheSpot(DIRECTION dirToCheck){

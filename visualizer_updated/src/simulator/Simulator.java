@@ -39,7 +39,7 @@ public class Simulator {
     private static int WP_Col;
 
     private static final CommMgr comm = CommMgr.getCommMgr();
-    private static final boolean realRun = false;
+    private static final boolean realRun = true;
 
     private static final boolean isExploring = false;
 
@@ -234,6 +234,11 @@ public class Simulator {
                 if (realRun) {
                     CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
                 }
+
+                //Change back
+//                loadMapFromDisk(exploredMap, "BlankMap");
+//                System.out.println("Hello I'm here");
+//                //
 
                 exploration.runExploration();
 

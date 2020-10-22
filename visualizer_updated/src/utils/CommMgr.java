@@ -95,7 +95,7 @@ public class CommMgr {
                 outputMsg = "2|1|" + msgType + "\n";
             }
             else if (msgType.equals(TO_ANDROID)){
-                outputMsg = "2|0|" + msg + "\n";
+                outputMsg = "2|0|" + msg;
             } 
             else if (msgType.equals(DONE_EX) || msgType.equals(FP_READY)){
                 outputMsg = "2|0|STA|" + msg + "\n";   
