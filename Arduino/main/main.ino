@@ -29,18 +29,21 @@ SharpIR fr =  SharpIR(FR, SRmodel);
 #define NUM_SENSOR_READINGS_CALI 19
 
 #define CALI_DISTANCE_OFFSET_R -0.1//-0.3//-0.2//-0.1//-0.7//0.3 //offset for distance calibration using front sensor
-#define CALI_DISTANCE_OFFSET_L -0.4//-0.2//-0.1//0//0.1//0
+#define CALI_DISTANCE_OFFSET_L 1.4//1.3//1.5//1//0.6//0.3//0//-0.2//-0.4//-0.5//-0.6//-0.7//-1.1//-0.9//-0.7//-0.9//-0.7//-0.8//-0.4//-0.2//-0.1//0//0.1//0  //too far: increase
 #define LR_OFFSET 0.78//0.75//0.8//0.85//0.9//1.2//1.1//0.5//0.9 //offset for angle calibration using FR and FL sensor
-#define LC_OFFSET 0.7//1.2 //offset for angle calibration using FL and FC sensor
+#define LC_OFFSET 1.2//1.1//0.9//0.85//1//0.7//1.2 //offset for angle calibration using FL and FC sensor
 #define CR_OFFSET -0.4 //offset for angle calibration using FR and FC sensor
 #define R_OFFSET 2.68//2.6//2.5//2.4//2.68//1.8//1.9//1.8//1.2////1.4//1.6//1.4//1.1//-0.5 //offset for angle calibration using right sensors
 #define RF_OFFSET 0.5
 
-#define thresholdRF 0.75
+#define thresholdRF 0.7//1.9//1.8//1.6//1.4//0.9//0.59//0.4//0.49//0.56
 #define thresholdRB 2.04
 
 #define thresholdRF_LONG 6.25
 #define thresholdRB_LONG 8.56
+
+#define CALI_ANGLE_COUNTER 3
+#define CALI_DISTANCE_COUNTER 3
 
 int front_calibration_counter = 0;
 
@@ -67,7 +70,7 @@ float output = 0.0;
 
 float testSpeed = 320; //180                              //
 float PID_KP = 1.6; // lower = right, higher = left     // computePID() //1.6
-float PID_KI = 0.25;//0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
+float PID_KI = 0.26;//0.27;//0.25;//0.2;//0.3;//0.5; //0.06; //0.00222;//0.01                                       // computePID()
 float PID_KD = 0; //0.05
 
 float PID_KP_R = 1.6; // lower = right, higher = left     // computePID() //1.6
@@ -76,7 +79,8 @@ float PID_KD_R = 0;// computePID()
 //float GRID_DISTANCE[10] = {10.15, 20.3, 29.7, 40.1, 51, 60, 70, 80, 90, 100};  // moveByGrids(int)
 //float DG_GRID_DISTANCE[5] = {14.7, 20.5, 29.7, 40.1, 51}; // moveByDgGrids(int)
 float LEFT_ROTATION_DEGREE_OFFSET = -5.0;//-4.9;//-4.6;//-4.5;//-6.5;//-4.5                   // rotateLeft(int)
-float RIGHT_ROTATION_DEGREE_OFFSET = -8.3;//-7.5;//-7.9;//-7.7;//-7.5;//-8.5;//-7.0;//-7.5;//-8.5;//-8.2;//-8.3;//-8.8;////-7.8//-3.8;   //-2.8               // rotateRight(int)
+float RIGHT_ROTATION_DEGREE_OFFSET =-8.0;//-8.4;//-8.6;//-8.8;// -9.0;//-9.2; //-9.2; //for 6.44V battery
+//-9.2;//-9.5;//-9.1;//-8.9;//-8.5;//-8.3;//-7.5;//-7.9;//-7.7;//-7.5;//-8.5;//-7.0;//-7.5;//-8.5;//-8.2;//-8.3;//-8.8;////-7.8//-3.8;   //-2.8               // rotateRight(int)
 //int NUM_OF_SENSOR_READINGS_TO_TAKE = 15;                  // getDistance()
 //int NUM_OF_SENSOR_READINGS_TO_TAKE_CALIBRATION = 5;       // calAngle() and calDistance()
 //int COMMAND_DELAY = 60;
@@ -101,13 +105,24 @@ double prev_prev_error_MR = 0, prev_prev_error_ML = 0;
 double total_Dis = 0;
 
 float kp_MR = 2.2;//0.085;
-float ki_MR = 0.13;//0.125;//0.12;//0.14;//0.13;//0.11;//0.15;//0.13;//0.15;//0.1;//0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
+float ki_MR = 0.13;//0.125;//0.13;//0.125;//0.12;//0.14;//0.13;//0.11;//0.15;//0.13;//0.15;//0.1;//0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
 float kd_MR = 0;//0;//0.160;
 //float kp_ML = 0.110;
 // NOTE MOTOR_LEFT (Purple Line)
 float kp_ML = 1.5;//0.085;//0.085;//0.0100;//0.025;//0.065;//0.075;//0.11;
-float ki_ML = 0.13; //0.14;//0.12;// 0.11;//0.12;//0.15;//0.1;//0.10;//0.09;//0.065;//0.080;
+float ki_ML = 0.13;//0.135;//0.13; //0.14;//0.12;// 0.11;//0.12;//0.15;//0.1;//0.10;//0.09;//0.065;//0.080;
 float kd_ML = 0;//0.160;//0.014;
+
+
+float kp_MR_Fast = 2.6;//2.4;//2.2;//0.085;
+float ki_MR_Fast = 0.135;//0.13;//0.125;//0.13;//0.125;//0.12;//0.14;//0.13;//0.11;//0.15;//0.13;//0.15;//0.1;//0.12;//0.1;//0.2;//0.1;//0.10;//0.0800;
+float kd_MR_Fast = 0;//0;//0.160;
+//float kp_ML = 0.110;
+// NOTE MOTOR_LEFT (Purple Line)
+float kp_ML_Fast = 1.5;//0.085;//0.085;//0.0100;//0.025;//0.065;//0.075;//0.11;
+float ki_ML_Fast = 0.13; //0.14;//0.12;// 0.11;//0.12;//0.15;//0.1;//0.10;//0.09;//0.065;//0.080;
+float kd_ML_Fast = 0;//0.160;//0.014;
+
 double setpoint = 130;//90//80
 double setpoint_RT = 100;
 
@@ -135,43 +150,248 @@ void loop()
 {
 
   //============================Preparation here====================================
-  //goStraightInGrids(1);//1
+  /*
+   * fully charge the two batteries, fully charge the power bank
+   * drain one battery and use this battery to test
+   * drain another battery and use this battery to run
+   * fully calibration, rotateLeft for 2 rounds
+   * fully calibration, rotateRight for 2 rounds
+   * fully calibration, moveForward for 5 steps
+   * test specialDistanceCalibration
+   * test sensor reading
+   * goStraightInGridsFast for 8 grids (now slightly towards right, if really cannot, make it slightly to left), rotateRight, goStraightInGridsFast for 3 grids
+   * 
+   */
+  //#RUN1 calibration + 2 rounds left
+//      rotateRight(90);
+//      rotateRight(90);
+//      delay(200);
+//      caliAngleRight();
+//      delay(200);
+//      caliDistanceFrontR();
+//      delay(100);
+//      caliAngleRight();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      //caliAngleFrontLR();
+//      //delay(200);
+//      caliDistanceFrontR();
+//      delay(200);
+//      caliAngleFrontLR();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      for(int i = 0; i<8; i++)
+//      {
+//        rotateLeft(90);
+//        delay(100);
+//      }
+//
+//      while(1)
+//      {
+//        delay(10000);
+//      }
 
 
-  //Calibration Angle Check
-  // caliAngleFrontLR();
-  // caliAngleFrontLC();
-  //caliAngleFrontCR();
-  //caliAngleRight();
-  //delay(100);
+//#RUN2 calibration + 2 rounds right 
+//      rotateRight(90);
+//      rotateRight(90);
+//      delay(200);
+//      caliAngleRight();
+//      delay(200);
+//      caliDistanceFrontR();
+//      delay(100);
+//      caliAngleRight();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      //caliAngleFrontLR();
+//      //delay(200);
+//      caliDistanceFrontR();
+//      delay(200);
+//      caliAngleFrontLR();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      for(int i = 0; i<4; i++)
+//      {
+//        rotateLeft(90);
+//        delay(1000);
+//      }
+//
+//      while(1)
+//      {
+//        delay(10000);
+//      }
 
-  // Calibration Disance Check
-  //caliDistanceFront();
-  //delay(1000);
+//#RUN2 calibration + 2 rounds right 
+//      rotateRight(90);
+//      rotateRight(90);
+//      delay(200);
+//      caliAngleRight();
+//      delay(200);
+//      caliDistanceFrontR();
+//      delay(100);
+//      caliAngleRight();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      //caliAngleFrontLR();
+//      //delay(200);
+//      caliDistanceFrontR();
+//      delay(200);
+//      caliAngleFrontLR();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      for(int i = 0; i<4 i++)
+//      {
+//        rotateRight(90);
+//        delay(100);
+//      }
+//
+//      while(1)
+//      {
+//        delay(10000);
+//      }
 
-  //Sensor Check  (Connect and check)
-  //rotateLeft(90);
-  //rotateRight(90);
 
 
-
-
+//#RUN3 calibration + moveForward 4 steps
+//      rotateRight(90);
+//      rotateRight(90);
+//      delay(200);
+//      caliAngleRight();
+//      delay(200);
+//      caliDistanceFrontR();
+//      delay(100);
+//      caliAngleRight();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      //caliAngleFrontLR();
+//      //delay(200);
+//      caliDistanceFrontR();
+//      delay(200);
+//      caliAngleFrontLR();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      for(int i = 0; i<4; i++)
+//      {
+//        goStraightInGrids(1);
+//        delay(100);
+//      }
+//
+//      while(1)
+//      {
+//        delay(10000);
+//      }
+//goStraightInGrids(1);
+//#RUN4 calibration + moveForward 4 steps
+//      rotateRight(90);
+//      rotateRight(90);
+//      delay(200);
+//      caliAngleRight();
+//      delay(200);
+//      caliDistanceFrontR();
+//      delay(100);
+//      caliAngleRight();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      //caliAngleFrontLR();
+//      //delay(200);
+//      caliDistanceFrontR();
+//      delay(200);
+//      caliAngleFrontLR();
+//      delay(200);
+//      rotateRight(90);
+//      delay(200);
+//      for(int i = 0; i<4; i++)
+//      {
+//        goStraightInGrids(1);
+//        delay(100);
+//      }
+//
+//      while(1)
+//      {
+//        delay(10000);
+//      }
 
   if (Serial.available() > 0)
   {
-
     commandExecution(char(Serial.read()));
   }
+  
+
+//14 //l
+//11 //c
+//14 //r
+
+ // Serial.println(fl.distance());
+
+ 
+// goStraightInGridsFast(8);
+// delay(10);
+// rotateRight(90);
+// delay(10);
+// goStraightInGridsFast(3);
+// while(1)
+// {
+//  delay(10000);
+// }
+//
+// goStraightInGridsFast(8);
+// delay(10);
+// rotateRight(90);
+// delay(10);
+//  goStraightInGridsFast(3);
+// while(1)
+// {
+//  delay(10000);
+// }
+
+/*
+
+  float rfDistance, rbDistance, rfDistance_, rbDistance_;
+  float error;
+  int counter = 0;
+  rfDistance = sensorCaliDistance(RF) + R_OFFSET;
+  rbDistance = sensorCaliDistance(RB);
+  error = rfDistance - rbDistance;
+  Serial.println(error);
+*/
+    
+//  
+// Serial.print(sensorCaliDistance(FL));
+// Serial.print(",");
+// Serial.println(sensorCaliDistance(FC));
 
 
+//   front_calibration_counter = 5;
+//   specialCalibrate();
+//   while(1)
+//   {
+//    delay(10000);
+//   }
 
-   //Serial.print(sensorCaliDistance(RF));
+   //caliAngleFrontLC();
+   /*
+   front_calibration_counter = 5;
+   specialCalibrate();
+   while(1)
+   {
+    delay(10000);
+   }*/
+   //Serial.println(sensorCaliDistance(RF));
    //Serial.print(",");
 
    //Serial.println(sensorCaliDistance(RB));
 
 /*
-    for(int i = 0; i<5; i++)
+    for(int i = 0; i<8; i++)
     {
     //rotateRight(90);
     goStraightInGrids(1);
@@ -182,11 +402,14 @@ void loop()
     {
     delay(10000);
     }
- */ 
+   */
+
+   
   //caliFront();
 
   //caliAngleRight();
   //Serial.println(ll.distance());
+    
 }
 
 void commandExecution(char cmd)
@@ -195,50 +418,49 @@ void commandExecution(char cmd)
     case 'F':
       goStraightInGrids(1);
       delay(100);
-      caliAngleRight();
       specialCalibrate();
       specialDistanceCalibration();
       sendSensorReading();
       break;
 
     case '1':
-      goStraightInGrids(1);
+      goStraightInGridsFast(1);
       Serial.println("k");
       break;
     case '2':
-      goStraightInGrids(2);
+      goStraightInGridsFast(2);
       Serial.println("k");
       break;
     case '3':
-      goStraightInGrids(3);
+      goStraightInGridsFast(3);
       Serial.println("k");
       break;
     case '4':
-      goStraightInGrids(4);
+      goStraightInGridsFast(4);
       Serial.println("k");
       break;
     case '5':
-      goStraightInGrids(5);
+     goStraightInGridsFast(5);
       Serial.println("k");
       break;
     case '6':
-      goStraightInGrids(6);
+      goStraightInGridsFast(6);
       Serial.println("k");
       break;
     case '7':
-      goStraightInGrids(7);
+      goStraightInGridsFast(7);
       Serial.println("k");
       break;
     case '8':
-      goStraightInGrids(8);
+      goStraightInGridsFast(8);
       Serial.println("k");
       break;
     case '9':
-      goStraightInGrids(9);
+      goStraightInGridsFast(9);
       Serial.println("k");
       break;
     case '0':
-      goStraightInGrids(10);
+      goStraightInGridsFast(10);
       Serial.println("k");
       break;
 
@@ -277,8 +499,8 @@ void commandExecution(char cmd)
       delay(200);
       rotateRight(90);
       delay(200);
-      caliAngleFrontLR();
-      delay(200);
+      //caliAngleFrontLR();
+      //delay(200);
       caliDistanceFrontR();
       delay(200);
       caliAngleFrontLR();
@@ -320,8 +542,8 @@ void commandExecution(char cmd)
       Serial.println("k");
       break;
     case 'S':
-//      sendSensorReading();
-      Serial.println("S ok");
+      sendSensorReading();
+      //Serial.println("S ok");
       break;
   }
 }
@@ -337,22 +559,23 @@ void specialCalibrate() {
       String fl = calculateGrids(FL);
       String fc = calculateGrids(FC);
       String fr = calculateGrids(FR);
-      if (fl == "1" && fc == "1") {
-        caliAngleFrontLC();
-        delay(100);
-        caliDistanceFrontL();
-        delay(100);
-        caliAngleFrontLC();
-        delay(100);
-        front_calibration_counter = 0;
-      }
+     
 
-      else if (fr == "1" && fc == "1") {
-        caliAngleFrontCR();
-        delay(100);
+      if (fr == "1" && fc == "1") {
+       // caliAngleFrontCR();
+       // delay(100);
         caliDistanceFrontR();
         delay(100);
         caliAngleFrontCR();
+        delay(100);
+        front_calibration_counter = 0;
+      }
+       else if (fl == "1" && fc == "1") {
+       // caliAngleFrontLC();
+       // delay(100);
+        caliDistanceFrontL();
+        delay(100);
+        caliAngleFrontLC();
         delay(100);
         front_calibration_counter = 0;
       }
@@ -368,14 +591,15 @@ void specialDistanceCalibration()
 {
   String fr = calculateGrids(FR);
   String fl = calculateGrids(FL);
-  if (fl == "1")
+  
+  if (fr == "1")
+  {
+    caliDistanceFrontR();
+  }
+  else if (fl == "1")
   {
     caliDistanceFrontL();
     
-  }
-  else if (fr == "1")
-  {
-    caliDistanceFrontR();
   }
   delay(100);
 }
@@ -459,17 +683,17 @@ void caliFront() {
   String f_c = calculateGrids(FC);
 
   if (f_l == "1" && f_c == "1") {
-    caliAngleFrontLC();
+    //caliAngleFrontLC();
     caliDistanceFrontL();
     caliAngleFrontLC();
     delay(100);
   } else if (f_c == "1" && f_r == "1") {
-    caliAngleFrontCR();
+    //caliAngleFrontCR();
     caliDistanceFrontR();
     caliAngleFrontCR();
     delay(100);
   } else if (f_l == "1" && f_r == "1") {
-    caliAngleFrontLR();
+    //caliAngleFrontLR();
     caliDistanceFrontL();
     caliAngleFrontLR();
     delay(100);
@@ -489,7 +713,7 @@ void caliAngleFrontLR()
 
   if (f_l == "1" && f_r == "1")
   {
-    while (abs(error) > 0.1 && counter < 30)
+    while (abs(error) > 0.1 && counter < CALI_ANGLE_COUNTER)
     {
       //Serial.println(error);
       if (error > 0)
@@ -528,7 +752,7 @@ void caliAngleFrontCR()
   String f_r = calculateGrids(FR);
   if (f_c == "1" && f_r == "1")
   {
-    while (abs(error) > 0.2 && counter < 30)
+    while (abs(error) > 0.2 && counter < CALI_ANGLE_COUNTER)
     {
       if (error > 0)
       {
@@ -567,7 +791,7 @@ void caliAngleFrontLC()
   {
 
 
-    while (abs(error) > 0.2 && counter < 30)
+    while (abs(error) > 0.2 && counter < CALI_ANGLE_COUNTER)
     {
 
       if (error > 0)
@@ -595,44 +819,49 @@ void caliAngleFrontLC()
 
 void caliAngleRight()
 {
-  float rfDistance, rbDistance;
+  float rfDistance, rbDistance, rfDistance_, rbDistance_;
   float error;
   int counter = 0;
   rfDistance = sensorCaliDistance(RF) + R_OFFSET;
   rbDistance = sensorCaliDistance(RB);
   error = rfDistance - rbDistance;
-
+  rfDistance_ = sensorCaliDistance(RF);
+  rbDistance_ = sensorCaliDistance(RB);
   String r_f = calculateGrids(RF);
   String r_b = calculateGrids(RB);
   if (r_f == "1" && r_b == "1")
   {
-
-    if(rfDistance < thresholdRF || rbDistance < thresholdRB || rfDistance > thresholdRF_LONG || rbDistance > thresholdRB_LONG)
+    if(rfDistance_ < thresholdRF || rbDistance_ < thresholdRB || rfDistance_ > thresholdRF_LONG || rbDistance_ > thresholdRB_LONG)
     {
       front_calibration_counter = 5;
       specialCalibrate();
     }
-    while (abs(error) > ERROR_RIGHT && counter < 30)
+
+    if(error > 5)
     {
-      if (error > 0)
-      {
-        md.setSpeeds(-100, 100);
-        delay(abs(error * 40));
-        md.setBrakes(300, 300);
-      }
-      else
-      {
-        md.setSpeeds(100, -100);
-        delay(abs(error * 40));
-        md.setBrakes(300, 300);
-      }
-      delay(10);
-      rfDistance = sensorCaliDistance(RF) + R_OFFSET;
-      rbDistance = sensorCaliDistance(RB);
-      error = rfDistance - rbDistance;
-      counter ++;
+      return;
     }
-    delay(100);
+      while (abs(error) > ERROR_RIGHT && counter < CALI_ANGLE_COUNTER)
+      {
+        if (error > 0)
+        {
+          md.setSpeeds(-100, 100);
+          delay(abs(error * 40));
+          md.setBrakes(300, 300);
+        }
+        else
+        {
+          md.setSpeeds(100, -100);
+          delay(abs(error * 40));
+          md.setBrakes(300, 300);
+        }
+        delay(10);
+        rfDistance = sensorCaliDistance(RF) + R_OFFSET;
+        rbDistance = sensorCaliDistance(RB);
+        error = rfDistance - rbDistance;
+        counter ++;
+      }
+      delay(100);
   }
 
 }
@@ -646,7 +875,7 @@ void caliAngleRightFront()
   frDistance = sensorCaliDistance(FR);
   error = rfDistance - frDistance;
 
-  while (abs(error) > ERROR_RIGHT && counter < 30)
+  while (abs(error) > 0.1 && counter < CALI_ANGLE_COUNTER)
   {
     if (error > 0)
     {
@@ -677,7 +906,7 @@ void caliDistanceFrontR()
   difference = targetDistance - actualDistance;
   if (calculateGrids(FR) == "1" )
   {
-    while (abs(difference) > 0.1 && counter < 30)
+    while (abs(difference) > 0.1 && counter < CALI_DISTANCE_COUNTER)
     {
       if (difference > 0)
       {
@@ -703,14 +932,15 @@ void caliDistanceFrontR()
 
 void caliDistanceFrontL()
 {
-  float targetDistance = 5 + CALI_DISTANCE_OFFSET_L;
-  float actualDistance = sensorCaliDistance(FL);
+  
+  float actualDistance = sensorCaliDistance(FL) + CALI_DISTANCE_OFFSET_L;
+  float targetDistance = 5;
   float difference;
   int counter = 0;
   difference = targetDistance - actualDistance;
   if (calculateGrids(FL) == "1" )
   {
-    while (abs(difference) > 0.1 && counter < 30)
+    while (abs(difference) > 0.1 && counter < CALI_DISTANCE_COUNTER)
     {
       if (difference > 0)
       {
@@ -726,7 +956,7 @@ void caliDistanceFrontL()
         md.setBrakes(300, 300); //move backward for 0.2cm
       }
       delay(10);
-      actualDistance = sensorCaliDistance(FL);
+      actualDistance = sensorCaliDistance(FL) + CALI_DISTANCE_OFFSET_L;
       difference = targetDistance - actualDistance;
       counter ++;
     }
@@ -744,90 +974,55 @@ float sensorCaliDistance(int sensor)
   {
 
     case FL:
-      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-
         med.add(analogRead(FL));
-        //Serial.println(analogRead(FL));
       }
       //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
       middle = med.getMedian();
-      //add formula for distance calculation
       voltage = middle / 1023 * 5;
-      //voltage = med.getMedian();
-
-      //Distance = -2.0927 * pow(voltage, 3) + 16.475 * voltage * voltage -47.533 * voltage + 52.481;
       Distance = -6.3295 * pow(voltage, 3) + 45.689 * voltage * voltage - 113.84 * voltage + 101.02;
       //distance =
       return Distance;
 
     case FR:
-      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-
         med.add(analogRead(FR));
       }
-      //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
-      //add formula for distance calculation
       middle = med.getMedian();
       voltage = middle / 1023 * 5;
-      //voltage = med.getMedian();
-      //Distance = -4.4405 * pow(voltage, 3) + 30.795 * voltage * voltage -76.011 * voltage + 70.041;
       Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage - 43.971 * voltage + 49.982;
       //distance =
       return Distance;
     case RF:
-      //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-
         med.add(analogRead(RF));
       }
-      //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
-      //add formula for distance calculation
-      // voltage = middle / 1023 * 5; middle = med.getMedian();
       middle = med.getMedian();
       voltage = middle / 1023 * 5;
-      //voltage = middle / 1023 * 5;
       Distance = -1.7829 * pow(voltage, 3) + 14.583 * voltage * voltage + -43.971 * voltage + 49.982;
-      //distance =
       return Distance;
     case RB:
       //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-
         med.add(analogRead(RB));
       }
-      //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
-      //add formula for distance calculation
-      // voltage = middle / 1023 * 5;
       middle = med.getMedian();
       voltage = middle / 1023 * 5;
-      //voltage = middle / 1023 * 5;
       Distance = -3.3307 * pow(voltage, 3) + 24.122 * voltage * voltage - 62.573 * voltage + 63.155; //doenst works when distance less than 2.5cm
-      //distance =
       return Distance;
     case FC:
       //RunningMedian med = RunningMedian(NUM_SENSOR_READINGS_CALI);
       for (int i = 0; i < NUM_SENSOR_READINGS_CALI; i++)
       {
-
         med.add(analogRead(FC));
       }
-      //Sort(caliReading, NUM_SENSOR_READINGS_CALI);
-      //middle = median(caliReading, NUM_SENSOR_READINGS_CALI);
-      //add formula for distance calculation
-      // voltage = middle / 1023 * 5;
       middle = med.getMedian();
       voltage = middle / 1023 * 5;
       Distance = -1.6918 * pow(voltage, 3) + 13.651 * voltage * voltage - 40.899 * voltage + 47.82; //doenst works when distance less than 2.5cm
-      //distance =
       return Distance;
 
   }
@@ -858,7 +1053,7 @@ void resetPID() {
 
 
 void goStraightInGrids(long grids) {
-  long distance = grids * 9500;//9550;//9600;//9630;//9500;//9700;//9800;//9900;//10100;//10200;//10300//10500;//10800;
+  long distance = grids * 9510;//9500;//9480;//9500;//9550;//9600;//9630;//9500;//9700;//9800;//9900;//10100;//10200;//10300//10500;//10800;
 
   while (true) {
     if (total_Dis >= distance) {
@@ -877,7 +1072,7 @@ void goStraightInGrids(long grids) {
   restartPID();
 }
 
-/*
+
 
   void goStraightInGridsFast(long grids) {
   long distance = grids * 11175;
@@ -887,16 +1082,24 @@ void goStraightInGrids(long grids) {
       md.setBrakes(400, 400);
       break;
     } else {
-      moveForward();
+      moveForward_Fast();
       total_Dis = total_Dis + input_ML + input_MR;
     }
+
+    //checkFront()
+    
   }
   delay(50);
   restartPID();
   }
 
 
+  void checkFront(){
+    
+  }
 
+
+/*
   void goBackInGrids(long grids) {
   long distance = grids * 10100;
   while (true) {
@@ -1015,13 +1218,19 @@ void moveForward(long distance) {
   else {
   */
   md.setSpeeds(-pidOutput_ML * 150, -pidOutput_MR * 150);
-  
+  delayMicroseconds(5000);
+}
 
+void moveForward_Fast() {
+ // pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
+  pidCalculation(kp_MR_Fast, ki_MR_Fast, kd_MR_Fast, kp_ML_Fast, ki_ML_Fast, kd_ML_Fast, setpoint);
+  md.setSpeeds(-pidOutput_ML * 150, -pidOutput_MR * 150);
   delayMicroseconds(5000);
 }
 
 void moveForwardSlow() {
-  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint / 2);
+  //pidCalculation(kp_MR_Long, ki_MR_Long, kd_MR_Long, kp_ML_Long, ki_ML_Long, kd_ML_Long, setpoint / 2);
+  pidCalculation(kp_MR, ki_MR, kd_MR, kp_ML, ki_ML, kd_ML, setpoint);
   md.setSpeeds(pidOutput_MR * 150, -pidOutput_ML * 150);
   delayMicroseconds(5000);
 }
@@ -1043,21 +1252,21 @@ void rotateLeft(int degree) {
   float offset = 0.1;
   float output;
   float dis = (degree + LEFT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 380;
-  int right_speed = 380;
+  int left_speed = 300;
+  int right_speed = 300;
   float actual_distance = (dis * 405);
   delay(1);
   md.setSpeeds(left_speed, -right_speed);
   resetPID();
   while (left_encoder_val2 < actual_distance) {
     output = pidControlForward(left_encoder_val, right_encoder_val);
-    if (left_encoder_val2 <= 16)
+    if (left_encoder_val2 <= 8)
     {
       md.setSpeeds(offset * left_speed, offset * (-right_speed + output));
       offset += 0.1;
       //Serial.println(left_speed*offset);
     }
-    else if (actual_distance - left_encoder_val2 <= 16)
+    else if (actual_distance - left_encoder_val2 <= 8)
     {
       md.setSpeeds(offset * left_speed, offset * (-right_speed + output));
       offset -= 0.1;
@@ -1085,8 +1294,8 @@ void rotateLeft(int degree) {
 void rotateRight(int degree) {
   float output;
   float dis = (degree + RIGHT_ROTATION_DEGREE_OFFSET) / 90.0;
-  int left_speed = 380;
-  int right_speed = 380 ;
+  int left_speed = 300;
+  int right_speed = 300;
   float actual_distance = (dis * 405);
   float offset = 0.1;
   delay(1);
