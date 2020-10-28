@@ -15,6 +15,7 @@ public class Sensor {
     private int sensorPosCol;
     private DIRECTION sensorDir;
     private final String id;
+    private int sensorVal;
 
     public Sensor(int lowerRange, int upperRange, int row, int col, DIRECTION dir, String id) {
         this.lowerRange = lowerRange;
@@ -31,6 +32,9 @@ public class Sensor {
         this.sensorDir = dir;
     }
 
+    public int getSensorVal(){
+        return this.sensorVal;
+    }
     /**
      * Returns the number of cells to the nearest detected obstacle or -1 if no obstacle is detected.
      */
@@ -88,6 +92,7 @@ public class Sensor {
      * Uses the sensor direction and given value from the actual sensor to update the map.
      */
     public void senseReal(Map exploredMap, int sensorVal) {
+        this.sensorVal = sensorVal;
         switch (sensorDir) {
             case NORTH:
                 processSensorVal(exploredMap, sensorVal, 1, 0);
@@ -110,25 +115,42 @@ public class Sensor {
     private void processSensorVal(Map exploredMap, int sensorVal, int rowInc, int colInc) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
-        // If above fails, check if starting point is valid for sensors with lowerRange > 1.
-        for (int i = 1; i < this.lowerRange; i++) {
-            int row = this.sensorPosRow + (rowInc * i);
-            int col = this.sensorPosCol + (colInc * i);
-
-            if (!exploredMap.checkValidCoordinates(row, col)) return;
-            if (exploredMap.getCell(row, col).getIsObstacle()) return;
-        }
+        //If above fails, check if starting point is valid for sensors with lowerRange > 1.
+//         for (int i = 1; i < this.lowerRange; i++) {
+//             int row = this.sensorPosRow + (rowInc * i);
+//             int col = this.sensorPosCol + (colInc * i);
+//
+//             if (!exploredMap.checkValidCoordinates(row, col)) return;
+//             if (exploredMap.getCell(row, col).getIsObstacle()) return;
+//         }
 
         // Update map according to sensor's value.
         for (int i = this.lowerRange; i <= this.upperRange; i++) {
             int row = this.sensorPosRow + (rowInc * i);
             int col = this.sensorPosCol + (colInc * i);
+            int prevRow = this.sensorPosRow + (rowInc * (i-1));
+            int prevCol = this.sensorPosCol + (colInc * (i-1));
 
             if (!exploredMap.checkValidCoordinates(row, col)) continue;
+            // if is explored, don't set obstacle
 
+            if (!id.equals("SRFL") && !id.equals("SRFC") && !id.equals("SRFR") && !id.equals("SRRB") && exploredMap.getCell(row, col).getIsExplored()) continue;
+//            if (id.equals("LRL") && exploredMap.getCell(row, col).getIsExplored()) continue;
+
+//            if(sensorVal == -1 ){ //handle sensor value if -1; to prevent from going beyond set obstacle; don't explore beyond
+
+            if(exploredMap.getCell(prevRow, prevCol).getIsObstacle()) return;
+
+            //}
             exploredMap.getCell(row, col).setIsExplored(true);
 
             if (sensorVal == i) {
+                // if((id.equals("SRRB") || id.equals("LRL")) && exploredMap.getCell(row, col).getIsExplored()){
+                //     return;
+                // }
+                if(!exploredMap.getCell(row, col).getIsObstacle()){ /** Override the empty grid, set it as obstacle if detected*/
+                    System.out.println("Shakingggggg .........");
+                }
                 exploredMap.setObstacleCell(row, col, true);
                 break;
             }
@@ -136,6 +158,7 @@ public class Sensor {
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.getCell(row, col).getIsObstacle()) {
                 if (id.equals("SRFL") || id.equals("SRFC") || id.equals("SRFR")) {
+                    System.out.println("Overwriting: [row, col]: "+row+" "+col);
                     exploredMap.setObstacleCell(row, col, false);
                 } else {
                     break;

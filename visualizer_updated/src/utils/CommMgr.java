@@ -13,11 +13,14 @@ public class CommMgr {
 
     public static final String EX_START = "EX_START";       // Android --> PC
     public static final String FP_START = "FP_START";       // Android --> PC
-    public static final String MAP_STRINGS = "MAP";         // PC --> Android
-    public static final String BOT_POS = "BOT_POS";         // PC --> Android
-    public static final String BOT_START = "BOT_START";     // PC --> Arduino
+    public static final String TO_ANDROID = "TO_ANDROID";   // PC --> Android
+    public static final String BOT_START = "S";             // PC --> Arduino
     public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
+    public static final String CALIBRATE = "C";             // PC --> Arduino
     public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
+    public static final String CAMERA = "NID";              // PC --> Rpi
+    public static final String DONE_EX = "DONE_EX";         // PC --> Anroid
+    public static final String FP_READY = "FP_READY";       // PC --> Android
 
     private static CommMgr commMgr = null;
     private static Socket conn = null;
@@ -39,7 +42,8 @@ public class CommMgr {
         System.out.println("Opening connection...");
 
         try {
-            String HOST = "192.168.16.2";
+            String HOST = "192.168.16.1";
+            // String HOST = "192.168.16.2";
             int PORT = 5560;
             conn = new Socket(HOST, PORT);
 
@@ -88,11 +92,21 @@ public class CommMgr {
         try {
             String outputMsg;
             if (msg == null) {
-                outputMsg = msgType + "\n";
-                outputMsg = "2|1|" + outputMsg;
-            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
-                outputMsg = msgType + " " + msg + "\n";
-            } else {
+                outputMsg = "2|1|" + msgType + "\n";
+            }
+            else if (msgType.equals(TO_ANDROID)){
+                outputMsg = "2|0|" + msg;
+            } 
+            else if (msgType.equals(DONE_EX) || msgType.equals(FP_READY)){
+                outputMsg = "2|0|STA|" + msg + "\n";   
+            }
+            else if(msgType.equals(INSTRUCTIONS)) {
+                outputMsg = "2|1|" + msg + "\n";
+            }
+            else if (msgType.equals(CAMERA)){
+                    outputMsg = msg + "\n";
+            }
+            else {
                 outputMsg = msgType + "\n" + msg + "\n";
             }
 
