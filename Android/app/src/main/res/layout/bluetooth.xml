@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#383e56"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    tools:context=".MapTab">
+    <!-- another color #17A398-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bt_card">
+
+        <Button
+            android:id="@+id/btnFindUnpairedDevices"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:layout_marginLeft="400dp"
+            android:background="@drawable/bg_btn_ripple"
+            android:text="@string/btn_discover"
+            android:layout_below="@+id/deviceList"
+            android:textColor="#FFFFFF" />
+
+        <ImageView
+            android:id="@+id/imgRaspberry"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_below="@+id/txtBTHeader"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/raspberry" />
+
+        <ListView
+            android:id="@+id/lvNewDevices"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_below="@+id/txtBTHeader"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"></ListView>
+
+        <ListView
+            android:id="@+id/deviceList"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_below="@+id/lvNewDevices"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="20dp"></ListView>
+
+        <TextView
+            android:id="@+id/txtBTHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:text="@string/txt_btHeaderText"
+            android:textColor="#C41C4A"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/btnGet"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/deviceList"
+            android:layout_marginTop="60dp"
+            android:layout_marginLeft="200dp"
+            android:background="@drawable/bg_btn_ripple"
+            android:text="Show Paired"
+            android:textColor="#FFFFFF" />
+
+    </RelativeLayout>
+
+
+</FrameLayout>

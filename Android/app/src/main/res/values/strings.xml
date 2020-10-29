@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">MDP-16</string>
+
+    <string name="bluetoothDefault">Bluetooth: Not Connected</string>
+
+    <string name="discover">Discover</string>
+    <string name="enter_text_here">Enter Text Here</string>
+    <string name="send">Send</string>
+    <string name="incoming_messages">Incoming Messages</string>
+
+    <string name="tab_BTText">Connect</string>
+    <string name="tab_MapText">Arena</string>
+    <string name="tab_CommText">Message</string>
+
+    <string name="btn_up">Up</string>
+    <string name="btn_down">Down</string>
+    <string name="btn_left">Left</string>
+    <string name="btn_right">Right</string>
+    <string name="btn_start">Fastest</string>
+    <string name="btn_explore">Explore</string>
+    <string name="btn_reset">Reset</string>
+    <string name="btn_waypoint_on">Waypoint On</string>
+    <string name="btn_waypoint_off">Waypoint Off</string>
+    <string name="btn_tilt_on">Tilt On</string>
+    <string name="btn_tilt_off">Tilt Off</string>
+    <string name="btn_update">Update</string>
+    <string name="btn_switch">Auto</string>
+    <string name="btn_switchOn">On</string>
+    <string name="btn_switchOff">Off</string>
+    <string name="btn_tilt">Tilt</string>
+    <string name="btn_robotstatus">Robot Status: N/A</string>
+
+    <string name="btn_discover">Search</string>
+    <string name="txt_btHeaderText">Connect to your Robot</string>
+
+    <string name="btn_f1">F1 btn</string>
+    <string name="btn_f2">F2 btn</string>
+    <string name="btn_reconfigure">Reconfigure</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="textView_F1Old">ABCDEF</string>
+    <string name="enter_text_hereF1">Enter new F1 text Here</string>
+    <string name="textView_F2Old">ABCDEF</string>
+    <string name="enter_text_hereF2">Enter new F2 text Here</string>
+
+</resources>
