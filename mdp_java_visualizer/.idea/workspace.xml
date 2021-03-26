@@ -20,44 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d3b0c79-9ec6-496b-9a7a-603d639548ed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../Project-MDP-Group16.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/ExplorationAlgo$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/ExplorationAlgo$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/ExplorationAlgo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/ExplorationAlgo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/FastestPathAlgo$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/FastestPathAlgo$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/FastestPathAlgo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/algorithms/FastestPathAlgo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Cell.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Cell.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/GraphicsConstants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/GraphicsConstants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map$_DisplayCell.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map$_DisplayCell.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/Map.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/MapConstants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/map/MapConstants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Robot$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Robot$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Robot.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Robot.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$DIRECTION.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$DIRECTION.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$MOVEMENT.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants$MOVEMENT.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/RobotConstants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Sensor$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Sensor$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Sensor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/robot/Sensor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1CoverageExploration.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1CoverageExploration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1Exploration.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1Exploration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1FastestPath.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1FastestPath.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1TimeExploration.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$1TimeExploration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$4$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$4$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$5$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$5$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator$5.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/simulator/Simulator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/utils/CommMgr.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/utils/CommMgr.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/mdp_java_visualizer/utils/MapDescriptor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/mdp_java_visualizer/utils/MapDescriptor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/robot/Robot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/robot/Robot.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +45,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -120,6 +84,9 @@
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="3d3b0c79-9ec6-496b-9a7a-603d639548ed" name="Default Changelist" comment="" />
